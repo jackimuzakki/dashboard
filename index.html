@@ -1,0 +1,507 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2775.2">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+    span.Apple-tab-span {white-space:pre}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="id"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;Digimap Staff Portal&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>:root {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--bg-main: #F4EEFF; --card-bg: #FFFFFF; --primary: #8C6DFD; --primary-light: #B49BFF;<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>--text-main: #2D2A4A; --text-muted: #8E8BA7; --shadow-soft: 0 10px 25px rgba(140, 109, 253, 0.08);<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>--radius-large: 24px; --radius-medium: 16px; --accent-green: #4ADE80; --accent-red: #FB7185; --accent-orange: #FBBF24;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>body { background-color: var(--bg-main); color: var(--text-main); display: flex; flex-direction: column; align-items: center; padding: 20px; padding-bottom: 80px; }</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.nav { background: var(--card-bg); padding: 12px 20px; border-radius: 40px; display: flex; gap: 5px; box-shadow: 0 15px 35px rgba(140,109,253,0.15); position: fixed; bottom: 20px; z-index: 100; flex-wrap: nowrap; justify-content: space-between; width: 90%; max-width: 500px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.nav button { background: transparent; border: none; padding: 12px 18px; font-weight: 600; color: var(--text-muted); cursor: pointer; border-radius: 30px; transition: all 0.3s ease; font-size: 13px; display: flex; flex-direction: column; align-items: center; gap: 4px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.nav button.active { background: var(--primary); color: white; box-shadow: 0 8px 15px rgba(140,109,253,0.3); }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.nav-icon { font-size: 18px; }</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.tab-content { display: none; width: 100%; max-width: 500px; animation: fadeIn 0.5s ease; padding-bottom: 20px;}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.tab-content.active { display: block; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>@keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.card { background: var(--card-bg); padding: 30px; border-radius: var(--radius-large); box-shadow: var(--shadow-soft); margin-bottom: 20px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.card h2 { text-align: center; margin-bottom: 25px; font-weight: 700; font-size: 22px; color: var(--text-main); }</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>label { font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; display: block; margin-top: 15px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>input[type="file"], input[type="password"] { width: 100%; padding: 16px; border: 2px solid #F0EDFF; border-radius: var(--radius-medium); margin-bottom: 15px; background: #FAFAFF; font-size: 14px; outline: none; transition: 0.3s; color: var(--text-main); }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>input[type="password"]:focus { border-color: var(--primary); background: #FFF; box-shadow: 0 0 0 4px rgba(140,109,253,0.1); }</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.btn-primary { width: 100%; background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; padding: 16px; border: none; border-radius: var(--radius-medium); font-size: 15px; font-weight: 600; cursor: pointer; transition: 0.3s; margin-top: 10px; box-shadow: 0 10px 20px rgba(140,109,253,0.25); }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(140,109,253,0.35); }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.btn-primary:disabled { background: #D4C9FF; cursor: not-allowed; box-shadow: none; transform: none; }</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.btn-outline { width: 100%; background: transparent; color: var(--primary); padding: 15px; border: 2px solid var(--primary); border-radius: var(--radius-medium); font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 15px; transition: 0.2s; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.btn-outline:hover { background: #F4EEFF; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>#status { margin-top: 20px; text-align: center; font-weight: 600; color: var(--accent-green); font-size: 14px; }</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.dropdown-container { text-align: center; margin-bottom: 25px; display: flex; flex-direction: column; align-items: center; gap: 12px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>select, input[type="text"].search-box { padding: 16px 20px; border-radius: 30px; border: 2px solid #FFF; font-size: 14px; font-weight: 600; color: var(--text-main); background: var(--card-bg); width: 100%; outline: none; box-shadow: var(--shadow-soft); transition: 0.3s; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>select { cursor: pointer; appearance: none; text-align: center; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>select:focus, input[type="text"].search-box:focus { border-color: var(--primary); }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>input[type="text"].search-box::placeholder { color: var(--text-muted); font-weight: 500; }</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.hero-header { background: linear-gradient(135deg, var(--primary), var(--primary-light)); border-radius: var(--radius-large); padding: 25px; color: white; margin-bottom: 25px; position: relative; overflow: hidden; box-shadow: 0 15px 30px rgba(140,109,253,0.2); }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.hero-header::after { content: ''; position: absolute; top: -30px; right: -30px; width: 120px; height: 120px; background: rgba(255,255,255,0.1); border-radius: 50%; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.hero-header::before { content: ''; position: absolute; bottom: -20px; left: 20px; width: 60px; height: 60px; background: rgba(255,255,255,0.1); border-radius: 50%; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.hero-title { font-size: 14px; font-weight: 500; opacity: 0.9; margin-bottom: 5px; z-index: 2; position: relative;}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.hero-name { font-size: 26px; font-weight: 700; z-index: 2; position: relative;}</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 25px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.kpi-card { background: var(--card-bg); padding: 20px 15px; border-radius: var(--radius-large); box-shadow: var(--shadow-soft); display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.kpi-bg-icon { position: absolute; right: -10px; bottom: -10px; font-size: 60px; opacity: 0.03; z-index: 0; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.kpi-title { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-bottom: 8px; z-index: 1; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.kpi-value { font-size: 20px; font-weight: 700; color: var(--text-main); z-index: 1; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.kpi-rank-badge { position: absolute; top: 15px; right: 15px; background: #FEF3C7; color: #D97706; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.section-title { font-size: 16px; font-weight: 700; color: var(--text-main); margin: 25px 0 15px 5px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>#qtyKPI { display: flex; gap: 12px; margin-bottom: 25px; overflow-x: auto; padding-bottom: 10px; -ms-overflow-style: none; scrollbar-width: none; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>#qtyKPI::-webkit-scrollbar { display: none; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.qty-card { background: var(--card-bg); padding: 15px; border-radius: var(--radius-medium); box-shadow: var(--shadow-soft); text-align: center; min-width: 90px; flex-shrink: 0; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.qty-emoji { font-size: 24px; margin-bottom: 8px; background: var(--bg-main); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px auto; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.qty-label { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-bottom: 2px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.qty-val { font-size: 18px; font-weight: 700; color: var(--primary); }<span class="Apple-converted-space"> </span></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.detail-card { background: var(--card-bg); padding: 22px; border-radius: var(--radius-large); box-shadow: var(--shadow-soft); margin-bottom: 15px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.detail-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.detail-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.detail-title { font-size: 14px; font-weight: 600; color: var(--text-main); }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.stat-row { display: flex; justify-content: space-between; margin-bottom: 5px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.stat-label { font-size: 12px; color: var(--text-muted); }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.stat-val { font-size: 14px; font-weight: 700; color: var(--text-main); }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.progress-bar-container { width: 100%; background-color: #F0EDFF; border-radius: 10px; height: 8px; margin-top: 10px; overflow: hidden; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.progress-bar { height: 100%; border-radius: 10px; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.loading-text { text-align: center; font-weight: 500; color: var(--text-muted); display: none; margin: 20px 0; font-size: 14px; }</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.table-container { background: var(--card-bg); border-radius: var(--radius-large); box-shadow: var(--shadow-soft); overflow: hidden; margin-bottom: 25px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>table { width: 100%; border-collapse: collapse; text-align: left; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>th { background: #FAFAFF; color: var(--text-muted); padding: 16px; font-weight: 600; font-size: 12px; text-transform: uppercase; border-bottom: 1px solid #F0EDFF; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>td { padding: 16px; border-bottom: 1px solid #F8F7FF; color: var(--text-main); font-size: 13px; font-weight: 500; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>tr:last-child td { border-bottom: none; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>tr:nth-child(even) { background-color: #FCFBFF; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.qty-badge { background: #EEF2FF; color: var(--primary); padding: 6px 12px; border-radius: 20px; font-weight: 700; font-size: 13px; display: inline-block; min-width: 45px; text-align: center; }</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.payslip { background: #FFFFFF; padding: 0; border-radius: var(--radius-large); margin-top: 10px; box-shadow: var(--shadow-soft); overflow: hidden; border: 1px solid #F0EDFF; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.payslip-header { background: linear-gradient(135deg, var(--primary), var(--primary-light)); padding: 25px; text-align: center; color: white; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.payslip-header h3 { font-size: 18px; font-weight: 700; opacity: 0.9; margin-bottom: 5px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.payslip-header h2 { font-size: 24px; font-weight: 800; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.payslip-body { padding: 25px; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.payslip-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed #E2E8F0; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.payslip-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.payslip-label { font-size: 13px; color: var(--text-muted); font-weight: 500; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.payslip-value { font-size: 15px; font-weight: 600; color: var(--text-main); }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.payslip-total-box { background: #FAFAFF; padding: 20px; border-radius: var(--radius-medium); text-align: center; margin-top: 15px; border: 1px solid #F0EDFF; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.payslip-total-label { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-bottom: 5px; text-transform: uppercase;}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.payslip-total-val { font-size: 26px; color: var(--primary); font-weight: 800; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.payslip-note { margin-top: 20px; font-size: 11px; color: #94A3B8; text-align: center; line-height: 1.5; background: #F8FAFC; padding: 15px; border-radius: 12px; }</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.c-blue { color: #3B82F6; } .bg-blue { background: rgba(59, 130, 246, 0.1); } .bar-blue { background-color: #3B82F6; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.c-purple { color: #8B5CF6; } .bg-purple { background: rgba(139, 92, 246, 0.1); } .bar-purple { background-color: #8B5CF6; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.c-orange { color: #F59E0B; } .bg-orange { background: rgba(245, 158, 11, 0.1); } .bar-orange { background-color: #F59E0B; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.c-green { color: #10B981; } .bg-green { background: rgba(16, 185, 129, 0.1); }</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="nav"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button id="btnTabDashboard" class="active" onclick="switchTab('dashboard')"&gt;&lt;span class="nav-icon"&gt;📊&lt;/span&gt;&lt;span style="font-size: 10px;"&gt;Target&lt;/span&gt;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button id="btnTabSoh" onclick="switchTab('soh')"&gt;&lt;span class="nav-icon"&gt;📦&lt;/span&gt;&lt;span style="font-size: 10px;"&gt;Stok&lt;/span&gt;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button id="btnTabBonus" onclick="switchTab('bonus')"&gt;&lt;span class="nav-icon"&gt;💳&lt;/span&gt;&lt;span style="font-size: 10px;"&gt;Slip Gaji&lt;/span&gt;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;button id="btnTabUpload" onclick="switchTab('upload')"&gt;&lt;span class="nav-icon"&gt;⚙️&lt;/span&gt;&lt;span style="font-size: 10px;"&gt;Admin&lt;/span&gt;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="tab-upload" class="tab-content"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;h2&gt;Admin Panel&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;p style="text-align:center; font-size:12px; color:var(--text-muted); margin-bottom: 20px;"&gt;Upload file data Excel/CSV terbaru.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;label&gt;1. File SPW (Sales)&lt;/label&gt;&lt;input type="file" id="fileSPW" accept=".xlsx, .xls, .csv"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;label&gt;2. File MSR (SKU Info)&lt;/label&gt;&lt;input type="file" id="fileMSR" accept=".xlsx, .xls, .csv"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;label&gt;3. File Stock Position&lt;/label&gt;&lt;input type="file" id="fileSTOCK" accept=".xlsx, .xls, .csv"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button id="btnUpload" class="btn-primary" onclick="uploadData()"&gt;Sinkronisasi Data&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div id="status"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="tab-dashboard" class="tab-content active"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="dropdown-container"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;select id="staffSelect" onchange="showPersonalData()"&gt;&lt;option value=""&gt;⏳ Memuat Data Staff...&lt;/option&gt;&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="loadingDash" class="loading-text"&gt;Menyiapkan dashboard Anda...&lt;/div&gt;</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="storeView" style="display:none;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="hero-header"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="hero-title"&gt;Overview Toko&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="hero-name"&gt;Digimap Roxy&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="kpi-grid"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="kpi-card"&gt;&lt;div class="kpi-bg-icon"&gt;💰&lt;/div&gt;&lt;div class="kpi-title"&gt;Total Sales&lt;/div&gt;&lt;div class="kpi-value" id="valStoreSales"&gt;Rp 0&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="kpi-card"&gt;&lt;div class="kpi-bg-icon"&gt;🎯&lt;/div&gt;&lt;div class="kpi-title"&gt;Target Toko&lt;/div&gt;&lt;div class="kpi-value" id="valStoreTarget" style="color: var(--text-muted); font-size: 16px;"&gt;Rp 0&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="kpi-card"&gt;&lt;div class="kpi-bg-icon"&gt;⭐&lt;/div&gt;&lt;div class="kpi-title"&gt;Total Poin&lt;/div&gt;&lt;div class="kpi-value c-purple" id="valStorePoint"&gt;0&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="kpi-card"&gt;&lt;div class="kpi-bg-icon"&gt;🚀&lt;/div&gt;&lt;div class="kpi-title"&gt;Pencapaian&lt;/div&gt;&lt;div class="kpi-value c-green" id="valStorePct"&gt;0%&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="section-title"&gt;Breakdown LOB&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="detail-card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="detail-card-header"&gt;&lt;div class="detail-icon bg-blue c-blue"&gt;📱&lt;/div&gt;&lt;div class="detail-title"&gt;Grup Device&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="stat-row"&gt;&lt;div class="stat-label"&gt;Sales: &lt;span class="stat-val" id="valStoreDeviceSales"&gt;Rp 0&lt;/span&gt;&lt;/div&gt;&lt;div class="stat-label"&gt;Target: &lt;span class="stat-val" id="valStoreDeviceTarget" style="font-weight:400;"&gt;Rp 0&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="progress-bar-container"&gt;&lt;div class="progress-bar bar-blue" id="barStoreDevice" style="width: 0%;"&gt;&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="detail-card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="detail-card-header"&gt;&lt;div class="detail-icon bg-purple c-purple"&gt;🎧&lt;/div&gt;&lt;div class="detail-title"&gt;Grup Accessories&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="stat-row"&gt;&lt;div class="stat-label"&gt;Sales: &lt;span class="stat-val" id="valStoreAccSales"&gt;Rp 0&lt;/span&gt;&lt;/div&gt;&lt;div class="stat-label"&gt;Target: &lt;span class="stat-val" id="valStoreAccTarget" style="font-weight:400;"&gt;Rp 0&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="progress-bar-container"&gt;&lt;div class="progress-bar bar-purple" id="barStoreAcc" style="width: 0%;"&gt;&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="detail-card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="detail-card-header"&gt;&lt;div class="detail-icon bg-orange c-orange"&gt;🛡️&lt;/div&gt;&lt;div class="detail-title"&gt;Grup VAS (Layanan)&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="stat-row"&gt;&lt;div class="stat-label"&gt;Sales: &lt;span class="stat-val" id="valStoreVasSales"&gt;Rp 0&lt;/span&gt;&lt;/div&gt;&lt;div class="stat-label"&gt;Target: &lt;span class="stat-val" id="valStoreVasTarget" style="font-weight:400;"&gt;Rp 0&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="progress-bar-container"&gt;&lt;div class="progress-bar bar-orange" id="barStoreVas" style="width: 0%;"&gt;&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="section-title" style="margin-top:35px;"&gt;🏆 Klasemen Staf&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="table-container"&gt;&lt;table id="rankTable"&gt;&lt;thead&gt;&lt;tr&gt;&lt;th style="width:50px; text-align:center;"&gt;#&lt;/th&gt;&lt;th&gt;Nama&lt;/th&gt;&lt;th style="text-align:right;"&gt;Sales&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody id="rankTableBody"&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="staffView" style="display:none;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="hero-header"&gt;&lt;div class="hero-title"&gt;Performa Saya&lt;/div&gt;&lt;div class="hero-name" id="heroStaffName"&gt;Nama Staf&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="kpi-grid"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="kpi-card"&gt;&lt;div class="kpi-rank-badge" id="valMyRank"&gt;#1&lt;/div&gt;&lt;div class="kpi-bg-icon"&gt;💰&lt;/div&gt;&lt;div class="kpi-title"&gt;Total Sales&lt;/div&gt;&lt;div class="kpi-value" id="valMySales"&gt;Rp 0&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="kpi-card"&gt;&lt;div class="kpi-bg-icon"&gt;🎯&lt;/div&gt;&lt;div class="kpi-title"&gt;Target Saya&lt;/div&gt;&lt;div class="kpi-value" id="valMyTarget" style="color: var(--text-muted); font-size: 16px;"&gt;Rp 0&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="kpi-card" style="grid-column: span 2; align-items: center; text-align: center;"&gt;&lt;div class="kpi-title"&gt;Status Target&lt;/div&gt;&lt;div class="kpi-value" id="valMySisa" style="font-size:24px;"&gt;Rp 0&lt;/div&gt;&lt;div style="margin-top: 5px; font-size: 12px; color: var(--text-muted);"&gt;Pencapaian: &lt;span id="valMyPct" style="font-weight:bold; color:var(--text-main);"&gt;0%&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="section-title"&gt;Perangkat Terjual (Unit)&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div id="qtyKPI"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="qty-card"&gt;&lt;div class="qty-emoji"&gt;📱&lt;/div&gt;&lt;div class="qty-val" id="qtyIphone"&gt;0&lt;/div&gt;&lt;div class="qty-label"&gt;iPhone&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="qty-card"&gt;&lt;div class="qty-emoji"&gt;💻&lt;/div&gt;&lt;div class="qty-val" id="qtyIpad"&gt;0&lt;/div&gt;&lt;div class="qty-label"&gt;iPad&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="qty-card"&gt;&lt;div class="qty-emoji"&gt;🖥️&lt;/div&gt;&lt;div class="qty-val" id="qtyMac"&gt;0&lt;/div&gt;&lt;div class="qty-label"&gt;Mac&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="qty-card"&gt;&lt;div class="qty-emoji"&gt;⌚&lt;/div&gt;&lt;div class="qty-val" id="qtyWatch"&gt;0&lt;/div&gt;&lt;div class="qty-label"&gt;Watch&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="qty-card"&gt;&lt;div class="qty-emoji"&gt;🎧&lt;/div&gt;&lt;div class="qty-val" id="qtyAirpods"&gt;0&lt;/div&gt;&lt;div class="qty-label"&gt;AirPods&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="section-title"&gt;Detail KPI Produk Tambahan&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="detail-card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="detail-card-header"&gt;&lt;div class="detail-icon bg-purple c-purple"&gt;🎧&lt;/div&gt;&lt;div class="detail-title"&gt;Aksesoris &amp; Audio&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="stat-row"&gt;&lt;div class="stat-label"&gt;Sales: &lt;span class="stat-val" id="valAccSales"&gt;Rp 0&lt;/span&gt;&lt;/div&gt;&lt;div class="stat-label"&gt;Target: &lt;span class="stat-val" id="valAccTarget" style="font-weight:400;"&gt;Rp 0&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="progress-bar-container"&gt;&lt;div class="progress-bar bar-purple" id="barAcc" style="width: 0%;"&gt;&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="detail-card"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="detail-card-header"&gt;&lt;div class="detail-icon bg-blue c-blue"&gt;🛡️&lt;/div&gt;&lt;div class="detail-title"&gt;Layanan Qoala&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="stat-row"&gt;&lt;div class="stat-label"&gt;Sales: &lt;span class="stat-val" id="valQoalaSales"&gt;Rp 0&lt;/span&gt;&lt;/div&gt;&lt;div class="stat-label"&gt;Target: &lt;span class="stat-val" id="valQoalaTarget" style="font-weight:400;"&gt;Rp 0&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="progress-bar-container"&gt;&lt;div class="progress-bar bar-blue" id="barQoala" style="width: 0%;"&gt;&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="tab-soh" class="tab-content"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="dropdown-container"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;input type="text" id="searchInput" class="search-box" placeholder="🔍 Cari nama barang..." onkeyup="renderSOH()"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;select id="catSelect" onchange="renderSOH()"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;option value="Semua"&gt;Tampilkan Semua Kategori&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;option value="iPhone"&gt;📱 iPhone&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;option value="iPad"&gt;💻 iPad&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;option value="Mac"&gt;🖥️ Mac&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;option value="Apple Watch"&gt;⌚ Apple Watch&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;option value="AirPods"&gt;🎧 AirPods&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;option value="Accessories"&gt;🛒 Accessories&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="loadingSOH" class="loading-text" style="display:block;"&gt;Mengecek ketersediaan di gudang...&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="table-container" id="sohTableContainer" style="display:none;"&gt;&lt;table id="sohTable"&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Detail Produk&lt;/th&gt;&lt;th style="text-align:center; width: 70px;"&gt;Stok&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody id="sohTableBody"&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="tab-bonus" class="tab-content"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="card" id="authBox" style="text-align:center;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div style="font-size: 50px; margin-bottom: 10px;"&gt;🔒&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;h2&gt;Akses Slip Gaji&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;p style="font-size:12px; color:var(--text-muted); margin-bottom: 25px;"&gt;Masukkan kredensial Anda untuk melihat estimasi take home pay bulan ini.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;select id="bonusStaffSelect" style="margin-bottom:15px;"&gt;&lt;option value=""&gt;👇 Pilih Nama Kamu 👇&lt;/option&gt;&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;input type="password" id="inputPin" placeholder="PIN Keamanan (Bawaan: 1234)"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="btn-primary" id="btnUnlock" onclick="bukaBrankas()"&gt;Buka Brankas Saya&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div id="loadingBonus" class="loading-text"&gt;Memverifikasi...&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div id="bonusError" style="color:var(--accent-red); font-weight:500; font-size:13px; margin-top:15px; display:none;"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="payslipBox" style="display:none;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="payslip"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="payslip-header"&gt;&lt;h3&gt;Estimasi Gajian&lt;/h3&gt;&lt;h2 id="slipNamaHeader"&gt;Nama Staff&lt;/h2&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="payslip-body"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="payslip-row"&gt;&lt;div class="payslip-label"&gt;Gaji Pokok&lt;/div&gt;&lt;div class="payslip-value" id="slipPokok"&gt;Rp 3.013.000&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="payslip-row"&gt;&lt;div class="payslip-label"&gt;Estimasi Insentif&lt;/div&gt;&lt;div class="payslip-value" id="slipBonus"&gt;Rp 0&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="payslip-row" id="rowTunjangan" style="display:none; border-bottom: none; padding-bottom:0;"&gt;&lt;div class="payslip-label c-purple"&gt;Tunjangan Khusus&lt;/div&gt;&lt;div class="payslip-value c-purple" id="slipTunjangan"&gt;Rp 0&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="payslip-total-box"&gt;&lt;div class="payslip-total-label"&gt;Total Take Home Pay&lt;/div&gt;&lt;div class="payslip-total-val" id="slipTotal"&gt;Rp 0&lt;/div&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="payslip-note"&gt;*Catatan: Hitungan insentif belum termasuk (accessories 3rd party, koala, provider dan AirPods)&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="card" style="margin-top:20px;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h3 style="font-size:15px; font-weight:600; margin-bottom:15px; color:var(--text-main);"&gt;Ganti PIN Keamanan&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;input type="password" id="oldPin" placeholder="PIN Lama"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;input type="password" id="newPin" placeholder="PIN Baru (min 4 digit)"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button class="btn-outline" onclick="gantiPin()"&gt;Simpan PIN Baru&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="pinStatus" style="font-size:12px; font-weight:500; text-align:center; margin-top:10px;"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button class="btn-outline" style="border-color:#E2E8F0; color:var(--text-muted); margin-top:10px; background:#FFF;" onclick="tutupBrankas()"&gt;Tutup &amp; Keluar 🔒&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>// ==========================================</p>
+<p class="p1"><span class="Apple-converted-space">    </span>// MASUKKAN URL APPS SCRIPT ANDA DI BAWAH INI</p>
+<p class="p1"><span class="Apple-converted-space">    </span>// ==========================================</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const API_URL = "https://script.google.com/macros/s/AKfycbwQafvOo2JU_75b2wF6h40oqotR101fh9bqml7UGnEsxBE4JHuO-C5EfrKAAmHiVJ4w/exec<span class="Apple-tab-span">	</span>";</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const GAJI_POKOK = 3013000;<span class="Apple-converted-space"> </span></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function switchTab(tabName) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.querySelectorAll('.tab-content').forEach(el =&gt; el.classList.remove('active'));</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.querySelectorAll('.nav button').forEach(el =&gt; el.classList.remove('active'));</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('tab-' + tabName).classList.add('active');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>let btnId = 'btnTab' + tabName.charAt(0).toUpperCase() + tabName.slice(1);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(document.getElementById(btnId)) document.getElementById(btnId).classList.add('active');</p>
+<p class="p2"><span class="Apple-converted-space">      </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(tabName === 'dashboard') loadDashboardData();<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(tabName === 'soh') loadSOHData();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(tabName === 'bonus') loadDashboardData();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function formatRp(angka) { return 'Rp ' + Math.round(Number(angka)).toLocaleString('id-ID').replace(/,/g, '.'); }</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let dashboardData = [];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let storeDataGlobal = null;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function loadDashboardData() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(dashboardData.length &gt; 0) return;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('loadingDash').style.display = 'block';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>fetch(API_URL + "?action=getDashboard")</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.then(response =&gt; response.json())</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.then(data =&gt; renderDashboard(data))</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.catch(err =&gt; console.error(err));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function renderDashboard(data) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('loadingDash').style.display = 'none';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>dashboardData = data.staffList;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>storeDataGlobal = data.storeData;</p>
+<p class="p2"><span class="Apple-converted-space">      </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const select = document.getElementById('staffSelect');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const bonusSelect = document.getElementById('bonusStaffSelect');</p>
+<p class="p2"><span class="Apple-converted-space">      </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>select.innerHTML = '&lt;option value=""&gt;🏢 Lihat Overview Toko&lt;/option&gt;';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>bonusSelect.innerHTML = '&lt;option value=""&gt;👇 Pilih Nama Kamu 👇&lt;/option&gt;';</p>
+<p class="p2"><span class="Apple-converted-space">      </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>dashboardData.forEach(s =&gt; {<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>select.innerHTML += `&lt;option value="${s.name}"&gt;${s.name}&lt;/option&gt;`;<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>bonusSelect.innerHTML += `&lt;option value="${s.name}"&gt;${s.name}&lt;/option&gt;`;<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p2"><span class="Apple-converted-space">      </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('valStoreSales').innerText = formatRp(storeDataGlobal.totalSales);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('valStoreTarget').innerText = formatRp(storeDataGlobal.target);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('valStorePoint').innerText = Math.round(storeDataGlobal.point);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('valStorePct').innerText = Math.round(storeDataGlobal.achieved) + '%';</p>
+<p class="p2"><span class="Apple-converted-space">      </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('valStoreDeviceSales').innerText = formatRp(storeDataGlobal.deviceSales);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('valStoreDeviceTarget').innerText = formatRp(storeDataGlobal.deviceTarget);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('barStoreDevice').style.width = Math.min((storeDataGlobal.deviceTarget &gt; 0 ? storeDataGlobal.deviceSales/storeDataGlobal.deviceTarget*100 : 0), 100) + '%';</p>
+<p class="p2"><span class="Apple-converted-space">      </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('valStoreAccSales').innerText = formatRp(storeDataGlobal.accSales);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('valStoreAccTarget').innerText = formatRp(storeDataGlobal.accTarget);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('barStoreAcc').style.width = Math.min((storeDataGlobal.accTarget &gt; 0 ? storeDataGlobal.accSales/storeDataGlobal.accTarget*100 : 0), 100) + '%';</p>
+<p class="p2"><span class="Apple-converted-space">      </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('valStoreVasSales').innerText = formatRp(storeDataGlobal.vasSales);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('valStoreVasTarget').innerText = formatRp(storeDataGlobal.vasTarget);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('barStoreVas').style.width = Math.min((storeDataGlobal.vasTarget &gt; 0 ? storeDataGlobal.vasSales/storeDataGlobal.vasTarget*100 : 0), 100) + '%';</p>
+<p class="p2"><span class="Apple-converted-space">      </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const tbody = document.getElementById('rankTableBody');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>tbody.innerHTML = '';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>let rankList = [...dashboardData].sort((a,b) =&gt; b.sales - a.sales);</p>
+<p class="p2"><span class="Apple-converted-space">      </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>rankList.forEach((s, idx) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">         </span>let tr = document.createElement('tr');</p>
+<p class="p1"><span class="Apple-converted-space">         </span>let rankIcon = (idx === 0) ? '🥇' : (idx === 1) ? '🥈' : (idx === 2) ? '🥉' : (idx + 1);</p>
+<p class="p1"><span class="Apple-converted-space">         </span>let weightClass = (idx &lt; 3) ? 'font-weight:700; font-size:16px;' : 'font-weight:600; color:var(--text-muted);';</p>
+<p class="p1"><span class="Apple-converted-space">         </span>tr.innerHTML = `&lt;td style="text-align:center; ${weightClass}"&gt;${rankIcon}&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;td style="font-weight:600;"&gt;${s.name.split(' ')[0]}&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;td style="text-align:right; font-weight:700; color:var(--primary);"&gt;${formatRp(s.sales)}&lt;/td&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">         </span>tbody.appendChild(tr);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p1"><span class="Apple-converted-space">      </span>showPersonalData();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function showPersonalData() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const selectedName = document.getElementById('staffSelect').value;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const storeView = document.getElementById('storeView');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const staffView = document.getElementById('staffView');</p>
+<p class="p2"><span class="Apple-converted-space">      </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (!selectedName) { staffView.style.display = 'none'; storeView.style.display = 'block'; return; }</p>
+<p class="p1"><span class="Apple-converted-space">      </span>storeView.style.display = 'none'; staffView.style.display = 'block';</p>
+<p class="p2"><span class="Apple-converted-space">      </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const staff = dashboardData.find(s =&gt; s.name === selectedName);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (staff) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('heroStaffName').innerText = staff.name;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('valMySales').innerText = formatRp(staff.sales);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('valMyTarget').innerText = formatRp(staff.target);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('valMyRank').innerText = "#" + staff.rank;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('valMyPct').innerText = Math.round(staff.achieved) + '%';</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>const sisaEl = document.getElementById('valMySisa');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (staff.sales &gt;= staff.target &amp;&amp; staff.target &gt; 0) { sisaEl.innerText = "🎉 TERCAPAI"; sisaEl.style.color = "var(--accent-green)"; }<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>else if (staff.target === 0) { sisaEl.innerText = "Target Kosong"; sisaEl.style.color = "var(--text-muted)"; }<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>else { sisaEl.innerText = formatRp(staff.kekurangan); sisaEl.style.color = "var(--accent-red)"; }</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('qtyIphone').innerText = staff.qty_iphone;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('qtyIpad').innerText = staff.qty_ipad;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('qtyMac').innerText = staff.qty_mac;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('qtyWatch').innerText = staff.qty_aw;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('qtyAirpods').innerText = staff.qty_airpods;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('valAccSales').innerText = formatRp(staff.accSales);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('valAccTarget').innerText = formatRp(staff.accTarget);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('barAcc').style.width = Math.min((staff.accTarget &gt; 0 ? staff.accSales/staff.accTarget*100 : 0), 100) + '%';</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('valQoalaSales').innerText = formatRp(staff.qoalaSales);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('valQoalaTarget').innerText = formatRp(staff.qoalaTarget);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('barQoala').style.width = Math.min((staff.qoalaTarget &gt; 0 ? staff.qoalaSales/staff.qoalaTarget*100 : 0), 100) + '%';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let sohDataGlobal = [];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>function loadSOHData() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (sohDataGlobal.length &gt; 0) { renderSOH(); return; }</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('loadingSOH').style.display = 'block';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('sohTableContainer').style.display = 'none';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>fetch(API_URL + "?action=getSOH")</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.then(res =&gt; res.json())</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.then(data =&gt; { sohDataGlobal = data; document.getElementById('loadingSOH').style.display = 'none'; document.getElementById('sohTableContainer').style.display = 'block'; renderSOH(); })</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.catch(err =&gt; console.error(err));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function renderSOH() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const selectedCat = document.getElementById('catSelect').value;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const searchText = document.getElementById('searchInput').value.toLowerCase().trim();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const tbody = document.getElementById('sohTableBody');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>tbody.innerHTML = '';</p>
+<p class="p2"><span class="Apple-converted-space">      </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>let filtered = sohDataGlobal;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (selectedCat !== 'Semua') filtered = filtered.filter(item =&gt; item.category === selectedCat);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (searchText !== '') filtered = filtered.filter(item =&gt; item.description.toLowerCase().includes(searchText));</p>
+<p class="p2"><span class="Apple-converted-space">      </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (filtered.length === 0) { tbody.innerHTML = '&lt;tr&gt;&lt;td colspan="2" style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;"&gt;❌ Produk tidak ditemukan.&lt;/td&gt;&lt;/tr&gt;'; return; }</p>
+<p class="p2"><span class="Apple-converted-space">      </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>filtered.forEach(item =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let tr = document.createElement('tr');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>tr.innerHTML = `&lt;td&gt;${item.description}&lt;/td&gt;&lt;td style="text-align:center;"&gt;&lt;span class="qty-badge"&gt;${item.qty}&lt;/span&gt;&lt;/td&gt;`;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>tbody.appendChild(tr);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function processFile(file, callback) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>var r = new FileReader();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>r.onload = function(e) { var d = new Uint8Array(e.target.result), wb = XLSX.read(d, {type:"array"}), csv = XLSX.utils.sheet_to_csv(wb.Sheets[wb.SheetNames[0]], {raw:false, dateNF:"DD-MM-YYYY"}); callback(csv); };</p>
+<p class="p1"><span class="Apple-converted-space">      </span>r.readAsArrayBuffer(file);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function uploadData() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>var fSPW = document.getElementById("fileSPW").files[0];</p>
+<p class="p1"><span class="Apple-converted-space">      </span>var fMSR = document.getElementById("fileMSR").files[0];</p>
+<p class="p1"><span class="Apple-converted-space">      </span>var fSTOCK = document.getElementById("fileSTOCK").files[0];</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (!fSPW &amp;&amp; !fMSR &amp;&amp; !fSTOCK) { alert("Pilih minimal satu file untuk diupload!"); return; }</p>
+<p class="p2"><span class="Apple-converted-space">      </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById("btnUpload").disabled = true; document.getElementById("btnUpload").innerText = "⏳ Memproses Data...";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>var spwT = "", msrT = "", stockT = "";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>function sendAll() {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>fetch(API_URL, {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>method: "POST",</p>
+<p class="p1"><span class="Apple-converted-space">          </span>headers: { "Content-Type": "text/plain;charset=utf-8" },</p>
+<p class="p1"><span class="Apple-converted-space">          </span>body: JSON.stringify({ action: "uploadData", spw: spwT, msr: msrT, stock: stockT })</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}).then(res =&gt; res.json()).then(res =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>document.getElementById("status").innerText = res.message; document.getElementById("btnUpload").disabled = false;<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">          </span>document.getElementById("btnUpload").innerText = "Sinkronisasi Data"; dashboardData = []; sohDataGlobal = [];</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}).catch(err =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>document.getElementById("status").innerText = "❌ Gagal koneksi ke server."; document.getElementById("btnUpload").disabled = false;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>var tasks = [];</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (fSPW) tasks.push(function(next) { processFile(fSPW, function(c) { spwT = c; next(); }); });</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (fMSR) tasks.push(function(next) { processFile(fMSR, function(c) { msrT = c; next(); }); });</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (fSTOCK) tasks.push(function(next) { processFile(fSTOCK, function(c) { stockT = c; next(); }); });</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>var step = 0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>function runNext() { if (step &lt; tasks.length) { tasks[step++](runNext); } else { sendAll(); } }</p>
+<p class="p1"><span class="Apple-converted-space">      </span>runNext();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let currentLockedStaff = "";</p>
+<p class="p1"><span class="Apple-converted-space">    </span>function bukaBrankas() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const name = document.getElementById("bonusStaffSelect").value;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const pin = document.getElementById("inputPin").value;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const errBox = document.getElementById("bonusError");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const btn = document.getElementById("btnUnlock");</p>
+<p class="p2"><span class="Apple-converted-space">      </span></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(!name) { errBox.style.display = 'block'; errBox.innerText = "Pilih nama kamu dulu!"; return; }</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(!pin) { errBox.style.display = 'block'; errBox.innerText = "Masukkan PIN keamanan kamu!"; return; }</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>errBox.style.display = 'none'; btn.disabled = true; document.getElementById("loadingBonus").style.display = 'block';</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>fetch(API_URL + "?action=getBonus&amp;name=" + encodeURIComponent(name) + "&amp;pin=" + encodeURIComponent(pin))</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.then(res =&gt; res.json())</p>
+<p class="p1"><span class="Apple-converted-space">        </span>.then(res =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>btn.disabled = false; document.getElementById("loadingBonus").style.display = 'none';</p>
+<p class="p1"><span class="Apple-converted-space">          </span>if(res.success) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>currentLockedStaff = name;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>let tunjanganKhusus = (name.toUpperCase().indexOf("HERMINIA") !== -1) ? 300000 : 0;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if(tunjanganKhusus &gt; 0) { document.getElementById("rowTunjangan").style.display = "flex"; document.getElementById("slipTunjangan").innerText = formatRp(tunjanganKhusus); }</p>
+<p class="p1"><span class="Apple-converted-space">            </span>else { document.getElementById("rowTunjangan").style.display = "none"; }</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById("slipNamaHeader").innerText = name.split(" ")[0];<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById("slipPokok").innerText = formatRp(GAJI_POKOK);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById("slipBonus").innerText = formatRp(res.bonus);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById("slipTotal").innerText = formatRp(GAJI_POKOK + res.bonus + tunjanganKhusus);</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById("authBox").style.display = 'none'; document.getElementById("payslipBox").style.display = 'block';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>document.getElementById("inputPin").value = ""; document.getElementById("pinStatus").innerText = "";</p>
+<p class="p1"><span class="Apple-converted-space">          </span>} else { errBox.style.display = 'block'; errBox.innerText = res.message; }</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}).catch(err =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>btn.disabled = false; document.getElementById("loadingBonus").style.display = 'none'; errBox.style.display = 'block'; errBox.innerText = "Gagal terhubung ke server.";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function gantiPin() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const oldPin = document.getElementById("oldPin").value, newPin = document.getElementById("newPin").value;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const statusBox = document.getElementById("pinStatus");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if(!oldPin || !newPin) { statusBox.style.color = "var(--accent-red)"; statusBox.innerText = "Isi PIN lama &amp; baru terlebih dahulu."; return; }</p>
+<p class="p1"><span class="Apple-converted-space">      </span>statusBox.style.color = "var(--text-muted)"; statusBox.innerText = "Sedang menyimpan...";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>fetch(API_URL, {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>method: "POST",</p>
+<p class="p1"><span class="Apple-converted-space">        </span>headers: { "Content-Type": "text/plain;charset=utf-8" },</p>
+<p class="p1"><span class="Apple-converted-space">        </span>body: JSON.stringify({ action: "updatePin", name: currentLockedStaff, oldPin: oldPin, newPin: newPin })</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}).then(res =&gt; res.json()).then(res =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if(res.success) { statusBox.style.color = "var(--accent-green)"; statusBox.innerText = "✅ Berhasil diperbarui!"; document.getElementById("oldPin").value = ""; document.getElementById("newPin").value = ""; }<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>else { statusBox.style.color = "var(--accent-red)"; statusBox.innerText = "❌ " + res.message; }</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function tutupBrankas() { currentLockedStaff = ""; document.getElementById("payslipBox").style.display = 'none'; document.getElementById("authBox").style.display = 'block'; }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>switchTab('dashboard');</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
