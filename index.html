@@ -37,7 +37,7 @@
     
     .btn-outline { width: 100%; background: transparent; color: var(--primary); padding: 15px; border: 2px solid var(--primary); border-radius: var(--radius-medium); font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 15px; transition: 0.2s; }
     .btn-outline:hover { background: #F4EEFF; }
-    #status { margin-top: 20px; text-align: center; font-weight: 600; color: var(--accent-green); font-size: 14px; }
+    # { margin-top: 20px; text-align: center; font-weight: 600; color: var(--accent-green); font-size: 14px; }
     
     .dropdown-container { text-align: center; margin-bottom: 25px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
     select, input[type="text"].search-box { padding: 16px 20px; border-radius: 30px; border: 2px solid #FFF; font-size: 14px; font-weight: 600; color: var(--text-main); background: var(--card-bg); width: 100%; outline: none; box-shadow: var(--shadow-soft); transition: 0.3s; }
@@ -123,7 +123,7 @@
       <label>2. File MSR (SKU Info)</label><input type="file" id="fileMSR" accept=".xlsx, .xls, .csv">
       <label>3. File Stock Position</label><input type="file" id="fileSTOCK" accept=".xlsx, .xls, .csv">
       <button id="btnUpload" class="btn-primary" onclick="uploadData()">Sinkronisasi Data</button>
-      <div id="status"></div>
+      <div id=""></div>
     </div>
   </div>
 
@@ -146,17 +146,17 @@
       </div>
       <div class="section-title">Breakdown LOB</div>
       <div class="detail-card">
-        <div class="detail-card-header"><div class="detail-icon bg-blue c-blue">📱</div><div class="detail-title">Grup Device</div></div>
+        <div class="detail-card-header"><div class="detail-icon bg-blue c-blue">📱</div><div class="detail-title">Device</div></div>
         <div class="stat-row"><div class="stat-label">Sales: <span class="stat-val" id="valStoreDeviceSales">Rp 0</span></div><div class="stat-label">Target: <span class="stat-val" id="valStoreDeviceTarget" style="font-weight:400;">Rp 0</span></div></div>
         <div class="progress-bar-container"><div class="progress-bar bar-blue" id="barStoreDevice" style="width: 0%;"></div></div>
       </div>
       <div class="detail-card">
-        <div class="detail-card-header"><div class="detail-icon bg-purple c-purple">🎧</div><div class="detail-title">Grup Accessories</div></div>
+        <div class="detail-card-header"><div class="detail-icon bg-purple c-purple">🎧</div><div class="detail-title">Aksesoris</div></div>
         <div class="stat-row"><div class="stat-label">Sales: <span class="stat-val" id="valStoreAccSales">Rp 0</span></div><div class="stat-label">Target: <span class="stat-val" id="valStoreAccTarget" style="font-weight:400;">Rp 0</span></div></div>
         <div class="progress-bar-container"><div class="progress-bar bar-purple" id="barStoreAcc" style="width: 0%;"></div></div>
       </div>
       <div class="detail-card">
-        <div class="detail-card-header"><div class="detail-icon bg-orange c-orange">🛡️</div><div class="detail-title">Grup VAS (Layanan)</div></div>
+        <div class="detail-card-header"><div class="detail-icon bg-orange c-orange">🛡️</div><div class="detail-title">VAS</div></div>
         <div class="stat-row"><div class="stat-label">Sales: <span class="stat-val" id="valStoreVasSales">Rp 0</span></div><div class="stat-label">Target: <span class="stat-val" id="valStoreVasTarget" style="font-weight:400;">Rp 0</span></div></div>
         <div class="progress-bar-container"><div class="progress-bar bar-orange" id="barStoreVas" style="width: 0%;"></div></div>
       </div>
@@ -169,9 +169,9 @@
       <div class="kpi-grid">
         <div class="kpi-card"><div class="kpi-rank-badge" id="valMyRank">#1</div><div class="kpi-bg-icon">💰</div><div class="kpi-title">Total Sales</div><div class="kpi-value" id="valMySales">Rp 0</div></div>
         <div class="kpi-card"><div class="kpi-bg-icon">🎯</div><div class="kpi-title">Target Saya</div><div class="kpi-value" id="valMyTarget" style="color: var(--text-muted); font-size: 16px;">Rp 0</div></div>
-        <div class="kpi-card" style="grid-column: span 2; align-items: center; text-align: center;"><div class="kpi-title">Status Target</div><div class="kpi-value" id="valMySisa" style="font-size:24px;">Rp 0</div><div style="margin-top: 5px; font-size: 12px; color: var(--text-muted);">Pencapaian: <span id="valMyPct" style="font-weight:bold; color:var(--text-main);">0%</span></div></div>
+        <div class="kpi-card" style="grid-column: span 2; align-items: center; text-align: center;"><div class="kpi-title">Kekurangan Target</div><div class="kpi-value" id="valMySisa" style="font-size:24px;">Rp 0</div><div style="margin-top: 5px; font-size: 12px; color: var(--text-muted);">Pencapaian: <span id="valMyPct" style="font-weight:bold; color:var(--text-main);">0%</span></div></div>
       </div>
-      <div class="section-title">Perangkat Terjual (Unit)</div>
+      <div class="section-title">LOB</div>
       <div id="qtyKPI">
         <div class="qty-card"><div class="qty-emoji">📱</div><div class="qty-val" id="qtyIphone">0</div><div class="qty-label">iPhone</div></div>
         <div class="qty-card"><div class="qty-emoji">💻</div><div class="qty-val" id="qtyIpad">0</div><div class="qty-label">iPad</div></div>
@@ -179,14 +179,14 @@
         <div class="qty-card"><div class="qty-emoji">⌚</div><div class="qty-val" id="qtyWatch">0</div><div class="qty-label">Watch</div></div>
         <div class="qty-card"><div class="qty-emoji">🎧</div><div class="qty-val" id="qtyAirpods">0</div><div class="qty-label">AirPods</div></div>
       </div>
-      <div class="section-title">Detail KPI Produk Tambahan</div>
+      <div class="section-title">Others</div>
       <div class="detail-card">
-        <div class="detail-card-header"><div class="detail-icon bg-purple c-purple">🎧</div><div class="detail-title">Aksesoris & Audio</div></div>
+        <div class="detail-card-header"><div class="detail-icon bg-purple c-purple">🎧</div><div class="detail-title">Aksesoris</div></div>
         <div class="stat-row"><div class="stat-label">Sales: <span class="stat-val" id="valAccSales">Rp 0</span></div><div class="stat-label">Target: <span class="stat-val" id="valAccTarget" style="font-weight:400;">Rp 0</span></div></div>
         <div class="progress-bar-container"><div class="progress-bar bar-purple" id="barAcc" style="width: 0%;"></div></div>
       </div>
       <div class="detail-card">
-        <div class="detail-card-header"><div class="detail-icon bg-blue c-blue">🛡️</div><div class="detail-title">Layanan Qoala</div></div>
+        <div class="detail-card-header"><div class="detail-icon bg-blue c-blue">🛡️</div><div class="detail-title">Qoala</div></div>
         <div class="stat-row"><div class="stat-label">Sales: <span class="stat-val" id="valQoalaSales">Rp 0</span></div><div class="stat-label">Target: <span class="stat-val" id="valQoalaTarget" style="font-weight:400;">Rp 0</span></div></div>
         <div class="progress-bar-container"><div class="progress-bar bar-blue" id="barQoala" style="width: 0%;"></div></div>
       </div>
@@ -214,7 +214,7 @@
     <div class="card" id="authBox" style="text-align:center;">
       <div style="font-size: 50px; margin-bottom: 10px;">🔒</div>
       <h2>Akses Slip Gaji</h2>
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom: 25px;">Masukkan kredensial Anda untuk melihat estimasi take home pay bulan ini.</p>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom: 25px;">Masukkan PIN Anda untuk melihat estimasi take home pay bulan ini.</p>
       <select id="bonusStaffSelect" style="margin-bottom:15px;"><option value="">👇 Pilih Nama Kamu 👇</option></select>
       <input type="password" id="inputPin" placeholder="PIN Keamanan (Bawaan: 1234)">
       <button class="btn-primary" id="btnUnlock" onclick="bukaBrankas()">Buka Brankas Saya</button>
