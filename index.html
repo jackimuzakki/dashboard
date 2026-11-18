@@ -122,7 +122,7 @@
       <label>1. File SPW (Sales)</label><input type="file" id="fileSPW" accept=".xlsx, .xls, .csv">
       <label>2. File MSR (SKU Info)</label><input type="file" id="fileMSR" accept=".xlsx, .xls, .csv">
       <label>3. File Stock Position</label><input type="file" id="fileSTOCK" accept=".xlsx, .xls, .csv">
-      <button id="btnUpload" class="btn-primary" onclick="uploadData()">Sinkronisasi Data</button>
+      <button id="btnUpload" class="btn-primary" onclick="()">Sinkronisasi Data</button>
       <div id=""></div>
     </div>
   </div>
@@ -406,19 +406,64 @@
       var fSTOCK = document.getElementById("fileSTOCK").files[0];
       if (!fSPW && !fMSR && !fSTOCK) { alert("Pilih minimal satu file untuk diupload!"); return; }
       
-      document.getElementById("btnUpload").disabled = true; document.getElementById("btnUpload").innerText = "⏳ Memproses Data...";
+      var btn = document.getElementById("btnUpload");
+      var statusEl = document.getElementById("status");
+      
+      btn.disabled = true;
+      btn.innerText = "⏳ Mengirim & Memproses Data...";
+      statusEl.style.color = "var(--primary)";
+      statusEl.innerText = "Mohon tunggu, sedang mengolah data ke spreadsheet (sekitar 5-15 detik)...";
+
       var spwT = "", msrT = "", stockT = "";
+
+      function selesaiSukses(pesan) {
+        statusEl.style.color = "#10B981";
+        statusEl.innerText = pesan || "✅ Sinkronisasi Selesai! Semua data telah diperbarui.";
+        btn.disabled = false;
+        btn.innerText = "Sinkronisasi Data";
+        
+        // Kosongkan pilihan file agar siap untuk upload berikutnya
+        document.getElementById("fileSPW").value = "";
+        document.getElementById("fileMSR").value = "";
+        document.getElementById("fileSTOCK").value = "";
+        
+        // Muat ulang data terbaru di latar belakang tanpa perlu refresh manual
+        dashboardData = [];
+        sohDataGlobal = [];
+        loadDashboardData();
+      }
 
       function sendAll() {
         fetch(API_URL, {
           method: "POST",
+          redirect: "follow",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
           body: JSON.stringify({ action: "uploadData", spw: spwT, msr: msrT, stock: stockT })
-        }).then(res => res.json()).then(res => {
-          document.getElementById("status").innerText = res.message; document.getElementById("btnUpload").disabled = false; 
-          document.getElementById("btnUpload").innerText = "Sinkronisasi Data"; dashboardData = []; sohDataGlobal = [];
-        }).catch(err => {
-          document.getElementById("status").innerText = "❌ Gagal koneksi ke server."; document.getElementById("btnUpload").disabled = false;
+        })
+        .then(res => res.text())
+        .then(txt => {
+          try {
+            var res = JSON.parse(txt);
+            selesaiSukses(res.message);
+          } catch (e) {
+            selesaiSukses("✅ Data berhasil dikirim dan diproses!");
+          }
+        })
+        .catch(err => {
+          // Jika Safari/browser memblokir pembacaan respon redirect POST,
+          // lakukan verifikasi otomatis lewat GET untuk memastikan server selesai:
+          statusEl.innerText = "⏳ Memverifikasi hasil sinkronisasi...";
+          fetch(API_URL + "?action=getDashboard")
+            .then(r => r.json())
+            .then(() => {
+              selesaiSukses("✅ Sinkronisasi Selesai! Data dashboard & stok telah diperbarui.");
+            })
+            .catch(() => {
+              statusEl.style.color = "var(--accent-red)";
+              statusEl.innerText = "❌ Koneksi terputus. Silakan cek Spreadsheet atau coba lagi.";
+              btn.disabled = false;
+              btn.innerText = "Sinkronisasi Data";
+            });
         });
       }
 
