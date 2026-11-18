@@ -277,24 +277,24 @@
     <div class="hero-header">
       <div class="link-hero-top">
         <div>
-          <div class="hero-title">Pusat Form & Link</div>
-          <div class="hero-name" style="font-size:21px;">Operasional Toko</div>
-          <div style="font-size:12px; opacity:0.9; margin-top:4px;">Akses cepat semua form harian & laporan</div>
+          <div class="hero-title">Form & Link</div>
+          <div class="hero-name" style="font-size:21px;">Digimap</div>
+          <div style="font-size:12px; opacity:0.9; margin-top:4px;">Jember Roxy Square</div>
         </div>
         <button class="btn-add-link" onclick="openAddFormModal()">+ Tambah</button>
       </div>
     </div>
 
     <div class="dropdown-container" style="margin-bottom:14px;">
-      <input type="text" id="linkSearchInput" class="search-box" placeholder="🔍 Cari nama form atau laporan..." onkeyup="renderLinks()">
+      <input type="text" id="linkSearchInput" class="search-box" placeholder="🔍 Cari nama form atau link..." onkeyup="renderLinks()">
     </div>
 
     <div class="chip-row" id="linkFilterChips">
       <button class="chip-btn active" onclick="setLinkCat('Semua', this)">Semua</button>
-      <button class="chip-btn" onclick="setLinkCat('Harian', this)">📅 Harian</button>
-      <button class="chip-btn" onclick="setLinkCat('Stok & Display', this)">📦 Stok & Display</button>
-      <button class="chip-btn" onclick="setLinkCat('Promo & VAS', this)">🛡️ Promo & VAS</button>
-      <button class="chip-btn" onclick="setLinkCat('Tim & HR', this)">👥 Tim & HR</button>
+      <button class="chip-btn" onclick="setLinkCat('Harian', this)">Project</button>
+      <button class="chip-btn" onclick="setLinkCat('Stok & Display', this)">Trainer</button>
+      <button class="chip-btn" onclick="setLinkCat('Promo & VAS', this)">SPV</button>
+      <button class="chip-btn" onclick="setLinkCat('Tim & HR', this)">Others</button>
     </div>
 
     <div id="formListContainer"></div>
@@ -306,10 +306,10 @@
       <input type="text" id="newFormTitle" placeholder="Nama Form (Contoh: Form Trade-In)">
       <input type="text" id="newFormDesc" placeholder="Keterangan singkat (opsional)">
       <select id="newFormCat">
-        <option value="Harian">📅 Kategori: Harian</option>
-        <option value="Stok & Display">📦 Kategori: Stok & Display</option>
-        <option value="Promo & VAS">🛡️ Kategori: Promo & VAS</option>
-        <option value="Tim & HR">👥 Kategori: Tim & HR</option>
+        <option value="Harian">Kategori: Project</option>
+        <option value="Stok & Display">Kategori: Trainer</option>
+        <option value="Promo & VAS">Kategori: SPV</option>
+        <option value="Tim & HR">Kategori: Lainnya</option>
       </select>
       <input type="url" id="newFormUrl" placeholder="Tempel URL Link (https://...)">
       <div style="display:flex; gap:10px; margin-top:6px;">
