@@ -13,14 +13,14 @@
       --radius-large: 24px; --radius-medium: 16px; --accent-green: #4ADE80; --accent-red: #FB7185; --accent-orange: #FBBF24;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
-    body { background-color: var(--bg-main); color: var(--text-main); display: flex; flex-direction: column; align-items: center; padding: 20px; padding-bottom: 80px; }
+    body { background-color: var(--bg-main); color: var(--text-main); display: flex; flex-direction: column; align-items: center; padding: 20px; padding-bottom: 100px; }
     
-    .nav { background: var(--card-bg); padding: 12px 20px; border-radius: 40px; display: flex; gap: 5px; box-shadow: 0 15px 35px rgba(140,109,253,0.15); position: fixed; bottom: 20px; z-index: 100; flex-wrap: nowrap; justify-content: space-between; width: 90%; max-width: 500px; }
-    .nav button { background: transparent; border: none; padding: 12px 18px; font-weight: 600; color: var(--text-muted); cursor: pointer; border-radius: 30px; transition: all 0.3s ease; font-size: 13px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .nav { background: var(--card-bg); padding: 10px 12px; border-radius: 40px; display: flex; gap: 4px; box-shadow: 0 15px 35px rgba(140,109,253,0.15); position: fixed; bottom: 20px; z-index: 100; flex-wrap: nowrap; justify-content: space-between; width: 92%; max-width: 500px; }
+    .nav button { background: transparent; border: none; padding: 10px 6px; flex: 1; font-weight: 600; color: var(--text-muted); cursor: pointer; border-radius: 30px; transition: all 0.3s ease; font-size: 13px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
     .nav button.active { background: var(--primary); color: white; box-shadow: 0 8px 15px rgba(140,109,253,0.3); }
     .nav-icon { font-size: 18px; }
     
-    .tab-content { display: none; width: 100%; max-width: 500px; animation: fadeIn 0.5s ease; padding-bottom: 20px;}
+    .tab-content { display: none; width: 100%; max-width: 500px; animation: fadeIn 0.5s ease; padding-bottom: 20px; }
     .tab-content.active { display: block; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -37,7 +37,7 @@
     
     .btn-outline { width: 100%; background: transparent; color: var(--primary); padding: 15px; border: 2px solid var(--primary); border-radius: var(--radius-medium); font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 15px; transition: 0.2s; }
     .btn-outline:hover { background: #F4EEFF; }
-    # { margin-top: 20px; text-align: center; font-weight: 600; color: var(--accent-green); font-size: 14px; }
+    #status { margin-top: 20px; text-align: center; font-weight: 600; color: var(--accent-green); font-size: 14px; }
     
     .dropdown-container { text-align: center; margin-bottom: 25px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
     select, input[type="text"].search-box { padding: 16px 20px; border-radius: 30px; border: 2px solid #FFF; font-size: 14px; font-weight: 600; color: var(--text-main); background: var(--card-bg); width: 100%; outline: none; box-shadow: var(--shadow-soft); transition: 0.3s; }
@@ -48,8 +48,8 @@
     .hero-header { background: linear-gradient(135deg, var(--primary), var(--primary-light)); border-radius: var(--radius-large); padding: 25px; color: white; margin-bottom: 25px; position: relative; overflow: hidden; box-shadow: 0 15px 30px rgba(140,109,253,0.2); }
     .hero-header::after { content: ''; position: absolute; top: -30px; right: -30px; width: 120px; height: 120px; background: rgba(255,255,255,0.1); border-radius: 50%; }
     .hero-header::before { content: ''; position: absolute; bottom: -20px; left: 20px; width: 60px; height: 60px; background: rgba(255,255,255,0.1); border-radius: 50%; }
-    .hero-title { font-size: 14px; font-weight: 500; opacity: 0.9; margin-bottom: 5px; z-index: 2; position: relative;}
-    .hero-name { font-size: 26px; font-weight: 700; z-index: 2; position: relative;}
+    .hero-title { font-size: 14px; font-weight: 500; opacity: 0.9; margin-bottom: 5px; z-index: 2; position: relative; }
+    .hero-name { font-size: 26px; font-weight: 700; z-index: 2; position: relative; }
     
     .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 25px; }
     .kpi-card { background: var(--card-bg); padding: 20px 15px; border-radius: var(--radius-large); box-shadow: var(--shadow-soft); display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
@@ -96,7 +96,7 @@
     .payslip-label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
     .payslip-value { font-size: 15px; font-weight: 600; color: var(--text-main); }
     .payslip-total-box { background: #FAFAFF; padding: 20px; border-radius: var(--radius-medium); text-align: center; margin-top: 15px; border: 1px solid #F0EDFF; }
-    .payslip-total-label { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-bottom: 5px; text-transform: uppercase;}
+    .payslip-total-label { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-bottom: 5px; text-transform: uppercase; }
     .payslip-total-val { font-size: 26px; color: var(--primary); font-weight: 800; }
     .payslip-note { margin-top: 20px; font-size: 11px; color: #94A3B8; text-align: center; line-height: 1.5; background: #F8FAFC; padding: 15px; border-radius: 12px; }
 
@@ -104,9 +104,6 @@
     .c-purple { color: #8B5CF6; } .bg-purple { background: rgba(139, 92, 246, 0.1); } .bar-purple { background-color: #8B5CF6; }
     .c-orange { color: #F59E0B; } .bg-orange { background: rgba(245, 158, 11, 0.1); } .bar-orange { background-color: #F59E0B; }
     .c-green { color: #10B981; } .bg-green { background: rgba(16, 185, 129, 0.1); }
-    /* Penyesuaian agar 5 tombol navigasi muat rapi di layar HP */
-    .nav { padding: 10px 12px; gap: 4px; }
-    .nav button { padding: 10px 6px; flex: 1; }
 
     /* Styling Menu Pusat Form & Link */
     .link-hero-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; z-index: 2; position: relative; }
@@ -140,7 +137,6 @@
 <body>
 
   <div class="nav">
-    <div class="nav">
     <button id="btnTabDashboard" class="active" onclick="switchTab('dashboard')"><span class="nav-icon">📊</span><span style="font-size: 10px;">Target</span></button>
     <button id="btnTabSoh" onclick="switchTab('soh')"><span class="nav-icon">📦</span><span style="font-size: 10px;">Stok</span></button>
     <button id="btnTabLinks" onclick="switchTab('links')"><span class="nav-icon">🔗</span><span style="font-size: 10px;">Link</span></button>
@@ -155,8 +151,8 @@
       <label>1. File SPW (Sales)</label><input type="file" id="fileSPW" accept=".xlsx, .xls, .csv">
       <label>2. File MSR (SKU Info)</label><input type="file" id="fileMSR" accept=".xlsx, .xls, .csv">
       <label>3. File Stock Position</label><input type="file" id="fileSTOCK" accept=".xlsx, .xls, .csv">
-      <button id="btnUpload" class="btn-primary" onclick="()">Sinkronisasi Data</button>
-      <div id=""></div>
+      <button id="btnUpload" class="btn-primary" onclick="uploadData()">Sinkronisasi Data</button>
+      <div id="status"></div>
     </div>
   </div>
 
@@ -276,7 +272,8 @@
       <button class="btn-outline" style="border-color:#E2E8F0; color:var(--text-muted); margin-top:10px; background:#FFF;" onclick="tutupBrankas()">Tutup & Keluar 🔒</button>
     </div>
   </div>
-<div id="tab-links" class="tab-content">
+
+  <div id="tab-links" class="tab-content">
     <div class="hero-header">
       <div class="link-hero-top">
         <div>
@@ -323,12 +320,9 @@
   </div>
 
   <div class="link-toast" id="linkToast">Link disalin!</div>
+
   <script>
-    // ==========================================
-    // MASUKKAN URL APPS SCRIPT ANDA DI BAWAH INI
-    // ==========================================
     const API_URL = "https://script.google.com/macros/s/AKfycbwQafvOo2JU_75b2wF6h40oqotR101fh9bqml7UGnEsxBE4JHuO-C5EfrKAAmHiVJ4w/exec";
-    
     const GAJI_POKOK = 3013000; 
 
     function switchTab(tabName) {
@@ -340,6 +334,7 @@
       
       if(tabName === 'dashboard') loadDashboardData(); 
       if(tabName === 'soh') loadSOHData();
+      if(tabName === 'links') loadLinksData();
       if(tabName === 'bonus') loadDashboardData();
     }
 
@@ -395,13 +390,13 @@
       let rankList = [...dashboardData].sort((a,b) => b.sales - a.sales);
       
       rankList.forEach((s, idx) => {
-         let tr = document.createElement('tr');
-         let rankIcon = (idx === 0) ? '🥇' : (idx === 1) ? '🥈' : (idx === 2) ? '🥉' : (idx + 1);
-         let weightClass = (idx < 3) ? 'font-weight:700; font-size:16px;' : 'font-weight:600; color:var(--text-muted);';
-         tr.innerHTML = `<td style="text-align:center; ${weightClass}">${rankIcon}</td>
-            <td style="font-weight:600;">${s.name.split(' ')[0]}</td>
-            <td style="text-align:right; font-weight:700; color:var(--primary);">${formatRp(s.sales)}</td>`;
-         tbody.appendChild(tr);
+        let tr = document.createElement('tr');
+        let rankIcon = (idx === 0) ? '🥇' : (idx === 1) ? '🥈' : (idx === 2) ? '🥉' : (idx + 1);
+        let weightClass = (idx < 3) ? 'font-weight:700; font-size:16px;' : 'font-weight:600; color:var(--text-muted);';
+        tr.innerHTML = `<td style="text-align:center; ${weightClass}">${rankIcon}</td>
+           <td style="font-weight:600;">${s.name.split(' ')[0]}</td>
+           <td style="text-align:right; font-weight:700; color:var(--primary);">${formatRp(s.sales)}</td>`;
+        tbody.appendChild(tr);
       });
       showPersonalData();
     }
@@ -501,12 +496,10 @@
         btn.disabled = false;
         btn.innerText = "Sinkronisasi Data";
         
-        // Kosongkan pilihan file agar siap untuk upload berikutnya
         document.getElementById("fileSPW").value = "";
         document.getElementById("fileMSR").value = "";
         document.getElementById("fileSTOCK").value = "";
         
-        // Muat ulang data terbaru di latar belakang tanpa perlu refresh manual
         dashboardData = [];
         sohDataGlobal = [];
         loadDashboardData();
@@ -529,8 +522,6 @@
           }
         })
         .catch(err => {
-          // Jika Safari/browser memblokir pembacaan respon redirect POST,
-          // lakukan verifikasi otomatis lewat GET untuk memastikan server selesai:
           statusEl.innerText = "⏳ Memverifikasi hasil sinkronisasi...";
           fetch(API_URL + "?action=getDashboard")
             .then(r => r.json())
@@ -608,6 +599,7 @@
     }
 
     function tutupBrankas() { currentLockedStaff = ""; document.getElementById("payslipBox").style.display = 'none'; document.getElementById("authBox").style.display = 'block'; }
+
     // =========================================================
     // SINKRONISASI LINK FORM KE GOOGLE SHEETS (GLOBAL TIM)
     // =========================================================
