@@ -122,9 +122,10 @@
     .form-title { font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 3px; line-height: 1.3; overflow-wrap: break-word; word-break: break-word; }
     .form-desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; overflow-wrap: break-word; word-break: break-word; }
     .form-actions { display: flex; gap: 8px; margin-top: 14px; padding-top: 12px; border-top: 1px dashed #F0EDFF; }
-    .btn-copy-link { flex: 1; background: #F8F7FF; border: 1.5px solid #E9E4FF; color: var(--primary); padding: 10px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; cursor: pointer; text-align: center; }
-    .btn-open-link { flex: 1.3; background: linear-gradient(135deg, var(--primary), var(--primary-light)); border: none; color: white; padding: 10px 14px; border-radius: 12px; font-size: 12px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 5px; box-shadow: 0 6px 14px rgba(140,109,253,0.22); }
-    .btn-del-custom { background: #FFF1F2; border: none; color: #FB7185; padding: 0 12px; border-radius: 12px; font-size: 13px; cursor: pointer; }
+    .btn-copy-link { flex: 1; background: #F8F7FF; border: 1.5px solid #E9E4FF; color: var(--primary); padding: 10px 8px; border-radius: 12px; font-size: 11.5px; font-weight: 600; cursor: pointer; text-align: center; white-space: nowrap; }
+    .btn-open-link { flex: 1.2; background: linear-gradient(135deg, var(--primary), var(--primary-light)); border: none; color: white; padding: 10px 10px; border-radius: 12px; font-size: 11.5px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 6px 14px rgba(140,109,253,0.22); white-space: nowrap; }
+    .btn-edit-custom { background: #EEF2FF; border: none; color: var(--primary); padding: 0 11px; border-radius: 12px; font-size: 13px; cursor: pointer; }
+    .btn-del-custom { background: #FFF1F2; border: none; color: #FB7185; padding: 0 11px; border-radius: 12px; font-size: 13px; cursor: pointer; }
 
     /* Modal Tambah Link */
     .link-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(45,42,74,0.45); backdrop-filter: blur(3px); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
@@ -303,7 +304,7 @@
 
   <div class="link-modal-overlay" id="addFormModal" onclick="if(event.target===this) closeAddFormModal()">
     <div class="link-modal-box">
-      <h3 style="font-size:17px; font-weight:700; margin-bottom:14px;">➕ Tambah Link Form Baru</h3>
+      <h3 id="formModalTitle" style="font-size:17px; font-weight:700; margin-bottom:14px;">➕ Tambah Link Form Baru</h3>
       <input type="text" id="newFormTitle" placeholder="Nama Form (Contoh: Form Trade-In)">
       <input type="text" id="newFormDesc" placeholder="Keterangan singkat (opsional)">
       <select id="newFormCat">
@@ -663,8 +664,9 @@
             </div>
           </div>
           <div class="form-actions">
-            <button class="btn-copy-link" onclick="copyFormLink('${f.id}')">📋 Salin Link</button>
+            <button class="btn-copy-link" onclick="copyFormLink('${f.id}')">📋 Salin</button>
             <a class="btn-open-link" href="${f.url}" target="_blank" rel="noopener">Buka Form ↗</a>
+            <button class="btn-edit-custom" onclick="openEditFormModal('${f.id}')" title="Edit Link">✏️</button>
             <button class="btn-del-custom" onclick="deleteForm('${f.id}')" title="Hapus Link">🗑️</button>
           </div>
         </div>
@@ -677,8 +679,34 @@
       navigator.clipboard.writeText(item.url).then(() => showLinkToast('📋 Link berhasil disalin!'));
     }
 
-    function openAddFormModal() { document.getElementById('addFormModal').classList.add('open'); }
-    function closeAddFormModal() { document.getElementById('addFormModal').classList.remove('open'); }
+    let editingLinkId = null;
+
+    function openAddFormModal() {
+      editingLinkId = null;
+      document.getElementById('formModalTitle').innerText = '➕ Tambah Link Form Baru';
+      document.getElementById('newFormTitle').value = '';
+      document.getElementById('newFormDesc').value = '';
+      document.getElementById('newFormCat').value = 'Harian';
+      document.getElementById('newFormUrl').value = '';
+      document.getElementById('addFormModal').classList.add('open');
+    }
+
+    function openEditFormModal(id) {
+      const item = allLinksData.find(f => f.id === id);
+      if (!item) return;
+      editingLinkId = id;
+      document.getElementById('formModalTitle').innerText = '✏️ Edit Link Form';
+      document.getElementById('newFormTitle').value = item.title || '';
+      document.getElementById('newFormDesc').value = item.desc || '';
+      document.getElementById('newFormCat').value = item.cat || 'Harian';
+      document.getElementById('newFormUrl').value = item.url || '';
+      document.getElementById('addFormModal').classList.add('open');
+    }
+
+    function closeAddFormModal() {
+      editingLinkId = null;
+      document.getElementById('addFormModal').classList.remove('open');
+    }
 
     function saveNewForm() {
       const title = document.getElementById('newFormTitle').value.trim();
@@ -688,9 +716,12 @@
       if (!title || !url) { alert('Nama Form dan URL wajib diisi!'); return; }
       if (!url.startsWith('http')) url = 'https://' + url;
 
-      const icons = { 'Project': '', 'Trainer': '', 'SPV': '', 'Lainnya': '' };
+      const icons = { 'Harian': '📅', 'Stok & Display': '📦', 'Promo & VAS': '🛡️', 'Tim & HR': '👥' };
       const icon = icons[cat] || '🔗';
       const btnSave = document.getElementById('btnSaveLink');
+      const isEdit = editingLinkId !== null;
+      const targetId = editingLinkId;
+
       btnSave.disabled = true;
       btnSave.innerText = '⏳ Menyimpan...';
 
@@ -702,14 +733,22 @@
         btnSave.innerText = 'Simpan Link';
         closeAddFormModal();
         loadLinksData();
-        showLinkToast('✅ Link tersimpan untuk semua staf!');
+        showLinkToast(isEdit ? '✅ Perubahan link disimpan!' : '✅ Link tersimpan untuk semua staf!');
       }
 
       fetch(API_URL, {
         method: 'POST',
         redirect: 'follow',
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'addLink', title, desc, cat, icon, url })
+        body: JSON.stringify({
+          action: isEdit ? 'editLink' : 'addLink',
+          id: targetId,
+          title,
+          desc,
+          cat,
+          icon,
+          url
+        })
       })
       .then(() => selesaiSimpan())
       .catch(() => selesaiSimpan());
