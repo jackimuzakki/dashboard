@@ -112,6 +112,9 @@
     .btn-date-step { background: var(--bg-main); border: none; color: var(--primary); width: 30px; height: 30px; border-radius: 50%; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; }
     .daily-date-input { border: none; background: transparent; font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600; color: var(--text-main); outline: none; cursor: pointer; }
     .daily-meta-info { font-size: 11.5px; color: var(--text-muted); margin: 0 0 14px 5px; }
+    .qty-row-scroll { display: flex; gap: 10px; margin-top: 12px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 6px; -ms-overflow-style: none; scrollbar-width: none; }
+    .qty-row-scroll::-webkit-scrollbar { display: none; }
+    .qty-row-scroll .qty-card { flex: 1; min-width: 76px; padding: 12px 8px; }
 
     /* Styling Menu Pusat Form & Link */
     .link-hero-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; z-index: 2; position: relative; }
@@ -260,6 +263,13 @@
           <div class="kpi-title">Qoala</div>
           <div class="kpi-value" id="valDailyQoala" style="font-size:17px;">Rp 0</div>
         </div>
+        <div class="qty-row-scroll">
+        <div class="qty-card"><div class="qty-emoji">📱</div><div class="qty-val" id="dailyQtyIphone">0</div><div class="qty-label">iPhone</div></div>
+        <div class="qty-card"><div class="qty-emoji">💻</div><div class="qty-val" id="dailyQtyIpad">0</div><div class="qty-label">iPad</div></div>
+        <div class="qty-card"><div class="qty-emoji">🖥️</div><div class="qty-val" id="dailyQtyMac">0</div><div class="qty-label">Mac</div></div>
+        <div class="qty-card"><div class="qty-emoji">⌚</div><div class="qty-val" id="dailyQtyWatch">0</div><div class="qty-label">Watch</div></div>
+        <div class="qty-card"><div class="qty-emoji">🎧</div><div class="qty-val" id="dailyQtyAirpods">0</div><div class="qty-label">AirPods</div></div>
+      </div>
       </div>
     </div>
   </div>
@@ -880,11 +890,20 @@
     }
 
     function renderDailySalesCard(staffName, dateStr, staffMap) {
-      const data = staffMap[staffName] || { total: 0, device: 0, acc: 0, qoala: 0, trx: 0 };
+      const data = staffMap[staffName] || {
+        total: 0, device: 0, acc: 0, qoala: 0, trx: 0,
+        qty_iphone: 0, qty_ipad: 0, qty_mac: 0, qty_aw: 0, qty_airpods: 0
+      };
       document.getElementById('valDailyTotal').innerText = formatRp(data.total);
       document.getElementById('valDailyDevice').innerText = formatRp(data.device);
       document.getElementById('valDailyAcc').innerText = formatRp(data.acc);
       document.getElementById('valDailyQoala').innerText = formatRp(data.qoala);
+
+      document.getElementById('dailyQtyIphone').innerText = data.qty_iphone || 0;
+      document.getElementById('dailyQtyIpad').innerText = data.qty_ipad || 0;
+      document.getElementById('dailyQtyMac').innerText = data.qty_mac || 0;
+      document.getElementById('dailyQtyWatch').innerText = data.qty_aw || 0;
+      document.getElementById('dailyQtyAirpods').innerText = data.qty_airpods || 0;
 
       const parts = dateStr.split('-');
       const tglIndo = `${parts[2]}/${parts[1]}/${parts[0]}`;
