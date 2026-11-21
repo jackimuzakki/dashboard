@@ -465,10 +465,10 @@
 
     <div class="chip-row" id="linkFilterChips">
       <button class="chip-btn active" onclick="setLinkCat('Semua', this)">Semua</button>
-      <button class="chip-btn" onclick="setLinkCat('Harian', this)">📅 Harian</button>
-      <button class="chip-btn" onclick="setLinkCat('Stok & Display', this)">📦 Stok & Display</button>
-      <button class="chip-btn" onclick="setLinkCat('Promo & VAS', this)">🛡️ Promo & VAS</button>
-      <button class="chip-btn" onclick="setLinkCat('Tim & HR', this)">👥 Tim & HR</button>
+      <button class="chip-btn" onclick="setLinkCat('Project', this)">Project</button>
+      <button class="chip-btn" onclick="setLinkCat('Trainer', this)">Trainer</button>
+      <button class="chip-btn" onclick="setLinkCat('SPV', this)">SPV</button>
+      <button class="chip-btn" onclick="setLinkCat('Lainnya', this)">Lainnya</button>
     </div>
 
     <div id="formListContainer"></div>
@@ -623,10 +623,10 @@
       <input type="text" id="newFormTitle" placeholder="Nama Form (Contoh: Form Trade-In)">
       <input type="text" id="newFormDesc" placeholder="Keterangan singkat (opsional)">
       <select id="newFormCat">
-        <option value="Harian">📅 Kategori: Harian</option>
-        <option value="Stok & Display">📦 Kategori: Stok & Display</option>
-        <option value="Promo & VAS">🛡️ Kategori: Promo & VAS</option>
-        <option value="Tim & HR">👥 Kategori: Tim & HR</option>
+        <option value="Project">Kategori: Project</option>
+        <option value="Trainer">Kategori: Trainer</option>
+        <option value="SPV">Kategori: SPV</option>
+        <option value="Lainnya">Kategori: Lainnya</option>
       </select>
       <input type="url" id="newFormUrl" placeholder="Tempel URL Link (https://...)">
       <div style="display:flex; gap:10px; margin-top:6px;">
@@ -1243,7 +1243,7 @@
       if (!title || !url) { showLinkToast('⚠️ Nama Form dan URL wajib diisi!'); return; }
       if (!url.startsWith('http')) url = 'https://' + url;
 
-      const icons = { 'Harian': '📅', 'Stok & Display': '📦', 'Promo & VAS': '🛡️', 'Tim & HR': '👥' };
+      const icons = { 'Project': '', 'Trainer': '', 'SPV': '', 'Lainnya': '' };
       const icon = icons[cat] || '🔗';
       const btnSave = document.getElementById('btnSaveLink');
       const isEdit = editingLinkId !== null;
