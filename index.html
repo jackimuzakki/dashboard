@@ -12,19 +12,20 @@
       --text-main: #2D2A4A; --text-muted: #8E8BA7; --shadow-soft: 0 10px 25px rgba(140, 109, 253, 0.08); 
       --radius-large: 24px; --radius-medium: 16px; --accent-green: #4ADE80; --accent-red: #FB7185; --accent-orange: #FBBF24;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
     html, body { width: 100%; overflow-x: hidden; background-color: var(--bg-main); color: var(--text-main); }
     body { display: block; padding: 20px 16px 120px 16px; }
     
+    /* Navigasi Bawah 5 Menu Utama */
     .nav { background: var(--card-bg); padding: 10px 12px; border-radius: 40px; display: flex; gap: 4px; box-shadow: 0 15px 35px rgba(140,109,253,0.18); position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 999; flex-wrap: nowrap; justify-content: space-between; width: 92%; max-width: 500px; }
     .nav button { background: transparent; border: none; padding: 10px 6px; flex: 1; font-weight: 600; color: var(--text-muted); cursor: pointer; border-radius: 30px; transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; gap: 4px; }
     .nav button.active { background: var(--primary); color: white; box-shadow: 0 8px 15px rgba(140,109,253,0.3); }
     .nav-icon { font-size: 18px; }
     .nav-text { font-size: 10px; white-space: nowrap; }
     
-    .tab-content { display: none; width: 100%; max-width: 500px; margin: 0 auto; animation: fadeIn 0.5s ease; padding-bottom: 20px; }
+    .tab-content { display: none; width: 100%; max-width: 500px; margin: 0 auto; animation: fadeIn 0.4s ease; padding-bottom: 20px; }
     .tab-content.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
     .card { background: var(--card-bg); padding: 30px; border-radius: var(--radius-large); box-shadow: var(--shadow-soft); margin-bottom: 20px; }
     .card h2 { text-align: center; margin-bottom: 25px; font-weight: 700; font-size: 22px; color: var(--text-main); }
@@ -47,11 +48,11 @@
     select:focus, input[type="text"].search-box:focus { border-color: var(--primary); }
     input[type="text"].search-box::placeholder { color: var(--text-muted); font-weight: 500; }
     
-    .hero-header { background: linear-gradient(135deg, var(--primary), var(--primary-light)); border-radius: var(--radius-large); padding: 25px; color: white; margin-bottom: 25px; position: relative; overflow: hidden; box-shadow: 0 15px 30px rgba(140,109,253,0.2); }
+    .hero-header { background: linear-gradient(135deg, var(--primary), var(--primary-light)); border-radius: var(--radius-large); padding: 24px 22px; color: white; margin-bottom: 20px; position: relative; overflow: hidden; box-shadow: 0 15px 30px rgba(140,109,253,0.2); }
     .hero-header::after { content: ''; position: absolute; top: -30px; right: -30px; width: 120px; height: 120px; background: rgba(255,255,255,0.1); border-radius: 50%; }
     .hero-header::before { content: ''; position: absolute; bottom: -20px; left: 20px; width: 60px; height: 60px; background: rgba(255,255,255,0.1); border-radius: 50%; }
-    .hero-title { font-size: 14px; font-weight: 500; opacity: 0.9; margin-bottom: 5px; z-index: 2; position: relative; }
-    .hero-name { font-size: 26px; font-weight: 700; z-index: 2; position: relative; }
+    .hero-title { font-size: 13px; font-weight: 500; opacity: 0.9; margin-bottom: 4px; z-index: 2; position: relative; }
+    .hero-name { font-size: 24px; font-weight: 700; z-index: 2; position: relative; }
     
     .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 25px; }
     .kpi-card { background: var(--card-bg); padding: 20px 15px; border-radius: var(--radius-large); box-shadow: var(--shadow-soft); display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
@@ -140,7 +141,7 @@
     .btn-edit-custom { background: #EEF2FF; border: none; color: var(--primary); padding: 0 11px; border-radius: 12px; font-size: 13px; cursor: pointer; }
     .btn-del-custom { background: #FFF1F2; border: none; color: #FB7185; padding: 0 11px; border-radius: 12px; font-size: 13px; cursor: pointer; }
 
-    /* Styling Menu Pilihan Staf (Gaji & Biodata) */
+    /* Styling Menu Pilihan Staf (Gaji, Biodata, Jadwal Shift) */
     .hub-choice-card { background: var(--card-bg); border-radius: 22px; padding: 20px; margin-bottom: 14px; box-shadow: var(--shadow-soft); display: flex; align-items: center; gap: 15px; cursor: pointer; border: 2px solid transparent; transition: 0.2s ease; }
     .hub-choice-card:active { transform: scale(0.98); border-color: var(--primary-light); }
     .hub-choice-icon { width: 54px; height: 54px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; }
@@ -148,8 +149,9 @@
     .hub-choice-title { font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 3px; }
     .hub-choice-desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
     .hub-choice-arrow { font-size: 20px; font-weight: 700; color: var(--primary); }
-    .sub-switcher-bar { display: flex; gap: 6px; background: var(--card-bg); padding: 6px; border-radius: 20px; box-shadow: var(--shadow-soft); margin-bottom: 18px; }
-    .sub-switch-btn { flex: 1; border: none; background: transparent; padding: 11px 10px; border-radius: 15px; font-size: 12.5px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: 0.2s; }
+    .sub-switcher-bar { display: flex; align-items: center; gap: 5px; background: var(--card-bg); padding: 6px; border-radius: 20px; box-shadow: var(--shadow-soft); margin-bottom: 16px; }
+    .btn-back-hub { background: #F4EEFF; border: none; color: var(--primary); padding: 9px 10px; border-radius: 14px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+    .sub-switch-btn { flex: 1; border: none; background: transparent; padding: 9px 4px; border-radius: 14px; font-size: 11.5px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: 0.2s; white-space: nowrap; }
     .sub-switch-btn.active { background: var(--primary); color: white; box-shadow: 0 6px 14px rgba(140,109,253,0.22); }
 
     /* Styling Menu Biodata Tim */
@@ -167,21 +169,136 @@
     .bio-val { color: var(--text-main); font-weight: 600; text-align: right; overflow-wrap: break-word; word-break: break-word; }
     .btn-wa-link { flex: 1.3; background: linear-gradient(135deg, #22C55E, #16A34A); border: none; color: white; padding: 10px 10px; border-radius: 12px; font-size: 11.5px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 5px; box-shadow: 0 6px 14px rgba(34,197,94,0.22); white-space: nowrap; }
 
-    /* Modal Umum (Link & Biodata) */
-    .link-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(45,42,74,0.45); backdrop-filter: blur(3px); z-index: 1000; align-items: center; justify-content: center; padding: 16px; overflow-y: auto; }
+    /* =========================================================
+       STYLING MENU JADWAL SHIFT & CATATAN PER STAF
+       ========================================================= */
+    .week-nav-bar { background: var(--card-bg); border-radius: 18px; padding: 8px 10px; margin-bottom: 13px; box-shadow: var(--shadow-soft); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .btn-week-step { width: 34px; height: 34px; border-radius: 12px; border: none; background: #F4EEFF; color: var(--primary); font-size: 13px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .week-range-label { font-size: 12.5px; font-weight: 700; color: var(--text-main); text-align: center; }
+
+    .subview-tabs { display: flex; background: #E8E0FF; padding: 5px; border-radius: 18px; margin-bottom: 14px; }
+    .subview-tab-btn { flex: 1; border: none; background: transparent; padding: 10px 6px; border-radius: 14px; font-size: 12px; font-weight: 700; color: var(--text-muted); cursor: pointer; transition: 0.2s ease; }
+    .subview-tab-btn.active { background: var(--card-bg); color: var(--primary); box-shadow: 0 4px 12px rgba(140, 109, 253, 0.15); }
+
+    .day-selector-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-bottom: 12px; }
+    .day-pill { position: relative; background: var(--card-bg); border: 1.5px solid transparent; border-radius: 16px; padding: 9px 2px 8px 2px; text-align: center; cursor: pointer; box-shadow: var(--shadow-soft); transition: 0.16s; }
+    .day-pill .dp-name { display: block; font-size: 10px; font-weight: 600; color: var(--text-muted); }
+    .day-pill .dp-num { display: block; font-size: 13.5px; font-weight: 800; color: var(--text-main); }
+    .day-pill.active { background: var(--primary); box-shadow: 0 8px 16px rgba(140, 109, 253, 0.28); transform: translateY(-2px); }
+    .day-pill.active .dp-name, .day-pill.active .dp-num { color: #FFFFFF; }
+    .note-dot-indicator { position: absolute; top: 5px; right: 5px; width: 6px; height: 6px; border-radius: 50%; background: #F59E0B; }
+    .day-pill.active .note-dot-indicator { background: #FDE047; }
+
+    .daily-summary-bar { background: var(--card-bg); border-radius: 18px; padding: 11px 13px; margin-bottom: 12px; box-shadow: var(--shadow-soft); }
+    .dsb-top { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 700; margin-bottom: 8px; }
+    .dsb-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+    .dsb-chip { padding: 5px 2px; border-radius: 10px; font-size: 10px; font-weight: 700; text-align: center; }
+
+    /* Kartu Per Hari: Nama & Jam Rata Kiri, Catatan Rata Kanan */
+    .daily-staff-row { background: var(--card-bg); border-radius: 20px; padding: 13px 14px; margin-bottom: 10px; box-shadow: var(--shadow-soft); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .daily-staff-row.is-off { opacity: 0.78; background: #FCFBFF; }
+    .dsr-left { display: flex; align-items: center; gap: 11px; flex: 1; min-width: 0; text-align: left; }
+    .sch-avatar { width: 42px; height: 42px; border-radius: 50%; font-size: 13.5px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .av-P { background: #DBEAFE; color: #1D4ED8; border: 2px solid #BFDBFE; }
+    .av-M { background: #FEF3C7; color: #B45309; border: 2px solid #FDE68A; }
+    .av-S { background: #EDE9FE; color: #6D28D9; border: 2px solid #DDD6FE; }
+    .av-OFF { background: #FFE4E6; color: #BE123C; border: 2px solid #FECDD3; }
+
+    .dsr-text-col { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; min-width: 0; flex: 1; }
+    .dsr-name { font-size: 14px; font-weight: 700; color: var(--text-main); line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+    .dsr-shift-line { display: inline-flex; align-items: center; gap: 4px; margin-top: 4px; padding: 3px 9px; border-radius: 9px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .dsr-shift-line:active { transform: scale(0.95); }
+
+    .dsr-right { display: flex; align-items: center; justify-content: flex-end; flex-shrink: 0; max-width: 44%; }
+    .btn-add-note-right { background: #F8F7FF; border: 1.5px dashed #D8CEFF; color: var(--primary); border-radius: 12px; padding: 7px 10px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+    .btn-active-note-right { background: #FFFBEB; border: 1.5px solid #FDE68A; color: #92400E; border-radius: 12px; padding: 7px 10px; font-size: 11px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; max-width: 100%; text-align: left; line-height: 1.25; }
+    .btn-active-note-right span.note-label-clamp { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .sh-P { background: #EFF6FF; color: #2563EB; border: 1px solid #BFDBFE; }
+    .sh-M { background: #FFFBEB; color: #D97706; border: 1px solid #FDE68A; }
+    .sh-S { background: #F4EEFF; color: #7C3AED; border: 1px solid #DDD6FE; }
+    .sh-OFF { background: #FFF1F2; color: #E11D48; border: 1px solid #FECDD3; }
+
+    /* View Per Staf (7 Hari - 1 Staf Terpilih) */
+    .staff-focus-card { background: var(--card-bg); border-radius: var(--radius-large); padding: 16px 14px; margin-bottom: 12px; box-shadow: var(--shadow-soft); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .swc-profile { display: flex; align-items: center; gap: 11px; min-width: 0; }
+    .swc-name { font-size: 15px; font-weight: 800; color: var(--text-main); }
+    .swc-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; margin-top: 3px; }
+    .role-badge { font-size: 10px; font-weight: 700; background: #F4EEFF; color: var(--primary); padding: 2px 8px; border-radius: 9px; }
+    .summary-pill { font-size: 10px; font-weight: 600; background: #F8FAFC; color: var(--text-muted); border: 1px solid #E2E8F0; padding: 2px 8px; border-radius: 9px; }
+    .btn-edit-staff-week { background: #F4EEFF; color: var(--primary); border: 1.5px solid #E2D9FF; border-radius: 12px; padding: 8px 11px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+
+    .staff-day-row { background: var(--card-bg); border-radius: 18px; padding: 12px 14px; margin-bottom: 9px; box-shadow: var(--shadow-soft); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .staff-day-row.is-off { opacity: 0.78; background: #FCFBFF; }
+    .sdr-left { display: flex; align-items: center; gap: 11px; flex: 1; min-width: 0; text-align: left; }
+    .day-badge-box { width: 44px; height: 44px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; line-height: 1.1; }
+    .dbb-day { font-size: 9.5px; font-weight: 700; text-transform: uppercase; }
+    .dbb-num { font-size: 14px; font-weight: 800; margin-top: 1px; }
+    .sdr-text-col { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; min-width: 0; flex: 1; }
+    .sdr-date-title { font-size: 13.5px; font-weight: 700; color: var(--text-main); line-height: 1.25; }
+
+    /* Modal Matriks 7 Hari & Catatan */
+    .brush-panel { position: sticky; top: -6px; z-index: 10; background: #F8F6FF; border: 1.5px solid #EAE2FF; border-radius: 16px; padding: 10px; margin-bottom: 12px; }
+    .brush-header { font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 7px; display: flex; justify-content: space-between; }
+    .brush-pills { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+    .brush-btn { background: #FFFFFF; border: 1.5px solid #E9E4FF; border-radius: 11px; padding: 8px 2px; font-size: 10px; font-weight: 700; color: var(--text-main); cursor: pointer; text-align: center; white-space: nowrap; }
+    .brush-btn.active-P { background: #2563EB; border-color: #2563EB; color: #FFF; }
+    .brush-btn.active-M { background: #D97706; border-color: #D97706; color: #FFF; }
+    .brush-btn.active-S { background: #7C3AED; border-color: #7C3AED; color: #FFF; }
+    .brush-btn.active-OFF { background: #E11D48; border-color: #E11D48; color: #FFF; }
+    .brush-btn.active-NOTE { background: #F59E0B; border-color: #F59E0B; color: #FFF; }
+
+    .matrix-cell-note-prompt { background: #FFFBEB; border: 1.5px solid #F59E0B; border-radius: 16px; padding: 12px; margin-bottom: 12px; }
+    .mcnp-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 12px; font-weight: 700; color: #92400E; }
+    .matrix-scroll-wrap { border: 1.5px solid #EFEAFF; border-radius: 16px; overflow-x: auto; margin-bottom: 12px; background: #FFFFFF; }
+    .matrix-table { width: 100%; min-width: 390px; border-collapse: collapse; }
+    .matrix-table th { background: #F6F3FF; padding: 8px 3px; font-size: 10px; font-weight: 700; color: var(--text-main); text-align: center; border-bottom: 1px solid #EAE2FF; }
+    .matrix-table th:first-child, .matrix-table td:first-child { position: sticky; left: 0; z-index: 2; background: #FFFFFF; text-align: left; padding-left: 10px; padding-right: 6px; min-width: 78px; font-size: 11.5px; font-weight: 700; border-right: 1px solid #F0EDFF; }
+    .matrix-table th:first-child { background: #F6F3FF; color: var(--text-muted); }
+    .matrix-table td { padding: 6px 2px; text-align: center; border-bottom: 1px solid #F5F2FF; }
+    .m-cell-btn { position: relative; width: 100%; min-width: 40px; height: 32px; border-radius: 9px; font-size: 10px; font-weight: 700; cursor: pointer; }
+    .m-cell-pin { position: absolute; top: -5px; right: -3px; font-size: 9px; background: #FEF3C7; border: 1px solid #F59E0B; border-radius: 50%; width: 14px; height: 14px; display: flex; align-items: center; justify-content: center; }
+    .matrix-sum-row td { background: #FAFAFF !important; border-bottom: none; border-top: 1.5px solid #EAE2FF; padding: 8px 2px; }
+    .duty-badge { display: inline-block; padding: 3px 5px; border-radius: 7px; font-size: 9.5px; font-weight: 800; }
+    .duty-ok { background: #ECFDF5; color: #059669; }
+    .duty-warn { background: #FFFBEB; color: #D97706; border: 1px solid #FDE68A; }
+
+    .preset-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; }
+    .btn-preset { background: #F8F6FF; border: 1.5px solid #E2D9FF; color: var(--primary); border-radius: 12px; padding: 8px 4px; font-size: 10.5px; font-weight: 700; cursor: pointer; text-align: center; }
+    .single-day-item { display: flex; flex-direction: column; gap: 7px; padding: 10px 11px; background: #FAFAFF; border: 1px solid #EFEAFF; border-radius: 15px; margin-bottom: 8px; }
+    .sdi-top-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .sdi-left { min-width: 80px; }
+    .sdi-day { font-size: 12px; font-weight: 700; color: var(--text-main); }
+    .sdi-date { font-size: 10.5px; color: var(--text-muted); }
+    .sdi-choices { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; flex: 1; }
+    .sdi-choice-btn { background: #FFFFFF; border: 1.5px solid #E9E4FF; color: var(--text-muted); border-radius: 10px; padding: 7px 2px; font-size: 10.5px; font-weight: 700; cursor: pointer; text-align: center; }
+    .sdi-choice-btn.sel-P { background: #2563EB; border-color: #2563EB; color: #FFF; }
+    .sdi-choice-btn.sel-M { background: #D97706; border-color: #D97706; color: #FFF; }
+    .sdi-choice-btn.sel-S { background: #7C3AED; border-color: #7C3AED; color: #FFF; }
+    .sdi-choice-btn.sel-OFF { background: #E11D48; border-color: #E11D48; color: #FFF; }
+    .sdi-note-input { width: 100%; border: 1.5px solid #EFEAFF; background: #FFFFFF; border-radius: 10px; padding: 7px 10px; font-size: 11.5px; font-weight: 600; color: var(--text-main); outline: none; margin-bottom: 0 !important; }
+
+    .preset-chips-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 12px 0; }
+    .note-preset-chip { background: #FFFBEB; border: 1.5px solid #FDE68A; color: #92400E; border-radius: 20px; padding: 6px 12px; font-size: 11.5px; font-weight: 700; cursor: pointer; }
+    .note-preset-chip.active-chip { background: #F59E0B; border-color: #F59E0B; color: #FFFFFF; }
+    .btn-danger-modal { flex: 1; padding: 13px; border-radius: 14px; border: 1.5px solid #FECDD3; background: #FFF1F2; color: #E11D48; font-size: 12.5px; font-weight: 700; cursor: pointer; }
+
+    /* Modal Umum (Link, Biodata, Jadwal) */
+    .link-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(45,42,74,0.48); backdrop-filter: blur(3px); z-index: 1200; align-items: center; justify-content: center; padding: 14px; overflow-y: auto; }
     .link-modal-overlay.open { display: flex; }
-    .link-modal-box { background: white; width: 100%; max-width: 420px; max-height: 90vh; overflow-y: auto; border-radius: 24px; padding: 22px; box-shadow: 0 20px 40px rgba(0,0,0,0.18); }
+    .link-modal-box { background: white; width: 100%; max-width: 440px; max-height: 90vh; overflow-y: auto; border-radius: 24px; padding: 22px 18px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
     .link-modal-box input, .link-modal-box select { width: 100%; padding: 12px 14px; border: 2px solid #F0EDFF; border-radius: 14px; font-size: 13px; margin-bottom: 10px; outline: none; background: #FAFAFF; text-align: left; }
     .modal-field-lbl { font-size: 11.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; display: block; margin-top: 2px; }
     .photo-picker-wrap { display: flex; align-items: center; gap: 14px; background: #FAFAFF; padding: 12px; border-radius: 16px; border: 2px dashed #E9E4FF; margin-bottom: 12px; }
     .photo-preview-circle { width: 58px; height: 58px; border-radius: 50%; object-fit: cover; background: var(--bg-main); display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--primary); font-weight: 700; flex-shrink: 0; border: 2px solid var(--primary-light); }
     .btn-pick-photo { background: #F4EEFF; color: var(--primary); border: none; padding: 8px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
-    .link-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-80px); background: var(--text-main); color: white; padding: 11px 20px; border-radius: 30px; font-size: 12px; font-weight: 600; z-index: 1100; transition: 0.3s ease; }
+    .link-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-80px); background: var(--text-main); color: white; padding: 11px 20px; border-radius: 30px; font-size: 12px; font-weight: 600; z-index: 1500; transition: 0.3s ease; white-space: nowrap; }
     .link-toast.show { transform: translateX(-50%) translateY(0); }
   </style>
 </head>
 <body>
 
+  <!-- Navigasi Bawah -->
   <div class="nav">
     <button id="btnTabDashboard" class="active" onclick="switchTab('dashboard')"><span class="nav-icon">📊</span><span class="nav-text">Target</span></button>
     <button id="btnTabSoh" onclick="switchTab('soh')"><span class="nav-icon">📦</span><span class="nav-text">Stok</span></button>
@@ -190,6 +307,7 @@
     <button id="btnTabUpload" onclick="switchTab('upload')"><span class="nav-icon">⚙️</span><span class="nav-text">Admin</span></button>
   </div>
 
+  <!-- TAB ADMIN -->
   <div id="tab-upload" class="tab-content">
     <div class="card">
       <h2>Admin Panel</h2>
@@ -202,6 +320,7 @@
     </div>
   </div>
 
+  <!-- TAB TARGET & SALES HARIAN -->
   <div id="tab-dashboard" class="tab-content active">
     <div class="dropdown-container">
       <select id="staffSelect" onchange="showPersonalData()"><option value="">⏳ Memuat Data Staff...</option></select>
@@ -309,6 +428,7 @@
     </div>
   </div>
 
+  <!-- TAB STOK (SOH) -->
   <div id="tab-soh" class="tab-content">
     <div class="dropdown-container">
       <input type="text" id="searchInput" class="search-box" placeholder="🔍 Cari nama barang..." onkeyup="renderSOH()">
@@ -326,6 +446,7 @@
     <div class="table-container" id="sohTableContainer" style="display:none;"><table id="sohTable"><thead><tr><th>Detail Produk</th><th style="text-align:center; width: 70px;">Stok</th></tr></thead><tbody id="sohTableBody"></tbody></table></div>
   </div>
 
+  <!-- TAB LINK -->
   <div id="tab-links" class="tab-content">
     <div class="hero-header">
       <div class="link-hero-top">
@@ -353,13 +474,13 @@
     <div id="formListContainer"></div>
   </div>
 
-  <!-- TAB GABUNGAN STAF (PILIHAN SLIP GAJI & BIODATA TIM) -->
+  <!-- TAB GABUNGAN STAF (SLIP GAJI, BIODATA TIM, & JADWAL SHIFT) -->
   <div id="tab-staf" class="tab-content">
     <!-- Layar Pilihan Awal saat Menu Staf Diklik -->
     <div id="staffHubChoice">
       <div class="hero-header">
         <div class="hero-title">Portal Personal</div>
-        <div class="hero-name" style="font-size:23px;">Tim & Slip Gaji</div>
+        <div class="hero-name" style="font-size:23px;">Tim, Jadwal & Slip Gaji</div>
         <div style="font-size:12px; opacity:0.9; margin-top:4px;">Pilih layanan yang ingin Anda akses</div>
       </div>
 
@@ -380,12 +501,23 @@
         </div>
         <div class="hub-choice-arrow">›</div>
       </div>
+
+      <div class="hub-choice-card" onclick="openStaffSubMenu('jadwal')">
+        <div class="hub-choice-icon bg-green c-green">📅</div>
+        <div class="hub-choice-info">
+          <div class="hub-choice-title">Jadwal Shift</div>
+          <div class="hub-choice-desc">Jadwal shift harian, catatan kegiatan & roster 7 hari</div>
+        </div>
+        <div class="hub-choice-arrow">›</div>
+      </div>
     </div>
 
-    <!-- Bar Switcher Cepat saat Sudah Masuk ke Salah Satu Menu -->
+    <!-- Bar Switcher Cepat saat Sudah Masuk ke Salah Satu Sub-Menu -->
     <div id="staffSubSwitcher" class="sub-switcher-bar" style="display:none;">
-      <button type="button" id="btnSubBonus" class="sub-switch-btn" onclick="openStaffSubMenu('bonus')">💳 Slip Gaji</button>
-      <button type="button" id="btnSubBiodata" class="sub-switch-btn" onclick="openStaffSubMenu('biodata')">👥 Biodata Tim</button>
+      <button type="button" class="btn-back-hub" onclick="showStaffHubChoice()">‹ Staf</button>
+      <button type="button" id="btnSubBonus" class="sub-switch-btn" onclick="openStaffSubMenu('bonus')">💳 Gaji</button>
+      <button type="button" id="btnSubBiodata" class="sub-switch-btn" onclick="openStaffSubMenu('biodata')">👥 Biodata</button>
+      <button type="button" id="btnSubJadwal" class="sub-switch-btn" onclick="openStaffSubMenu('jadwal')">📅 Jadwal</button>
     </div>
 
     <!-- Sub-Menu 1: Slip Gaji -->
@@ -441,6 +573,46 @@
       </div>
 
       <div id="biodataListContainer"></div>
+    </div>
+
+    <!-- Sub-Menu 3: Jadwal Shift & Catatan Per Staf -->
+    <div id="sub-jadwal" style="display:none;">
+      <div class="hero-header">
+        <div class="link-hero-top">
+          <div>
+            <div class="hero-title">Jadwal Operasional</div>
+            <div class="hero-name" style="font-size:21px;">Roster & Shift Tim</div>
+            <div style="font-size:12px; opacity:0.9; margin-top:4px;" id="scheduleHeroSub">Digimap Jember Roxy</div>
+          </div>
+          <button type="button" class="btn-add-link" onclick="openBulkMatrixModal()">⚡ Atur 7 Hari</button>
+        </div>
+      </div>
+
+      <div class="week-nav-bar">
+        <button type="button" class="btn-week-step" onclick="changeScheduleWeek(-7)" title="Minggu Sebelumnya">◀</button>
+        <div class="week-range-label" id="weekHeaderLabel">Minggu Ini</div>
+        <button type="button" class="btn-week-step" onclick="changeScheduleWeek(7)" title="Minggu Berikutnya">▶</button>
+      </div>
+
+      <div class="subview-tabs">
+        <button type="button" id="tabBtnPerDay" class="subview-tab-btn active" onclick="switchScheduleSubTab('perDay')">📅 Per Hari (Tim)</button>
+        <button type="button" id="tabBtnPerStaff" class="subview-tab-btn" onclick="switchScheduleSubTab('perStaff')">👤 Per Staf (7 Hari)</button>
+      </div>
+
+      <!-- View 1: Per Hari (Tim) -->
+      <div id="panelSchedulePerDay">
+        <div class="day-selector-strip" id="daySelectorStrip"></div>
+        <div class="daily-summary-bar" id="dailySummaryBar"></div>
+        <div id="dailyStaffList"></div>
+      </div>
+
+      <!-- View 2: Per Staf (7 Hari - 1 Staf Terpilih) -->
+      <div id="panelSchedulePerStaff" style="display:none;">
+        <div class="dropdown-container" style="margin-bottom:12px;">
+          <select id="perStaffScheduleSelect" onchange="onSelectPerStaffSchedule(this.value)"></select>
+        </div>
+        <div id="staffWeekCardsContainer"></div>
+      </div>
     </div>
   </div>
 
@@ -521,6 +693,115 @@
     </div>
   </div>
 
+  <!-- MODAL A JADWAL: ATUR ROSTER 7 HARI (SEMUA STAF) -->
+  <div class="link-modal-overlay" id="bulkMatrixModal" onclick="if(event.target===this) closeBulkModal()">
+    <div class="link-modal-box">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:12px;">
+        <div>
+          <div style="font-size:16px; font-weight:800; color:var(--text-main);" id="bulkModalTitle">⚡ Atur Roster 7 Hari</div>
+          <div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;" id="bulkModalSub">Minggu Ini</div>
+        </div>
+        <button type="button" style="background:#F4EEFF; color:var(--text-muted); border:none; width:32px; height:32px; border-radius:50%; font-weight:700; cursor:pointer;" onclick="closeBulkModal()">✕</button>
+      </div>
+
+      <div class="brush-panel">
+        <div class="brush-header">
+          <span>🖌️ Mode Kuas Cepat</span>
+          <span style="color:var(--primary);" id="brushHintLabel">Ketuk sel: 🌅 Pagi</span>
+        </div>
+        <div class="brush-pills">
+          <button type="button" id="brushBtn-P" class="brush-btn active-P" onclick="selectBrush('P')">🌅 Pagi</button>
+          <button type="button" id="brushBtn-M" class="brush-btn" onclick="selectBrush('M')">☀️ Middle</button>
+          <button type="button" id="brushBtn-S" class="brush-btn" onclick="selectBrush('S')">🌙 Siang</button>
+          <button type="button" id="brushBtn-OFF" class="brush-btn" onclick="selectBrush('OFF')">🏖️ Off</button>
+          <button type="button" id="brushBtn-NOTE" class="brush-btn" onclick="selectBrush('NOTE')">📌 Catatan</button>
+        </div>
+      </div>
+
+      <div id="matrixCellNotePrompt" class="matrix-cell-note-prompt" style="display:none;">
+        <div class="mcnp-head">
+          <span id="mcnpTitle">📌 Catatan Kegiatan</span>
+          <button type="button" style="background:none; border:none; color:#92400E; font-weight:800; cursor:pointer;" onclick="closeMatrixCellNotePrompt()">✕</button>
+        </div>
+        <div class="preset-chips-wrap" style="margin:0 0 8px 0;" id="matrixNotePresets"></div>
+        <input type="text" id="matrixCellNoteInput" style="padding:9px 12px; font-size:12px; background:#FFF; margin-bottom:8px;" placeholder="Tulis kegiatan staf ini...">
+        <div style="display:flex; gap:6px;">
+          <button type="button" id="btnMcnpDelete" class="btn-danger-modal" style="padding:8px; font-size:11px;" onclick="deleteMatrixCellNote()">Hapus</button>
+          <button type="button" class="btn-primary" style="margin-top:0; padding:8px; font-size:11px;" onclick="applyMatrixCellNote()">Terapkan</button>
+        </div>
+      </div>
+
+      <div class="matrix-scroll-wrap">
+        <table class="matrix-table">
+          <thead id="bulkMatrixThead"></thead>
+          <tbody id="bulkMatrixTbody"></tbody>
+        </table>
+      </div>
+
+      <div style="display:flex; gap:10px; margin-top:10px;">
+        <button type="button" class="btn-outline" style="margin-top:0; padding:13px;" onclick="closeBulkModal()">Batal</button>
+        <button type="button" id="btnSaveBulkMatrix" class="btn-primary" style="margin-top:0; padding:13px;" onclick="saveBulkMatrix()">Simpan Semua Jadwal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL B JADWAL: ATUR JADWAL 7 HARI PER STAF -->
+  <div class="link-modal-overlay" id="singleStaffModal" onclick="if(event.target===this) closeSingleModal()">
+    <div class="link-modal-box">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:12px;">
+        <div style="display:flex; align-items:center; gap:11px;">
+          <div class="sch-avatar av-P" id="singleModalAvatar">SA</div>
+          <div>
+            <div style="font-size:15.5px; font-weight:800; color:var(--text-main);" id="singleModalTitle">✏️ Atur 7 Hari</div>
+            <div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;" id="singleModalSub">Minggu Ini</div>
+          </div>
+        </div>
+        <button type="button" style="background:#F4EEFF; color:var(--text-muted); border:none; width:32px; height:32px; border-radius:50%; font-weight:700; cursor:pointer;" onclick="closeSingleModal()">✕</button>
+      </div>
+
+      <div class="preset-row">
+        <button type="button" class="btn-preset" onclick="applySinglePreset('P')">🌅 Semua Pagi</button>
+        <button type="button" class="btn-preset" onclick="applySinglePreset('M')">☀️ Semua Middle</button>
+        <button type="button" class="btn-preset" onclick="applySinglePreset('S')">🌙 Semua Siang</button>
+      </div>
+
+      <div id="singleDaysContainer"></div>
+
+      <div style="display:flex; gap:10px; margin-top:10px;">
+        <button type="button" class="btn-outline" style="margin-top:0; padding:13px;" onclick="closeSingleModal()">Batal</button>
+        <button type="button" id="btnSaveSingleStaff" class="btn-primary" style="margin-top:0; padding:13px;" onclick="saveSingleStaffSchedule()">Simpan Jadwal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL C JADWAL: CATATAN KEGIATAN PER STAF -->
+  <div class="link-modal-overlay" id="staffNoteModal" onclick="if(event.target===this) closeStaffNoteModal()">
+    <div class="link-modal-box">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:12px;">
+        <div style="display:flex; align-items:center; gap:11px;">
+          <div class="sch-avatar av-M" id="snmAvatar">SA</div>
+          <div>
+            <div style="font-size:15.5px; font-weight:800; color:var(--text-main);" id="snmTitle">📌 Catatan Staf</div>
+            <div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;" id="snmSub">Tanggal</div>
+          </div>
+        </div>
+        <button type="button" style="background:#F4EEFF; color:var(--text-muted); border:none; width:32px; height:32px; border-radius:50%; font-weight:700; cursor:pointer;" onclick="closeStaffNoteModal()">✕</button>
+      </div>
+
+      <div style="font-size:11.5px; font-weight:700; color:var(--text-muted);">Pilih Cepat:</div>
+      <div class="preset-chips-wrap" id="snmPresetChips"></div>
+
+      <span class="modal-field-lbl">Detail Kegiatan Khusus</span>
+      <input type="text" id="snmTextInput" placeholder="Contoh: Stock Opname, Meeting Area...">
+
+      <div style="display:flex; gap:8px; margin-top:10px;">
+        <button type="button" class="btn-outline" style="margin-top:0; padding:13px;" onclick="closeStaffNoteModal()">Batal</button>
+        <button type="button" id="btnSnmDelete" class="btn-danger-modal" style="display:none;" onclick="deleteStaffNoteFromModal()">Hapus</button>
+        <button type="button" id="btnSnmSave" class="btn-primary" style="margin-top:0; padding:13px;" onclick="saveStaffNoteFromModal()">Simpan</button>
+      </div>
+    </div>
+  </div>
+
   <div class="link-toast" id="linkToast">Berhasil!</div>
 
   <script>
@@ -541,6 +822,7 @@
         showStaffHubChoice();
         loadDashboardData();
         loadBiodataData();
+        loadScheduleData();
       }
     }
 
@@ -549,6 +831,7 @@
       document.getElementById('staffSubSwitcher').style.display = 'none';
       document.getElementById('sub-bonus').style.display = 'none';
       document.getElementById('sub-biodata').style.display = 'none';
+      document.getElementById('sub-jadwal').style.display = 'none';
     }
 
     function openStaffSubMenu(subName) {
@@ -556,12 +839,20 @@
       document.getElementById('staffSubSwitcher').style.display = 'flex';
       document.getElementById('sub-bonus').style.display = (subName === 'bonus') ? 'block' : 'none';
       document.getElementById('sub-biodata').style.display = (subName === 'biodata') ? 'block' : 'none';
+      document.getElementById('sub-jadwal').style.display = (subName === 'jadwal') ? 'block' : 'none';
 
       document.getElementById('btnSubBonus').classList.toggle('active', subName === 'bonus');
       document.getElementById('btnSubBiodata').classList.toggle('active', subName === 'biodata');
+      document.getElementById('btnSubJadwal').classList.toggle('active', subName === 'jadwal');
 
       if (subName === 'bonus') loadDashboardData();
       if (subName === 'biodata') loadBiodataData();
+      if (subName === 'jadwal') {
+        loadDashboardData();
+        loadBiodataData();
+        loadScheduleData();
+        renderAllScheduleViews();
+      }
     }
 
     function formatRp(angka) { return 'Rp ' + Math.round(Number(angka)).toLocaleString('id-ID').replace(/,/g, '.'); }
@@ -580,7 +871,7 @@
 
     function renderDashboard(data) {
       document.getElementById('loadingDash').style.display = 'none';
-      dashboardData = data.staffList;
+      dashboardData = data.staffList || [];
       storeDataGlobal = data.storeData;
       
       const select = document.getElementById('staffSelect');
@@ -625,6 +916,7 @@
         tbody.appendChild(tr);
       });
       showPersonalData();
+      renderAllScheduleViews();
     }
 
     function showPersonalData() {
@@ -706,7 +998,7 @@
       var fSPW = document.getElementById("fileSPW").files[0];
       var fMSR = document.getElementById("fileMSR").files[0];
       var fSTOCK = document.getElementById("fileSTOCK").files[0];
-      if (!fSPW && !fMSR && !fSTOCK) { alert("Pilih minimal satu file untuk diupload!"); return; }
+      if (!fSPW && !fMSR && !fSTOCK) { showLinkToast("⚠️ Pilih minimal satu file untuk diupload!"); return; }
       
       var btn = document.getElementById("btnUpload");
       var statusEl = document.getElementById("status");
@@ -750,7 +1042,7 @@
             selesaiSukses("✅ Data berhasil dikirim dan diproses!");
           }
         })
-        .catch(err => {
+        .catch(() => {
           statusEl.innerText = "⏳ Memverifikasi hasil sinkronisasi...";
           fetch(API_URL + "?action=getDashboard")
             .then(r => r.json())
@@ -806,7 +1098,7 @@
             document.getElementById("authBox").style.display = 'none'; document.getElementById("payslipBox").style.display = 'block';
             document.getElementById("inputPin").value = ""; document.getElementById("pinStatus").innerText = "";
           } else { errBox.style.display = 'block'; errBox.innerText = res.message; }
-        }).catch(err => {
+        }).catch(() => {
           btn.disabled = false; document.getElementById("loadingBonus").style.display = 'none'; errBox.style.display = 'block'; errBox.innerText = "Gagal terhubung ke server.";
         });
     }
@@ -903,7 +1195,15 @@
     function copyFormLink(id) {
       const item = allLinksData.find(f => f.id === id);
       if (!item) return;
-      navigator.clipboard.writeText(item.url).then(() => showLinkToast('📋 Link berhasil disalin!'));
+      const tmp = document.createElement('textarea');
+      tmp.value = item.url;
+      tmp.style.position = 'fixed';
+      tmp.style.left = '-9999px';
+      document.body.appendChild(tmp);
+      tmp.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(tmp);
+      showLinkToast('📋 Link berhasil disalin!');
     }
 
     let editingLinkId = null;
@@ -940,7 +1240,7 @@
       const desc = document.getElementById('newFormDesc').value.trim();
       const cat = document.getElementById('newFormCat').value;
       let url = document.getElementById('newFormUrl').value.trim();
-      if (!title || !url) { alert('Nama Form dan URL wajib diisi!'); return; }
+      if (!title || !url) { showLinkToast('⚠️ Nama Form dan URL wajib diisi!'); return; }
       if (!url.startsWith('http')) url = 'https://' + url;
 
       const icons = { 'Harian': '📅', 'Stok & Display': '📦', 'Promo & VAS': '🛡️', 'Tim & HR': '👥' };
@@ -982,9 +1282,7 @@
     }
 
     function deleteForm(id) {
-      if (!confirm('Hapus link ini? Perubahan akan berlaku untuk semua staf.')) return;
       showLinkToast('⏳ Menghapus link...');
-
       fetch(API_URL, {
         method: 'POST',
         redirect: 'follow',
@@ -1005,7 +1303,7 @@
       const t = document.getElementById('linkToast');
       t.innerText = msg;
       t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 2200);
+      setTimeout(() => t.classList.remove('show'), 2300);
     }
 
     // =========================================================
@@ -1025,6 +1323,7 @@
           allBiodataList = data.biodata || [];
           isBiodataLoading = false;
           renderBiodata();
+          renderAllScheduleViews();
         })
         .catch(() => {
           isBiodataLoading = false;
@@ -1056,7 +1355,7 @@
     function getInitials(name) {
       const parts = String(name || '').trim().split(/\s+/);
       if (parts.length === 0 || !parts[0]) return '👤';
-      return (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
+      return (parts[0][0] + (parts[1] ? parts[1][0] : parts[0][1] || '')).toUpperCase();
     }
 
     function renderBiodata() {
@@ -1218,7 +1517,7 @@
       const shirt = document.getElementById('bioShirt').value;
       const address = document.getElementById('bioAddress').value.trim();
 
-      if (!name) { alert('Nama Lengkap wajib diisi!'); return; }
+      if (!name) { showLinkToast('⚠️ Nama Lengkap wajib diisi!'); return; }
 
       const btn = document.getElementById('btnSaveBio');
       const isEdit = editingBioId !== null;
@@ -1251,7 +1550,6 @@
     }
 
     function deleteBiodata(id) {
-      if (!confirm('Hapus biodata ini dari daftar tim?')) return;
       showLinkToast('⏳ Menghapus biodata...');
       fetch(API_URL, {
         method: 'POST',
@@ -1266,6 +1564,682 @@
       .catch(() => {
         loadBiodataData();
         showLinkToast('🗑️ Biodata dihapus');
+      });
+    }
+
+    // =========================================================
+    // FITUR JADWAL SHIFT & CATATAN PER STAF (GOOGLE SHEETS)
+    // =========================================================
+    const SHIFTS_DEF = {
+      P:   { code: 'P',   shortLabel: 'P',   label: 'Pagi',   icon: '🌅', hours: '09:30–18:00', badgeClass: 'sh-P',   avClass: 'av-P' },
+      M:   { code: 'M',   shortLabel: 'M',   label: 'Middle', icon: '☀️', hours: '11:30–20:00', badgeClass: 'sh-M',   avClass: 'av-M' },
+      S:   { code: 'S',   shortLabel: 'S',   label: 'Siang',  icon: '🌙', hours: '13:30–22:00', badgeClass: 'sh-S',   avClass: 'av-S' },
+      OFF: { code: 'OFF', shortLabel: 'OFF', label: 'Off',    icon: '🏖️', hours: 'Libur',       badgeClass: 'sh-OFF', avClass: 'av-OFF' }
+    };
+
+    const NOTE_PRESETS = ['Stock Opname', 'Meeting Area', 'Training Produk', 'Cek Display', 'Admin & Laporan'];
+    const SHIFT_ORDER = ['P', 'M', 'S', 'OFF'];
+    const DAY_NAMES_SHORT = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+    const DAY_NAMES_FULL  = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const MONTH_NAMES_ID  = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+
+    function parseSchKey(key) {
+      const [y, m, d] = key.split('-').map(Number);
+      return new Date(y, m - 1, d);
+    }
+
+    function formatSchKey(dt) {
+      return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+    }
+
+    function shiftSchDateKey(key, deltaDays) {
+      const dt = parseSchKey(key);
+      dt.setDate(dt.getDate() + deltaDays);
+      return formatSchKey(dt);
+    }
+
+    function getMondayOfCurrentWeekStr() {
+      const now = new Date();
+      const dayOfWeek = now.getDay();
+      const diffToMon = (dayOfWeek === 0) ? -6 : (1 - dayOfWeek);
+      const mon = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diffToMon);
+      return formatSchKey(mon);
+    }
+
+    let currentScheduleWeekStart = getMondayOfCurrentWeekStr();
+    let activeScheduleSubTab = 'perDay';
+    let selectedScheduleDayIdx = (new Date().getDay() + 6) % 7;
+    let selectedPerStaffName = '';
+    let scheduleDatabase = {};
+    let isScheduleLoading = false;
+
+    function getScheduleStaffList() {
+      const names = [];
+      dashboardData.forEach(s => {
+        if (s.name && names.indexOf(s.name) === -1) names.push(s.name);
+      });
+      allBiodataList.forEach(b => {
+        if (b.name && names.indexOf(b.name) === -1) names.push(b.name);
+      });
+      return names.map(name => {
+        const bio = allBiodataList.find(b => b.name.toLowerCase() === name.toLowerCase());
+        return {
+          name: name,
+          shortName: name.split(' ')[0],
+          role: (bio && bio.role) ? bio.role : 'Staff Toko'
+        };
+      });
+    }
+
+    function getWeekList(startKey) {
+      const list = [];
+      for (let i = 0; i < 7; i++) {
+        const k = shiftSchDateKey(startKey, i);
+        const dt = parseSchKey(k);
+        list.push({
+          key: k,
+          dayShort: DAY_NAMES_SHORT[dt.getDay()],
+          dayFull: DAY_NAMES_FULL[dt.getDay()],
+          dateNum: dt.getDate(),
+          monthShort: MONTH_NAMES_ID[dt.getMonth()],
+          year: dt.getFullYear()
+        });
+      }
+      return list;
+    }
+
+    function getWeekRangeText(startKey) {
+      const days = getWeekList(startKey);
+      return `${days[0].dateNum} ${days[0].monthShort} – ${days[6].dateNum} ${days[6].monthShort} ${days[6].year}`;
+    }
+
+    function getScheduleCell(dateKey, staffName) {
+      if (!scheduleDatabase[dateKey]) scheduleDatabase[dateKey] = {};
+      if (!scheduleDatabase[dateKey][staffName]) {
+        scheduleDatabase[dateKey][staffName] = { shift: 'P', note: '' };
+      }
+      return scheduleDatabase[dateKey][staffName];
+    }
+
+    function loadScheduleData() {
+      isScheduleLoading = true;
+      renderAllScheduleViews();
+      fetch(API_URL + "?action=getSchedule")
+        .then(res => res.json())
+        .then(res => {
+          if (res.success && res.schedule) {
+            scheduleDatabase = res.schedule;
+          }
+          isScheduleLoading = false;
+          renderAllScheduleViews();
+        })
+        .catch(() => {
+          isScheduleLoading = false;
+          renderAllScheduleViews();
+        });
+    }
+
+    function pushScheduleBatchToServer(items, onDone) {
+      fetch(API_URL, {
+        method: 'POST',
+        redirect: 'follow',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          action: 'saveScheduleBatch',
+          items: items
+        })
+      })
+      .then(() => { if (onDone) onDone(); })
+      .catch(() => { if (onDone) onDone(); });
+    }
+
+    function changeScheduleWeek(deltaDays) {
+      currentScheduleWeekStart = shiftSchDateKey(currentScheduleWeekStart, deltaDays);
+      renderAllScheduleViews();
+    }
+
+    function switchScheduleSubTab(tab) {
+      activeScheduleSubTab = tab;
+      document.getElementById('tabBtnPerDay').classList.toggle('active', tab === 'perDay');
+      document.getElementById('tabBtnPerStaff').classList.toggle('active', tab === 'perStaff');
+      document.getElementById('panelSchedulePerDay').style.display = tab === 'perDay' ? 'block' : 'none';
+      document.getElementById('panelSchedulePerStaff').style.display = tab === 'perStaff' ? 'block' : 'none';
+      renderAllScheduleViews();
+    }
+
+    function renderAllScheduleViews() {
+      const weekLabelEl = document.getElementById('weekHeaderLabel');
+      if (!weekLabelEl) return;
+      weekLabelEl.innerText = getWeekRangeText(currentScheduleWeekStart);
+
+      const staffList = getScheduleStaffList();
+      const subEl = document.getElementById('scheduleHeroSub');
+      if (subEl) {
+        subEl.innerText = staffList.length > 0
+          ? `Digimap Jember Roxy • ${staffList.length} Staf`
+          : 'Digimap Jember Roxy';
+      }
+
+      renderSchedulePerDayView(staffList);
+      renderSchedulePerStaffView(staffList);
+    }
+
+    function quickToggleStaffShift(staffName, dateKey) {
+      const cell = getScheduleCell(dateKey, staffName);
+      const next = SHIFT_ORDER[(SHIFT_ORDER.indexOf(cell.shift || 'P') + 1) % SHIFT_ORDER.length];
+      cell.shift = next;
+      renderAllScheduleViews();
+      const shortName = staffName.split(' ')[0];
+      showLinkToast(`${SHIFTS_DEF[next].icon} ${shortName}: ${SHIFTS_DEF[next].label} (${SHIFTS_DEF[next].hours})`);
+      pushScheduleBatchToServer([{
+        date: dateKey,
+        staff: staffName,
+        shift: cell.shift,
+        note: cell.note || ''
+      }]);
+    }
+
+    function renderSchedulePerDayView(staffList) {
+      const weekDays = getWeekList(currentScheduleWeekStart);
+      const stripEl = document.getElementById('daySelectorStrip');
+      const sumEl = document.getElementById('dailySummaryBar');
+      const listEl = document.getElementById('dailyStaffList');
+      if (!stripEl || !sumEl || !listEl) return;
+
+      stripEl.innerHTML = weekDays.map((d, idx) => {
+        const hasAnyNote = staffList.some(m => (getScheduleCell(d.key, m.name).note || '').trim() !== '');
+        return `
+          <button type="button" class="day-pill ${idx === selectedScheduleDayIdx ? 'active' : ''}" onclick="selectedScheduleDayIdx=${idx}; renderAllScheduleViews();">
+            ${hasAnyNote ? '<span class="note-dot-indicator"></span>' : ''}
+            <span class="dp-name">${d.dayShort}</span>
+            <span class="dp-num">${d.dateNum}</span>
+          </button>
+        `;
+      }).join('');
+
+      const activeDay = weekDays[selectedScheduleDayIdx];
+      if (staffList.length === 0) {
+        sumEl.innerHTML = `<div class="dsb-top"><span>${activeDay.dayFull}, ${activeDay.dateNum} ${activeDay.monthShort} ${activeDay.year}</span></div>`;
+        listEl.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">⏳ Memuat daftar staf & jadwal...</div>';
+        return;
+      }
+
+      let cP = 0, cM = 0, cS = 0, cOff = 0;
+      const rowsData = staffList.map(m => {
+        const cell = getScheduleCell(activeDay.key, m.name);
+        const code = SHIFTS_DEF[cell.shift] ? cell.shift : 'P';
+        if (code === 'P') cP++;
+        else if (code === 'M') cM++;
+        else if (code === 'S') cS++;
+        else cOff++;
+        return { member: m, code, note: (cell.note || '').trim() };
+      });
+
+      const orderRank = { P: 1, M: 2, S: 3, OFF: 4 };
+      rowsData.sort((a, b) => orderRank[a.code] - orderRank[b.code]);
+
+      sumEl.innerHTML = `
+        <div class="dsb-top">
+          <span>${activeDay.dayFull}, ${activeDay.dateNum} ${activeDay.monthShort} ${activeDay.year}</span>
+          <span style="color:var(--primary);">${staffList.length - cOff}/${staffList.length} Masuk</span>
+        </div>
+        <div class="dsb-grid">
+          <div class="dsb-chip sh-P">🌅 Pagi: ${cP}</div>
+          <div class="dsb-chip sh-M">☀️ Mid: ${cM}</div>
+          <div class="dsb-chip sh-S">🌙 Siang: ${cS}</div>
+          <div class="dsb-chip sh-OFF">🏖️ Off: ${cOff}</div>
+        </div>
+      `;
+
+      listEl.innerHTML = rowsData.map(({ member, code, note }) => {
+        const sh = SHIFTS_DEF[code];
+        const isOff = code === 'OFF';
+        const shiftText = isOff ? `${sh.icon} Off / Libur` : `${sh.icon} ${sh.label} • ${sh.hours}`;
+        const safeName = member.name.replace(/'/g, "\\'");
+
+        const rightNoteHtml = note
+          ? `<button type="button" class="btn-active-note-right" onclick="openStaffNoteModal('${safeName}', '${activeDay.key}')" title="${note.replace(/"/g, '&quot;')}">
+               <span>📌</span>
+               <span class="note-label-clamp">${note}</span>
+               <span>✏️</span>
+             </button>`
+          : `<button type="button" class="btn-add-note-right" onclick="openStaffNoteModal('${safeName}', '${activeDay.key}')">+ Catatan</button>`;
+
+        return `
+          <div class="daily-staff-row ${isOff ? 'is-off' : ''}">
+            <div class="dsr-left">
+              <div class="sch-avatar ${sh.avClass}">${getInitials(member.name)}</div>
+              <div class="dsr-text-col">
+                <div class="dsr-name">${member.name}</div>
+                <div class="dsr-shift-line ${sh.badgeClass}" onclick="quickToggleStaffShift('${safeName}', '${activeDay.key}')" title="Ketuk untuk ubah shift">
+                  ${shiftText}
+                </div>
+              </div>
+            </div>
+            <div class="dsr-right">
+              ${rightNoteHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function onSelectPerStaffSchedule(staffName) {
+      selectedPerStaffName = staffName;
+      renderAllScheduleViews();
+    }
+
+    function renderSchedulePerStaffView(staffList) {
+      const pickerEl = document.getElementById('perStaffScheduleSelect');
+      const container = document.getElementById('staffWeekCardsContainer');
+      if (!pickerEl || !container) return;
+
+      if (staffList.length === 0) {
+        pickerEl.innerHTML = '<option value="">⏳ Memuat Data Staff...</option>';
+        container.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">⏳ Memuat daftar staf...</div>';
+        return;
+      }
+
+      if (!selectedPerStaffName || !staffList.some(m => m.name === selectedPerStaffName)) {
+        selectedPerStaffName = staffList[0].name;
+      }
+
+      pickerEl.innerHTML = staffList.map(m =>
+        `<option value="${m.name.replace(/"/g, '&quot;')}" ${m.name === selectedPerStaffName ? 'selected' : ''}>👤 ${m.name}</option>`
+      ).join('');
+
+      const member = staffList.find(m => m.name === selectedPerStaffName) || staffList[0];
+      const safeName = member.name.replace(/'/g, "\\'");
+      const weekDays = getWeekList(currentScheduleWeekStart);
+
+      let onDutyCount = 0;
+      let offCount = 0;
+      let noteCount = 0;
+
+      const dayRowsHtml = weekDays.map(d => {
+        const cell = getScheduleCell(d.key, member.name);
+        const code = SHIFTS_DEF[cell.shift] ? cell.shift : 'P';
+        const sh = SHIFTS_DEF[code];
+        const isOff = code === 'OFF';
+        const noteText = (cell.note || '').trim();
+
+        if (isOff) offCount++;
+        else onDutyCount++;
+        if (noteText) noteCount++;
+
+        const shiftDisplay = isOff
+          ? `${sh.icon} Off / Libur`
+          : `${sh.icon} ${sh.label} • ${sh.hours}`;
+
+        const rightActionHtml = noteText
+          ? `<button type="button" class="btn-active-note-right" onclick="openStaffNoteModal('${safeName}', '${d.key}')" title="${noteText.replace(/"/g, '&quot;')}">
+               <span>📌</span>
+               <span class="note-label-clamp">${noteText}</span>
+               <span>✏️</span>
+             </button>`
+          : `<button type="button" class="btn-add-note-right" onclick="openStaffNoteModal('${safeName}', '${d.key}')">+ Catatan</button>`;
+
+        return `
+          <div class="staff-day-row ${isOff ? 'is-off' : ''}">
+            <div class="sdr-left">
+              <div class="day-badge-box ${sh.avClass}">
+                <span class="dbb-day">${d.dayShort}</span>
+                <span class="dbb-num">${d.dateNum}</span>
+              </div>
+              <div class="sdr-text-col">
+                <div class="sdr-date-title">${d.dayFull}, ${d.dateNum} ${d.monthShort}</div>
+                <div class="dsr-shift-line ${sh.badgeClass}" onclick="quickToggleStaffShift('${safeName}', '${d.key}')" title="Ketuk untuk ubah shift">
+                  ${shiftDisplay}
+                </div>
+              </div>
+            </div>
+            <div class="dsr-right">
+              ${rightActionHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      container.innerHTML = `
+        <div class="staff-focus-card">
+          <div class="swc-profile">
+            <div class="sch-avatar av-P">${getInitials(member.name)}</div>
+            <div>
+              <div class="swc-name">${member.name}</div>
+              <div class="swc-meta">
+                <span class="role-badge">${member.role}</span>
+                <span class="summary-pill">${onDutyCount} Masuk • ${offCount} Off</span>
+                ${noteCount > 0 ? `<span class="summary-pill" style="background:#FFFBEB; color:#B45309; border-color:#FDE68A;">📌 ${noteCount}</span>` : ''}
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn-edit-staff-week" onclick="openSingleStaffModal('${safeName}')">✏️ Atur 7 Hari</button>
+        </div>
+        ${dayRowsHtml}
+      `;
+    }
+
+    // =========================================================
+    // MODAL A: BATCH 7-DAY MATRIX (SEMUA STAF)
+    // =========================================================
+    let draftBulkData = {};
+    let activeBrushMode = 'P';
+    let editingMatrixCell = null;
+
+    function selectBrush(mode) {
+      activeBrushMode = mode;
+      ['P', 'M', 'S', 'OFF', 'NOTE'].forEach(m => {
+        const btn = document.getElementById('brushBtn-' + m);
+        btn.className = 'brush-btn' + (m === mode ? ' active-' + m : '');
+      });
+      if (mode === 'NOTE') {
+        document.getElementById('brushHintLabel').innerText = 'Ketuk sel: 📌 Catatan';
+      } else {
+        closeMatrixCellNotePrompt();
+        document.getElementById('brushHintLabel').innerText = `Ketuk sel: ${SHIFTS_DEF[mode].icon} ${SHIFTS_DEF[mode].label}`;
+      }
+    }
+
+    function openBulkMatrixModal() {
+      const staffList = getScheduleStaffList();
+      if (staffList.length === 0) {
+        showLinkToast('⏳ Daftar staf sedang dimuat...');
+        return;
+      }
+      const weekDays = getWeekList(currentScheduleWeekStart);
+      document.getElementById('bulkModalTitle').innerText = `⚡ Atur Roster 7 Hari (${staffList.length} Staf)`;
+      document.getElementById('bulkModalSub').innerText = getWeekRangeText(currentScheduleWeekStart);
+      draftBulkData = {};
+      staffList.forEach(m => {
+        draftBulkData[m.name] = weekDays.map(d => {
+          const c = getScheduleCell(d.key, m.name);
+          return { shift: SHIFTS_DEF[c.shift] ? c.shift : 'P', note: c.note || '' };
+        });
+      });
+      closeMatrixCellNotePrompt();
+      selectBrush('P');
+      renderBulkMatrix();
+      document.getElementById('bulkMatrixModal').classList.add('open');
+    }
+
+    function closeBulkModal() {
+      closeMatrixCellNotePrompt();
+      document.getElementById('bulkMatrixModal').classList.remove('open');
+    }
+
+    function handleMatrixCellTap(staffName, dayIdx) {
+      if (activeBrushMode === 'NOTE') {
+        editingMatrixCell = { staffName, dayIdx };
+        const day = getWeekList(currentScheduleWeekStart)[dayIdx];
+        const currNote = draftBulkData[staffName][dayIdx].note || '';
+        document.getElementById('mcnpTitle').innerText = `📌 Catatan: ${staffName.split(' ')[0]} • ${day.dayShort} ${day.dateNum}`;
+        document.getElementById('matrixCellNoteInput').value = currNote;
+        document.getElementById('btnMcnpDelete').style.display = currNote ? 'block' : 'none';
+        document.getElementById('matrixNotePresets').innerHTML = NOTE_PRESETS.map(p => `
+          <button type="button" class="note-preset-chip ${currNote === p ? 'active-chip' : ''}" onclick="document.getElementById('matrixCellNoteInput').value='${p}'">${p}</button>
+        `).join('');
+        document.getElementById('matrixCellNotePrompt').style.display = 'block';
+        return;
+      }
+      draftBulkData[staffName][dayIdx].shift = activeBrushMode;
+      renderBulkMatrix();
+    }
+
+    function closeMatrixCellNotePrompt() {
+      editingMatrixCell = null;
+      document.getElementById('matrixCellNotePrompt').style.display = 'none';
+    }
+
+    function applyMatrixCellNote() {
+      if (!editingMatrixCell) return;
+      draftBulkData[editingMatrixCell.staffName][editingMatrixCell.dayIdx].note = document.getElementById('matrixCellNoteInput').value.trim();
+      closeMatrixCellNotePrompt();
+      renderBulkMatrix();
+    }
+
+    function deleteMatrixCellNote() {
+      if (!editingMatrixCell) return;
+      draftBulkData[editingMatrixCell.staffName][editingMatrixCell.dayIdx].note = '';
+      closeMatrixCellNotePrompt();
+      renderBulkMatrix();
+    }
+
+    function renderBulkMatrix() {
+      const staffList = getScheduleStaffList();
+      const weekDays = getWeekList(currentScheduleWeekStart);
+      document.getElementById('bulkMatrixThead').innerHTML = `
+        <tr>
+          <th>Staf</th>
+          ${weekDays.map(d => `<th>${d.dayShort}<br>${d.dateNum}</th>`).join('')}
+        </tr>
+      `;
+
+      const rowsHtml = staffList.map(m => {
+        const safeName = m.name.replace(/'/g, "\\'");
+        return `
+          <tr>
+            <td>${m.shortName}</td>
+            ${weekDays.map((d, idx) => {
+              const c = draftBulkData[m.name][idx];
+              const sh = SHIFTS_DEF[c.shift] || SHIFTS_DEF.P;
+              return `
+                <td>
+                  <button type="button" class="m-cell-btn ${sh.badgeClass}" onclick="handleMatrixCellTap('${safeName}', ${idx})">
+                    ${c.note ? '<span class="m-cell-pin">📌</span>' : ''}
+                    ${sh.shortLabel}
+                  </button>
+                </td>
+              `;
+            }).join('')}
+          </tr>
+        `;
+      }).join('');
+
+      const sumCells = weekDays.map((d, idx) => {
+        let onDuty = 0;
+        staffList.forEach(m => { if (draftBulkData[m.name][idx].shift !== 'OFF') onDuty++; });
+        return `<td><span class="duty-badge ${onDuty >= Math.max(1, staffList.length - 2) ? 'duty-ok' : 'duty-warn'}">${onDuty}/${staffList.length}</span></td>`;
+      }).join('');
+
+      document.getElementById('bulkMatrixTbody').innerHTML = rowsHtml + `<tr class="matrix-sum-row"><td>Masuk</td>${sumCells}</tr>`;
+    }
+
+    function saveBulkMatrix() {
+      const staffList = getScheduleStaffList();
+      const weekDays = getWeekList(currentScheduleWeekStart);
+      const batchItems = [];
+
+      weekDays.forEach((d, idx) => {
+        if (!scheduleDatabase[d.key]) scheduleDatabase[d.key] = {};
+        staffList.forEach(m => {
+          const entry = draftBulkData[m.name][idx];
+          scheduleDatabase[d.key][m.name] = {
+            shift: entry.shift,
+            note: entry.note
+          };
+          batchItems.push({
+            date: d.key,
+            staff: m.name,
+            shift: entry.shift,
+            note: entry.note
+          });
+        });
+      });
+
+      const btn = document.getElementById('btnSaveBulkMatrix');
+      btn.disabled = true;
+      btn.innerText = '⏳ Menyimpan...';
+
+      pushScheduleBatchToServer(batchItems, () => {
+        btn.disabled = false;
+        btn.innerText = 'Simpan Semua Jadwal';
+        closeBulkModal();
+        renderAllScheduleViews();
+        showLinkToast('✅ Semua jadwal minggu ini disimpan!');
+      });
+    }
+
+    // =========================================================
+    // MODAL B: SINGLE STAFF 7-DAY MODAL
+    // =========================================================
+    let editingSingleStaffName = null;
+    let draftSingleDays = [];
+
+    function openSingleStaffModal(staffName) {
+      editingSingleStaffName = staffName;
+      const weekDays = getWeekList(currentScheduleWeekStart);
+      document.getElementById('singleModalAvatar').innerText = getInitials(staffName);
+      document.getElementById('singleModalTitle').innerText = `✏️ Atur 7 Hari - ${staffName.split(' ')[0]}`;
+      document.getElementById('singleModalSub').innerText = getWeekRangeText(currentScheduleWeekStart);
+
+      draftSingleDays = weekDays.map(d => {
+        const c = getScheduleCell(d.key, staffName);
+        return { shift: SHIFTS_DEF[c.shift] ? c.shift : 'P', note: c.note || '' };
+      });
+      renderSingleStaffDays();
+      document.getElementById('singleStaffModal').classList.add('open');
+    }
+
+    function closeSingleModal() {
+      editingSingleStaffName = null;
+      document.getElementById('singleStaffModal').classList.remove('open');
+    }
+
+    function applySinglePreset(code) {
+      draftSingleDays.forEach(d => d.shift = code);
+      renderSingleStaffDays();
+    }
+
+    function renderSingleStaffDays() {
+      const weekDays = getWeekList(currentScheduleWeekStart);
+      document.getElementById('singleDaysContainer').innerHTML = weekDays.map((d, idx) => {
+        const row = draftSingleDays[idx];
+        return `
+          <div class="single-day-item">
+            <div class="sdi-top-row">
+              <div class="sdi-left">
+                <div class="sdi-day">${d.dayFull}</div>
+                <div class="sdi-date">${d.dateNum} ${d.monthShort}</div>
+              </div>
+              <div class="sdi-choices">
+                ${SHIFT_ORDER.map(code => `
+                  <button type="button" class="sdi-choice-btn ${row.shift === code ? 'sel-' + code : ''}" onclick="draftSingleDays[${idx}].shift='${code}'; renderSingleStaffDays();">
+                    ${SHIFTS_DEF[code].label}
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+            <input type="text" class="sdi-note-input" value="${row.note.replace(/"/g, '&quot;')}" placeholder="📌 Catatan kegiatan ${d.dayShort} (opsional)..." oninput="draftSingleDays[${idx}].note=this.value">
+          </div>
+        `;
+      }).join('');
+    }
+
+    function saveSingleStaffSchedule() {
+      if (!editingSingleStaffName) return;
+      const staffName = editingSingleStaffName;
+      const weekDays = getWeekList(currentScheduleWeekStart);
+      const batchItems = [];
+
+      weekDays.forEach((d, idx) => {
+        if (!scheduleDatabase[d.key]) scheduleDatabase[d.key] = {};
+        const noteTrimmed = draftSingleDays[idx].note.trim();
+        scheduleDatabase[d.key][staffName] = {
+          shift: draftSingleDays[idx].shift,
+          note: noteTrimmed
+        };
+        batchItems.push({
+          date: d.key,
+          staff: staffName,
+          shift: draftSingleDays[idx].shift,
+          note: noteTrimmed
+        });
+      });
+
+      const btn = document.getElementById('btnSaveSingleStaff');
+      btn.disabled = true;
+      btn.innerText = '⏳ Menyimpan...';
+
+      pushScheduleBatchToServer(batchItems, () => {
+        btn.disabled = false;
+        btn.innerText = 'Simpan Jadwal';
+        closeSingleModal();
+        renderAllScheduleViews();
+        showLinkToast(`✅ Jadwal 7 hari ${staffName.split(' ')[0]} disimpan!`);
+      });
+    }
+
+    // =========================================================
+    // MODAL C: INDIVIDUAL STAFF NOTE MODAL
+    // =========================================================
+    let noteModalContext = null;
+
+    function openStaffNoteModal(staffName, dateKey) {
+      noteModalContext = { staffName, dateKey };
+      const dt = parseSchKey(dateKey);
+      const currNote = getScheduleCell(dateKey, staffName).note || '';
+
+      document.getElementById('snmAvatar').innerText = getInitials(staffName);
+      document.getElementById('snmTitle').innerText = currNote ? '✏️ Edit Catatan Staf' : '📌 Tambah Catatan Staf';
+      document.getElementById('snmSub').innerText = `${staffName} • ${DAY_NAMES_FULL[dt.getDay()]}, ${dt.getDate()} ${MONTH_NAMES_ID[dt.getMonth()]} ${dt.getFullYear()}`;
+      document.getElementById('snmTextInput').value = currNote;
+      document.getElementById('btnSnmDelete').style.display = currNote ? 'block' : 'none';
+
+      renderSnmPresets(currNote);
+      document.getElementById('staffNoteModal').classList.add('open');
+    }
+
+    function renderSnmPresets(activeText) {
+      document.getElementById('snmPresetChips').innerHTML = NOTE_PRESETS.map(p => `
+        <button type="button" class="note-preset-chip ${activeText === p ? 'active-chip' : ''}" onclick="document.getElementById('snmTextInput').value='${p}'; renderSnmPresets('${p}')">${p}</button>
+      `).join('');
+    }
+
+    function closeStaffNoteModal() {
+      noteModalContext = null;
+      document.getElementById('staffNoteModal').classList.remove('open');
+    }
+
+    function saveStaffNoteFromModal() {
+      if (!noteModalContext) return;
+      const { staffName, dateKey } = noteModalContext;
+      const val = document.getElementById('snmTextInput').value.trim();
+      const cell = getScheduleCell(dateKey, staffName);
+      cell.note = val;
+
+      const btn = document.getElementById('btnSnmSave');
+      btn.disabled = true;
+      btn.innerText = '⏳...';
+
+      pushScheduleBatchToServer([{
+        date: dateKey,
+        staff: staffName,
+        shift: cell.shift || 'P',
+        note: val
+      }], () => {
+        btn.disabled = false;
+        btn.innerText = 'Simpan';
+        closeStaffNoteModal();
+        renderAllScheduleViews();
+        showLinkToast(val ? `📌 Catatan ${staffName.split(' ')[0]} disimpan!` : `Catatan ${staffName.split(' ')[0]} dikosongkan`);
+      });
+    }
+
+    function deleteStaffNoteFromModal() {
+      if (!noteModalContext) return;
+      const { staffName, dateKey } = noteModalContext;
+      const cell = getScheduleCell(dateKey, staffName);
+      cell.note = '';
+
+      pushScheduleBatchToServer([{
+        date: dateKey,
+        staff: staffName,
+        shift: cell.shift || 'P',
+        note: ''
+      }], () => {
+        closeStaffNoteModal();
+        renderAllScheduleViews();
+        showLinkToast(`🗑️ Catatan ${staffName.split(' ')[0]} dihapus`);
       });
     }
 
