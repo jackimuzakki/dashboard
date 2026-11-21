@@ -16,11 +16,11 @@
     html, body { width: 100%; overflow-x: hidden; background-color: var(--bg-main); color: var(--text-main); }
     body { display: block; padding: 20px 16px 120px 16px; }
     
-    .nav { background: var(--card-bg); padding: 8px 8px; border-radius: 40px; display: flex; gap: 2px; box-shadow: 0 15px 35px rgba(140,109,253,0.18); position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 999; flex-wrap: nowrap; justify-content: space-between; width: 94%; max-width: 500px; }
-    .nav button { background: transparent; border: none; padding: 9px 2px; flex: 1; min-width: 0; font-weight: 600; color: var(--text-muted); cursor: pointer; border-radius: 30px; transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .nav { background: var(--card-bg); padding: 10px 12px; border-radius: 40px; display: flex; gap: 4px; box-shadow: 0 15px 35px rgba(140,109,253,0.18); position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 999; flex-wrap: nowrap; justify-content: space-between; width: 92%; max-width: 500px; }
+    .nav button { background: transparent; border: none; padding: 10px 6px; flex: 1; font-weight: 600; color: var(--text-muted); cursor: pointer; border-radius: 30px; transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; gap: 4px; }
     .nav button.active { background: var(--primary); color: white; box-shadow: 0 8px 15px rgba(140,109,253,0.3); }
-    .nav-icon { font-size: 16px; }
-    .nav-text { font-size: 9.5px; white-space: nowrap; }
+    .nav-icon { font-size: 18px; }
+    .nav-text { font-size: 10px; white-space: nowrap; }
     
     .tab-content { display: none; width: 100%; max-width: 500px; margin: 0 auto; animation: fadeIn 0.5s ease; padding-bottom: 20px; }
     .tab-content.active { display: block; }
@@ -140,6 +140,18 @@
     .btn-edit-custom { background: #EEF2FF; border: none; color: var(--primary); padding: 0 11px; border-radius: 12px; font-size: 13px; cursor: pointer; }
     .btn-del-custom { background: #FFF1F2; border: none; color: #FB7185; padding: 0 11px; border-radius: 12px; font-size: 13px; cursor: pointer; }
 
+    /* Styling Menu Pilihan Staf (Gaji & Biodata) */
+    .hub-choice-card { background: var(--card-bg); border-radius: 22px; padding: 20px; margin-bottom: 14px; box-shadow: var(--shadow-soft); display: flex; align-items: center; gap: 15px; cursor: pointer; border: 2px solid transparent; transition: 0.2s ease; }
+    .hub-choice-card:active { transform: scale(0.98); border-color: var(--primary-light); }
+    .hub-choice-icon { width: 54px; height: 54px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; }
+    .hub-choice-info { flex: 1; min-width: 0; }
+    .hub-choice-title { font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 3px; }
+    .hub-choice-desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+    .hub-choice-arrow { font-size: 20px; font-weight: 700; color: var(--primary); }
+    .sub-switcher-bar { display: flex; gap: 6px; background: var(--card-bg); padding: 6px; border-radius: 20px; box-shadow: var(--shadow-soft); margin-bottom: 18px; }
+    .sub-switch-btn { flex: 1; border: none; background: transparent; padding: 11px 10px; border-radius: 15px; font-size: 12.5px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: 0.2s; }
+    .sub-switch-btn.active { background: var(--primary); color: white; box-shadow: 0 6px 14px rgba(140,109,253,0.22); }
+
     /* Styling Menu Biodata Tim */
     .bio-card { background: var(--card-bg); border-radius: 22px; padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow-soft); }
     .bio-header { display: flex; gap: 14px; align-items: center; margin-bottom: 14px; }
@@ -174,8 +186,7 @@
     <button id="btnTabDashboard" class="active" onclick="switchTab('dashboard')"><span class="nav-icon">📊</span><span class="nav-text">Target</span></button>
     <button id="btnTabSoh" onclick="switchTab('soh')"><span class="nav-icon">📦</span><span class="nav-text">Stok</span></button>
     <button id="btnTabLinks" onclick="switchTab('links')"><span class="nav-icon">🔗</span><span class="nav-text">Link</span></button>
-    <button id="btnTabBiodata" onclick="switchTab('biodata')"><span class="nav-icon">👥</span><span class="nav-text">Tim</span></button>
-    <button id="btnTabBonus" onclick="switchTab('bonus')"><span class="nav-icon">💳</span><span class="nav-text">Slip Gaji</span></button>
+    <button id="btnTabStaf" onclick="switchTab('staf')"><span class="nav-icon">👤</span><span class="nav-text">Staf</span></button>
     <button id="btnTabUpload" onclick="switchTab('upload')"><span class="nav-icon">⚙️</span><span class="nav-text">Admin</span></button>
   </div>
 
@@ -342,56 +353,94 @@
     <div id="formListContainer"></div>
   </div>
 
-  <div id="tab-biodata" class="tab-content">
-    <div class="hero-header">
-      <div class="link-hero-top">
-        <div>
-          <div class="hero-title">Direktori & Biodata</div>
-          <div class="hero-name" style="font-size:21px;">Tim Digimap Roxy</div>
-          <div style="font-size:12px; opacity:0.9; margin-top:4px;">Profil, kontak WA, NIK & masa kerja tim</div>
+  <!-- TAB GABUNGAN STAF (PILIHAN SLIP GAJI & BIODATA TIM) -->
+  <div id="tab-staf" class="tab-content">
+    <!-- Layar Pilihan Awal saat Menu Staf Diklik -->
+    <div id="staffHubChoice">
+      <div class="hero-header">
+        <div class="hero-title">Portal Personal</div>
+        <div class="hero-name" style="font-size:23px;">Tim & Slip Gaji</div>
+        <div style="font-size:12px; opacity:0.9; margin-top:4px;">Pilih layanan yang ingin Anda akses</div>
+      </div>
+
+      <div class="hub-choice-card" onclick="openStaffSubMenu('bonus')">
+        <div class="hub-choice-icon bg-purple c-purple">💳</div>
+        <div class="hub-choice-info">
+          <div class="hub-choice-title">Cek Slip Gaji</div>
+          <div class="hub-choice-desc">Lihat estimasi gaji pokok, insentif & atur PIN keamanan</div>
         </div>
-        <button class="btn-add-link" onclick="openAddBiodataModal()">+ Tambah</button>
+        <div class="hub-choice-arrow">›</div>
+      </div>
+
+      <div class="hub-choice-card" onclick="openStaffSubMenu('biodata')">
+        <div class="hub-choice-icon bg-blue c-blue">👥</div>
+        <div class="hub-choice-info">
+          <div class="hub-choice-title">Biodata Tim</div>
+          <div class="hub-choice-desc">Profil tim, foto, kontak WA, NIK & edit biodata Anda</div>
+        </div>
+        <div class="hub-choice-arrow">›</div>
       </div>
     </div>
 
-    <div class="dropdown-container" style="margin-bottom:16px;">
-      <input type="text" id="bioSearchInput" class="search-box" placeholder="🔍 Cari nama, jabatan, atau NIK..." onkeyup="renderBiodata()">
+    <!-- Bar Switcher Cepat saat Sudah Masuk ke Salah Satu Menu -->
+    <div id="staffSubSwitcher" class="sub-switcher-bar" style="display:none;">
+      <button type="button" id="btnSubBonus" class="sub-switch-btn" onclick="openStaffSubMenu('bonus')">💳 Slip Gaji</button>
+      <button type="button" id="btnSubBiodata" class="sub-switch-btn" onclick="openStaffSubMenu('biodata')">👥 Biodata Tim</button>
     </div>
 
-    <div id="biodataListContainer"></div>
-  </div>
+    <!-- Sub-Menu 1: Slip Gaji -->
+    <div id="sub-bonus" style="display:none;">
+      <div class="card" id="authBox" style="text-align:center;">
+        <div style="font-size: 50px; margin-bottom: 10px;">🔒</div>
+        <h2>Akses Slip Gaji</h2>
+        <p style="font-size:12px; color:var(--text-muted); margin-bottom: 25px;">Masukkan PIN Anda untuk melihat estimasi take home pay bulan ini.</p>
+        <select id="bonusStaffSelect" style="margin-bottom:15px;"><option value="">👇 Pilih Nama Kamu 👇</option></select>
+        <input type="password" id="inputPin" placeholder="PIN Keamanan (Bawaan: 1234)">
+        <button class="btn-primary" id="btnUnlock" onclick="bukaBrankas()">Buka Brankas Saya</button>
+        <div id="loadingBonus" class="loading-text">Memverifikasi...</div>
+        <div id="bonusError" style="color:var(--accent-red); font-weight:500; font-size:13px; margin-top:15px; display:none;"></div>
+      </div>
 
-  <div id="tab-bonus" class="tab-content">
-    <div class="card" id="authBox" style="text-align:center;">
-      <div style="font-size: 50px; margin-bottom: 10px;">🔒</div>
-      <h2>Akses Slip Gaji</h2>
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom: 25px;">Masukkan PIN Anda untuk melihat estimasi take home pay bulan ini.</p>
-      <select id="bonusStaffSelect" style="margin-bottom:15px;"><option value="">👇 Pilih Nama Kamu 👇</option></select>
-      <input type="password" id="inputPin" placeholder="PIN Keamanan (Bawaan: 1234)">
-      <button class="btn-primary" id="btnUnlock" onclick="bukaBrankas()">Buka Brankas Saya</button>
-      <div id="loadingBonus" class="loading-text">Memverifikasi...</div>
-      <div id="bonusError" style="color:var(--accent-red); font-weight:500; font-size:13px; margin-top:15px; display:none;"></div>
+      <div id="payslipBox" style="display:none;">
+        <div class="payslip">
+          <div class="payslip-header"><h3>Estimasi Gajian</h3><h2 id="slipNamaHeader">Nama Staff</h2></div>
+          <div class="payslip-body">
+            <div class="payslip-row"><div class="payslip-label">Gaji Pokok</div><div class="payslip-value" id="slipPokok">Rp 3.013.000</div></div>
+            <div class="payslip-row"><div class="payslip-label">Estimasi Insentif</div><div class="payslip-value" id="slipBonus">Rp 0</div></div>
+            <div class="payslip-row" id="rowTunjangan" style="display:none; border-bottom: none; padding-bottom:0;"><div class="payslip-label c-purple">Tunjangan Khusus</div><div class="payslip-value c-purple" id="slipTunjangan">Rp 0</div></div>
+            <div class="payslip-total-box"><div class="payslip-total-label">Total Take Home Pay</div><div class="payslip-total-val" id="slipTotal">Rp 0</div></div>
+          </div>
+        </div>
+        <div class="payslip-note">*Catatan: Hitungan insentif belum termasuk (accessories 3rd party, koala, provider dan AirPods)</div>
+        <div class="card" style="margin-top:20px;">
+          <h3 style="font-size:15px; font-weight:600; margin-bottom:15px; color:var(--text-main);">Ganti PIN Keamanan</h3>
+          <input type="password" id="oldPin" placeholder="PIN Lama">
+          <input type="password" id="newPin" placeholder="PIN Baru (min 4 digit)">
+          <button class="btn-outline" onclick="gantiPin()">Simpan PIN Baru</button>
+          <div id="pinStatus" style="font-size:12px; font-weight:500; text-align:center; margin-top:10px;"></div>
+        </div>
+        <button class="btn-outline" style="border-color:#E2E8F0; color:var(--text-muted); margin-top:10px; background:#FFF;" onclick="tutupBrankas()">Tutup & Keluar 🔒</button>
+      </div>
     </div>
 
-    <div id="payslipBox" style="display:none;">
-      <div class="payslip">
-        <div class="payslip-header"><h3>Estimasi Gajian</h3><h2 id="slipNamaHeader">Nama Staff</h2></div>
-        <div class="payslip-body">
-          <div class="payslip-row"><div class="payslip-label">Gaji Pokok</div><div class="payslip-value" id="slipPokok">Rp 3.013.000</div></div>
-          <div class="payslip-row"><div class="payslip-label">Estimasi Insentif</div><div class="payslip-value" id="slipBonus">Rp 0</div></div>
-          <div class="payslip-row" id="rowTunjangan" style="display:none; border-bottom: none; padding-bottom:0;"><div class="payslip-label c-purple">Tunjangan Khusus</div><div class="payslip-value c-purple" id="slipTunjangan">Rp 0</div></div>
-          <div class="payslip-total-box"><div class="payslip-total-label">Total Take Home Pay</div><div class="payslip-total-val" id="slipTotal">Rp 0</div></div>
+    <!-- Sub-Menu 2: Biodata Tim -->
+    <div id="sub-biodata" style="display:none;">
+      <div class="hero-header">
+        <div class="link-hero-top">
+          <div>
+            <div class="hero-title">Direktori & Biodata</div>
+            <div class="hero-name" style="font-size:21px;">Tim Digimap Roxy</div>
+            <div style="font-size:12px; opacity:0.9; margin-top:4px;">Profil, kontak WA, NIK & masa kerja tim</div>
+          </div>
+          <button class="btn-add-link" onclick="openAddBiodataModal()">+ Tambah</button>
         </div>
       </div>
-      <div class="payslip-note">*Catatan: Hitungan insentif belum termasuk (accessories 3rd party, koala, provider dan AirPods)</div>
-      <div class="card" style="margin-top:20px;">
-        <h3 style="font-size:15px; font-weight:600; margin-bottom:15px; color:var(--text-main);">Ganti PIN Keamanan</h3>
-        <input type="password" id="oldPin" placeholder="PIN Lama">
-        <input type="password" id="newPin" placeholder="PIN Baru (min 4 digit)">
-        <button class="btn-outline" onclick="gantiPin()">Simpan PIN Baru</button>
-        <div id="pinStatus" style="font-size:12px; font-weight:500; text-align:center; margin-top:10px;"></div>
+
+      <div class="dropdown-container" style="margin-bottom:16px;">
+        <input type="text" id="bioSearchInput" class="search-box" placeholder="🔍 Cari nama, jabatan, atau NIK..." onkeyup="renderBiodata()">
       </div>
-      <button class="btn-outline" style="border-color:#E2E8F0; color:var(--text-muted); margin-top:10px; background:#FFF;" onclick="tutupBrankas()">Tutup & Keluar 🔒</button>
+
+      <div id="biodataListContainer"></div>
     </div>
   </div>
 
@@ -488,8 +537,31 @@
       if(tabName === 'dashboard') loadDashboardData(); 
       if(tabName === 'soh') loadSOHData();
       if(tabName === 'links') loadLinksData();
-      if(tabName === 'biodata') loadBiodataData();
-      if(tabName === 'bonus') loadDashboardData();
+      if(tabName === 'staf') {
+        showStaffHubChoice();
+        loadDashboardData();
+        loadBiodataData();
+      }
+    }
+
+    function showStaffHubChoice() {
+      document.getElementById('staffHubChoice').style.display = 'block';
+      document.getElementById('staffSubSwitcher').style.display = 'none';
+      document.getElementById('sub-bonus').style.display = 'none';
+      document.getElementById('sub-biodata').style.display = 'none';
+    }
+
+    function openStaffSubMenu(subName) {
+      document.getElementById('staffHubChoice').style.display = 'none';
+      document.getElementById('staffSubSwitcher').style.display = 'flex';
+      document.getElementById('sub-bonus').style.display = (subName === 'bonus') ? 'block' : 'none';
+      document.getElementById('sub-biodata').style.display = (subName === 'biodata') ? 'block' : 'none';
+
+      document.getElementById('btnSubBonus').classList.toggle('active', subName === 'bonus');
+      document.getElementById('btnSubBiodata').classList.toggle('active', subName === 'biodata');
+
+      if (subName === 'bonus') loadDashboardData();
+      if (subName === 'biodata') loadBiodataData();
     }
 
     function formatRp(angka) { return 'Rp ' + Math.round(Number(angka)).toLocaleString('id-ID').replace(/,/g, '.'); }
