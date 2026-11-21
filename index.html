@@ -222,7 +222,1792 @@
     /* View Per Staf (7 Hari - 1 Staf Terpilih) */
     .staff-day-row { background: var(--card-bg); border-radius: 18px; padding: 12px 14px; margin-bottom: 9px; box-shadow: var(--shadow-soft); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
     .staff-day-row.is-off { opacity: 0.78; background: #FCFBFF; }
-/* ... existing code ... -->
+    .sdr-left { display: flex; align-items: center; gap: 11px; flex: 1; min-width: 0; text-align: left; }
+    .day-badge-box { width: 44px; height: 44px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; line-height: 1.1; }
+    .dbb-day { font-size: 9.5px; font-weight: 700; text-transform: uppercase; }
+    .dbb-num { font-size: 14px; font-weight: 800; margin-top: 1px; }
+    .sdr-text-col { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; min-width: 0; flex: 1; }
+    .sdr-date-title { font-size: 13.5px; font-weight: 700; color: var(--text-main); line-height: 1.25; }
+
+    /* Modal Matriks 7 Hari & Catatan */
+    .brush-panel { position: sticky; top: -6px; z-index: 10; background: #F8F6FF; border: 1.5px solid #EAE2FF; border-radius: 16px; padding: 10px; margin-bottom: 12px; }
+    .brush-header { font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 7px; display: flex; justify-content: space-between; }
+    .brush-pills { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+    .brush-btn { background: #FFFFFF; border: 1.5px solid #E9E4FF; border-radius: 11px; padding: 8px 2px; font-size: 10px; font-weight: 700; color: var(--text-main); cursor: pointer; text-align: center; white-space: nowrap; }
+    .brush-btn.active-P { background: #2563EB; border-color: #2563EB; color: #FFF; }
+    .brush-btn.active-M { background: #D97706; border-color: #D97706; color: #FFF; }
+    .brush-btn.active-S { background: #7C3AED; border-color: #7C3AED; color: #FFF; }
+    .brush-btn.active-OFF { background: #E11D48; border-color: #E11D48; color: #FFF; }
+    .brush-btn.active-NOTE { background: #F59E0B; border-color: #F59E0B; color: #FFF; }
+
+    .matrix-cell-note-prompt { background: #FFFBEB; border: 1.5px solid #F59E0B; border-radius: 16px; padding: 12px; margin-bottom: 12px; }
+    .mcnp-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 12px; font-weight: 700; color: #92400E; }
+    .matrix-scroll-wrap { border: 1.5px solid #EFEAFF; border-radius: 16px; overflow-x: auto; margin-bottom: 12px; background: #FFFFFF; }
+    .matrix-table { width: 100%; min-width: 390px; border-collapse: collapse; }
+    .matrix-table th { background: #F6F3FF; padding: 8px 3px; font-size: 10px; font-weight: 700; color: var(--text-main); text-align: center; border-bottom: 1px solid #EAE2FF; }
+    .matrix-table th:first-child, .matrix-table td:first-child { position: sticky; left: 0; z-index: 2; background: #FFFFFF; text-align: left; padding-left: 10px; padding-right: 6px; min-width: 78px; font-size: 11.5px; font-weight: 700; border-right: 1px solid #F0EDFF; }
+    .matrix-table th:first-child { background: #F6F3FF; color: var(--text-muted); }
+    .matrix-table td { padding: 6px 2px; text-align: center; border-bottom: 1px solid #F5F2FF; }
+    .m-cell-btn { position: relative; width: 100%; min-width: 40px; height: 32px; border-radius: 9px; font-size: 10px; font-weight: 700; cursor: pointer; }
+    .m-cell-pin { position: absolute; top: -5px; right: -3px; font-size: 9px; background: #FEF3C7; border: 1px solid #F59E0B; border-radius: 50%; width: 14px; height: 14px; display: flex; align-items: center; justify-content: center; }
+    .matrix-sum-row td { background: #FAFAFF !important; border-bottom: none; border-top: 1.5px solid #EAE2FF; padding: 8px 2px; }
+    .duty-badge { display: inline-block; padding: 3px 5px; border-radius: 7px; font-size: 9.5px; font-weight: 800; }
+    .duty-ok { background: #ECFDF5; color: #059669; }
+    .duty-warn { background: #FFFBEB; color: #D97706; border: 1px solid #FDE68A; }
+
+    .preset-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; }
+    .btn-preset { background: #F8F6FF; border: 1.5px solid #E2D9FF; color: var(--primary); border-radius: 12px; padding: 8px 4px; font-size: 10.5px; font-weight: 700; cursor: pointer; text-align: center; }
+    .single-day-item { display: flex; flex-direction: column; gap: 7px; padding: 10px 11px; background: #FAFAFF; border: 1px solid #EFEAFF; border-radius: 15px; margin-bottom: 8px; }
+    .sdi-top-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .sdi-left { min-width: 80px; }
+    .sdi-day { font-size: 12px; font-weight: 700; color: var(--text-main); }
+    .sdi-date { font-size: 10.5px; color: var(--text-muted); }
+    .sdi-choices { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; flex: 1; }
+    .sdi-choice-btn { background: #FFFFFF; border: 1.5px solid #E9E4FF; color: var(--text-muted); border-radius: 10px; padding: 7px 2px; font-size: 10.5px; font-weight: 700; cursor: pointer; text-align: center; }
+    .sdi-choice-btn.sel-P { background: #2563EB; border-color: #2563EB; color: #FFF; }
+    .sdi-choice-btn.sel-M { background: #D97706; border-color: #D97706; color: #FFF; }
+    .sdi-choice-btn.sel-S { background: #7C3AED; border-color: #7C3AED; color: #FFF; }
+    .sdi-choice-btn.sel-OFF { background: #E11D48; border-color: #E11D48; color: #FFF; }
+    .sdi-note-input { width: 100%; border: 1.5px solid #EFEAFF; background: #FFFFFF; border-radius: 10px; padding: 7px 10px; font-size: 11.5px; font-weight: 600; color: var(--text-main); outline: none; margin-bottom: 0 !important; }
+
+    .preset-chips-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 12px 0; }
+    .note-preset-chip { background: #FFFBEB; border: 1.5px solid #FDE68A; color: #92400E; border-radius: 20px; padding: 6px 12px; font-size: 11.5px; font-weight: 700; cursor: pointer; }
+    .note-preset-chip.active-chip { background: #F59E0B; border-color: #F59E0B; color: #FFFFFF; }
+    .btn-danger-modal { flex: 1; padding: 13px; border-radius: 14px; border: 1.5px solid #FECDD3; background: #FFF1F2; color: #E11D48; font-size: 12.5px; font-weight: 700; cursor: pointer; }
+
+    /* Modal Umum (Link, Biodata, Jadwal) */
+    .link-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(45,42,74,0.48); backdrop-filter: blur(3px); z-index: 1200; align-items: center; justify-content: center; padding: 14px; overflow-y: auto; }
+    .link-modal-overlay.open { display: flex; }
+    .link-modal-box { background: white; width: 100%; max-width: 440px; max-height: 90vh; overflow-y: auto; border-radius: 24px; padding: 22px 18px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+    .link-modal-box input, .link-modal-box select { width: 100%; padding: 12px 14px; border: 2px solid #F0EDFF; border-radius: 14px; font-size: 13px; margin-bottom: 10px; outline: none; background: #FAFAFF; text-align: left; }
+    .modal-field-lbl { font-size: 11.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; display: block; margin-top: 2px; }
+    .photo-picker-wrap { display: flex; align-items: center; gap: 14px; background: #FAFAFF; padding: 12px; border-radius: 16px; border: 2px dashed #E9E4FF; margin-bottom: 12px; }
+    .photo-preview-circle { width: 58px; height: 58px; border-radius: 50%; object-fit: cover; background: var(--bg-main); display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--primary); font-weight: 700; flex-shrink: 0; border: 2px solid var(--primary-light); }
+    .btn-pick-photo { background: #F4EEFF; color: var(--primary); border: none; padding: 8px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .link-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-80px); background: var(--text-main); color: white; padding: 11px 20px; border-radius: 30px; font-size: 12px; font-weight: 600; z-index: 1500; transition: 0.3s ease; white-space: nowrap; }
+    .link-toast.show { transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+  <!-- Navigasi Bawah -->
+  <div class="nav">
+    <button id="btnTabDashboard" class="active" onclick="switchTab('dashboard')"><span class="nav-icon">📊</span><span class="nav-text">Target</span></button>
+    <button id="btnTabSoh" onclick="switchTab('soh')"><span class="nav-icon">📦</span><span class="nav-text">Stok</span></button>
+    <button id="btnTabLinks" onclick="switchTab('links')"><span class="nav-icon">🔗</span><span class="nav-text">Link</span></button>
+    <button id="btnTabStaf" onclick="switchTab('staf')"><span class="nav-icon">👤</span><span class="nav-text">Staf</span></button>
+    <button id="btnTabUpload" onclick="switchTab('upload')"><span class="nav-icon">⚙️</span><span class="nav-text">Admin</span></button>
+  </div>
+
+  <!-- TAB ADMIN -->
+  <div id="tab-upload" class="tab-content">
+    <div class="card">
+      <h2>Admin Panel</h2>
+      <p style="text-align:center; font-size:12px; color:var(--text-muted); margin-bottom: 20px;">Upload file data Excel/CSV terbaru.</p>
+      <label>1. File SPW (Sales)</label><input type="file" id="fileSPW" accept=".xlsx, .xls, .csv">
+      <label>2. File MSR (SKU Info)</label><input type="file" id="fileMSR" accept=".xlsx, .xls, .csv">
+      <label>3. File Stock Position</label><input type="file" id="fileSTOCK" accept=".xlsx, .xls, .csv">
+      <button id="btnUpload" class="btn-primary" onclick="uploadData()">Sinkronisasi Data</button>
+      <div id="status"></div>
+    </div>
+  </div>
+
+  <!-- TAB TARGET & SALES HARIAN -->
+  <div id="tab-dashboard" class="tab-content active">
+    <div class="dropdown-container">
+      <select id="staffSelect" onchange="showPersonalData()"><option value="">⏳ Memuat Data Staff...</option></select>
+    </div>
+    <div id="loadingDash" class="loading-text">Menyiapkan dashboard Anda...</div>
+    
+    <div id="storeView" style="display:none;">
+      <div class="hero-header">
+        <div class="hero-title">Overview Toko</div>
+        <div class="hero-name">Digimap Jember Roxy</div>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi-card"><div class="kpi-bg-icon">💰</div><div class="kpi-title">Total Sales</div><div class="kpi-value" id="valStoreSales">Rp 0</div></div>
+        <div class="kpi-card"><div class="kpi-bg-icon">🎯</div><div class="kpi-title">Target Toko</div><div class="kpi-value" id="valStoreTarget" style="color: var(--text-muted); font-size: 16px;">Rp 0</div></div>
+        <div class="kpi-card"><div class="kpi-bg-icon">⭐</div><div class="kpi-title">Total Poin</div><div class="kpi-value c-purple" id="valStorePoint">0</div></div>
+        <div class="kpi-card"><div class="kpi-bg-icon">🚀</div><div class="kpi-title">Pencapaian</div><div class="kpi-value c-green" id="valStorePct">0%</div></div>
+      </div>
+      <div class="section-title">Breakdown LOB</div>
+      <div class="detail-card">
+        <div class="detail-card-header"><div class="detail-icon bg-blue c-blue">📱</div><div class="detail-title">Device</div></div>
+        <div class="stat-row"><div class="stat-label">Sales: <span class="stat-val" id="valStoreDeviceSales">Rp 0</span></div><div class="stat-label">Target: <span class="stat-val" id="valStoreDeviceTarget" style="font-weight:400;">Rp 0</span></div></div>
+        <div class="progress-bar-container"><div class="progress-bar bar-blue" id="barStoreDevice" style="width: 0%;"></div></div>
+      </div>
+      <div class="detail-card">
+        <div class="detail-card-header"><div class="detail-icon bg-purple c-purple">🎧</div><div class="detail-title">Aksesoris</div></div>
+        <div class="stat-row"><div class="stat-label">Sales: <span class="stat-val" id="valStoreAccSales">Rp 0</span></div><div class="stat-label">Target: <span class="stat-val" id="valStoreAccTarget" style="font-weight:400;">Rp 0</span></div></div>
+        <div class="progress-bar-container"><div class="progress-bar bar-purple" id="barStoreAcc" style="width: 0%;"></div></div>
+      </div>
+      <div class="detail-card">
+        <div class="detail-card-header"><div class="detail-icon bg-orange c-orange">🛡️</div><div class="detail-title">VAS</div></div>
+        <div class="stat-row"><div class="stat-label">Sales: <span class="stat-val" id="valStoreVasSales">Rp 0</span></div><div class="stat-label">Target: <span class="stat-val" id="valStoreVasTarget" style="font-weight:400;">Rp 0</span></div></div>
+        <div class="progress-bar-container"><div class="progress-bar bar-orange" id="barStoreVas" style="width: 0%;"></div></div>
+      </div>
+      <div class="section-title" style="margin-top:35px;">🏆 Klasemen Staf</div>
+      <div class="table-container"><table id="rankTable"><thead><tr><th style="width:50px; text-align:center;">#</th><th>Nama</th><th style="text-align:right;">Sales</th></tr></thead><tbody id="rankTableBody"></tbody></table></div>
+    </div>
+
+    <div id="staffView" style="display:none;">
+      <div class="hero-header"><div class="hero-title">Performa Saya</div><div class="hero-name" id="heroStaffName">Nama Staf</div></div>
+      <div class="kpi-grid">
+        <div class="kpi-card"><div class="kpi-rank-badge" id="valMyRank">#1</div><div class="kpi-bg-icon">💰</div><div class="kpi-title">Total Sales</div><div class="kpi-value" id="valMySales">Rp 0</div></div>
+        <div class="kpi-card"><div class="kpi-bg-icon">🎯</div><div class="kpi-title">Target Saya</div><div class="kpi-value" id="valMyTarget" style="color: var(--text-muted); font-size: 16px;">Rp 0</div></div>
+        <div class="kpi-card" style="grid-column: span 2; align-items: center; text-align: center;"><div class="kpi-title">Kekurangan Target</div><div class="kpi-value" id="valMySisa" style="font-size:24px;">Rp 0</div><div style="margin-top: 5px; font-size: 12px; color: var(--text-muted);">Pencapaian: <span id="valMyPct" style="font-weight:bold; color:var(--text-main);">0%</span></div></div>
+      </div>
+      <div class="section-title">LOB</div>
+      <div id="qtyKPI">
+        <div class="qty-card"><div class="qty-emoji">📱</div><div class="qty-val" id="qtyIphone">0</div><div class="qty-label">iPhone</div></div>
+        <div class="qty-card"><div class="qty-emoji">💻</div><div class="qty-val" id="qtyIpad">0</div><div class="qty-label">iPad</div></div>
+        <div class="qty-card"><div class="qty-emoji">🖥️</div><div class="qty-val" id="qtyMac">0</div><div class="qty-label">Mac</div></div>
+        <div class="qty-card"><div class="qty-emoji">⌚</div><div class="qty-val" id="qtyWatch">0</div><div class="qty-label">Watch</div></div>
+        <div class="qty-card"><div class="qty-emoji">🎧</div><div class="qty-val" id="qtyAirpods">0</div><div class="qty-label">AirPods</div></div>
+      </div>
+      <div class="section-title">Others</div>
+      <div class="detail-card">
+        <div class="detail-card-header"><div class="detail-icon bg-purple c-purple">🎧</div><div class="detail-title">Aksesoris</div></div>
+        <div class="stat-row"><div class="stat-label">Sales: <span class="stat-val" id="valAccSales">Rp 0</span></div><div class="stat-label">Target: <span class="stat-val" id="valAccTarget" style="font-weight:400;">Rp 0</span></div></div>
+        <div class="progress-bar-container"><div class="progress-bar bar-purple" id="barAcc" style="width: 0%;"></div></div>
+      </div>
+      <div class="detail-card">
+        <div class="detail-card-header"><div class="detail-icon bg-blue c-blue">🛡️</div><div class="detail-title">Qoala</div></div>
+        <div class="stat-row"><div class="stat-label">Sales: <span class="stat-val" id="valQoalaSales">Rp 0</span></div><div class="stat-label">Target: <span class="stat-val" id="valQoalaTarget" style="font-weight:400;">Rp 0</span></div></div>
+        <div class="progress-bar-container"><div class="progress-bar bar-blue" id="barQoala" style="width: 0%;"></div></div>
+      </div>
+
+      <div class="daily-header-row">
+        <div class="section-title" style="margin:0;">📅 Sales Harian</div>
+        <div class="daily-date-nav">
+          <button type="button" class="btn-date-step" onclick="stepDailyDate(-1)" title="Hari Sebelumnya">◀</button>
+          <input type="date" id="dailyDateInput" class="daily-date-input" onchange="loadDailySales()">
+          <button type="button" class="btn-date-step" onclick="stepDailyDate(1)" title="Hari Berikutnya">▶</button>
+        </div>
+      </div>
+      <div id="dailyMetaInfo" class="daily-meta-info">Memuat data harian...</div>
+
+      <div class="kpi-grid" style="margin-bottom: 10px;">
+        <div class="kpi-card">
+          <div class="kpi-bg-icon">💰</div>
+          <div class="kpi-title">Total Harian</div>
+          <div class="kpi-value c-purple" id="valDailyTotal" style="font-size:17px;">Rp 0</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-bg-icon">📱</div>
+          <div class="kpi-title">Device</div>
+          <div class="kpi-value" id="valDailyDevice" style="font-size:17px;">Rp 0</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-bg-icon">🎧</div>
+          <div class="kpi-title">Accessories</div>
+          <div class="kpi-value" id="valDailyAcc" style="font-size:17px;">Rp 0</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-bg-icon">🛡️</div>
+          <div class="kpi-title">Qoala</div>
+          <div class="kpi-value" id="valDailyQoala" style="font-size:17px;">Rp 0</div>
+        </div>
+      </div>
+
+      <div class="qty-row-scroll">
+        <div class="qty-card"><div class="qty-emoji">📱</div><div class="qty-val" id="dailyQtyIphone">0</div><div class="qty-label">iPhone</div></div>
+        <div class="qty-card"><div class="qty-emoji">💻</div><div class="qty-val" id="dailyQtyIpad">0</div><div class="qty-label">iPad</div></div>
+        <div class="qty-card"><div class="qty-emoji">🖥️</div><div class="qty-val" id="dailyQtyMac">0</div><div class="qty-label">Mac</div></div>
+        <div class="qty-card"><div class="qty-emoji">⌚</div><div class="qty-val" id="dailyQtyWatch">0</div><div class="qty-label">Watch</div></div>
+        <div class="qty-card"><div class="qty-emoji">🎧</div><div class="qty-val" id="dailyQtyAirpods">0</div><div class="qty-label">AirPods</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB STOK (SOH) -->
+  <div id="tab-soh" class="tab-content">
+    <div class="dropdown-container">
+      <input type="text" id="searchInput" class="search-box" placeholder="🔍 Cari nama barang..." onkeyup="renderSOH()">
+      <select id="catSelect" onchange="renderSOH()">
+        <option value="Semua">Tampilkan Semua Kategori</option>
+        <option value="iPhone">📱 iPhone</option>
+        <option value="iPad">💻 iPad</option>
+        <option value="Mac">🖥️ Mac</option>
+        <option value="Apple Watch">⌚ Apple Watch</option>
+        <option value="AirPods">🎧 AirPods</option>
+        <option value="Accessories">🛒 Accessories</option>
+      </select>
+    </div>
+    <div id="loadingSOH" class="loading-text" style="display:block;">Mengecek ketersediaan di gudang...</div>
+    <div class="table-container" id="sohTableContainer" style="display:none;"><table id="sohTable"><thead><tr><th>Detail Produk</th><th style="text-align:center; width: 70px;">Stok</th></tr></thead><tbody id="sohTableBody"></tbody></table></div>
+  </div>
+
+  <!-- TAB LINK -->
+  <div id="tab-links" class="tab-content">
+    <div class="hero-header">
+      <div class="link-hero-top">
+        <div>
+          <div class="hero-title">Pusat Form & Link</div>
+          <div class="hero-name" style="font-size:21px;">Operasional Toko</div>
+          <div style="font-size:12px; opacity:0.9; margin-top:4px;">Akses cepat semua form harian & laporan</div>
+        </div>
+        <button class="btn-add-link" onclick="openAddFormModal()">+ Tambah</button>
+      </div>
+    </div>
+
+    <div class="dropdown-container" style="margin-bottom:14px;">
+      <input type="text" id="linkSearchInput" class="search-box" placeholder="🔍 Cari nama form atau laporan..." onkeyup="renderLinks()">
+    </div>
+
+    <div class="chip-row" id="linkFilterChips">
+      <button class="chip-btn active" onclick="setLinkCat('Semua', this)">Semua</button>
+      <button class="chip-btn" onclick="setLinkCat('Project', this)">Project</button>
+      <button class="chip-btn" onclick="setLinkCat('Trainer', this)">Trainer</button>
+      <button class="chip-btn" onclick="setLinkCat('SPV', this)">SPV</button>
+      <button class="chip-btn" onclick="setLinkCat('Lainnya', this)">Lainnya</button>
+    </div>
+
+    <div id="formListContainer"></div>
+  </div>
+
+  <!-- TAB GABUNGAN STAF (SLIP GAJI, BIODATA TIM, & JADWAL SHIFT) -->
+  <div id="tab-staf" class="tab-content">
+    <!-- Layar Pilihan Awal saat Menu Staf Diklik -->
+    <div id="staffHubChoice">
+      <div class="hero-header">
+        <div class="hero-title">Portal Personal</div>
+        <div class="hero-name" style="font-size:23px;">Tim, Jadwal & Slip Gaji</div>
+        <div style="font-size:12px; opacity:0.9; margin-top:4px;">Pilih layanan yang ingin Anda akses</div>
+      </div>
+
+      <div class="hub-choice-card" onclick="openStaffSubMenu('bonus')">
+        <div class="hub-choice-icon bg-purple c-purple">💳</div>
+        <div class="hub-choice-info">
+          <div class="hub-choice-title">Cek Slip Gaji</div>
+          <div class="hub-choice-desc">Lihat estimasi gaji pokok, insentif & atur PIN keamanan</div>
+        </div>
+        <div class="hub-choice-arrow">›</div>
+      </div>
+
+      <div class="hub-choice-card" onclick="openStaffSubMenu('biodata')">
+        <div class="hub-choice-icon bg-blue c-blue">👥</div>
+        <div class="hub-choice-info">
+          <div class="hub-choice-title">Biodata Tim</div>
+          <div class="hub-choice-desc">Profil tim, foto, kontak WA, NIK & edit biodata Anda</div>
+        </div>
+        <div class="hub-choice-arrow">›</div>
+      </div>
+
+      <div class="hub-choice-card" onclick="openStaffSubMenu('jadwal')">
+        <div class="hub-choice-icon bg-green c-green">📅</div>
+        <div class="hub-choice-info">
+          <div class="hub-choice-title">Jadwal Shift</div>
+          <div class="hub-choice-desc">Jadwal shift harian, catatan kegiatan & roster 7 hari</div>
+        </div>
+        <div class="hub-choice-arrow">›</div>
+      </div>
+    </div>
+
+    <!-- Bar Switcher Cepat saat Sudah Masuk ke Salah Satu Sub-Menu -->
+    <div id="staffSubSwitcher" class="sub-switcher-bar" style="display:none;">
+      <button type="button" class="btn-back-hub" onclick="showStaffHubChoice()">‹ Staf</button>
+      <button type="button" id="btnSubBonus" class="sub-switch-btn" onclick="openStaffSubMenu('bonus')">💳 Gaji</button>
+      <button type="button" id="btnSubBiodata" class="sub-switch-btn" onclick="openStaffSubMenu('biodata')">👥 Biodata</button>
+      <button type="button" id="btnSubJadwal" class="sub-switch-btn" onclick="openStaffSubMenu('jadwal')">📅 Jadwal</button>
+    </div>
+
+    <!-- Sub-Menu 1: Slip Gaji -->
+    <div id="sub-bonus" style="display:none;">
+      <div class="card" id="authBox" style="text-align:center;">
+        <div style="font-size: 50px; margin-bottom: 10px;">🔒</div>
+        <h2>Akses Slip Gaji</h2>
+        <p style="font-size:12px; color:var(--text-muted); margin-bottom: 25px;">Masukkan PIN Anda untuk melihat estimasi take home pay bulan ini.</p>
+        <select id="bonusStaffSelect" style="margin-bottom:15px;"><option value="">👇 Pilih Nama Kamu 👇</option></select>
+        <input type="password" id="inputPin" placeholder="PIN Keamanan (Bawaan: 1234)">
+        <button class="btn-primary" id="btnUnlock" onclick="bukaBrankas()">Buka Brankas Saya</button>
+        <div id="loadingBonus" class="loading-text">Memverifikasi...</div>
+        <div id="bonusError" style="color:var(--accent-red); font-weight:500; font-size:13px; margin-top:15px; display:none;"></div>
+      </div>
+
+      <div id="payslipBox" style="display:none;">
+        <div class="payslip">
+          <div class="payslip-header"><h3>Estimasi Gajian</h3><h2 id="slipNamaHeader">Nama Staff</h2></div>
+          <div class="payslip-body">
+            <div class="payslip-row"><div class="payslip-label">Gaji Pokok</div><div class="payslip-value" id="slipPokok">Rp 3.013.000</div></div>
+            <div class="payslip-row"><div class="payslip-label">Estimasi Insentif</div><div class="payslip-value" id="slipBonus">Rp 0</div></div>
+            <div class="payslip-row" id="rowTunjangan" style="display:none; border-bottom: none; padding-bottom:0;"><div class="payslip-label c-purple">Tunjangan Khusus</div><div class="payslip-value c-purple" id="slipTunjangan">Rp 0</div></div>
+            <div class="payslip-total-box"><div class="payslip-total-label">Total Take Home Pay</div><div class="payslip-total-val" id="slipTotal">Rp 0</div></div>
+          </div>
+        </div>
+        <div class="payslip-note">*Catatan: Hitungan insentif belum termasuk (accessories 3rd party, koala, provider dan AirPods)</div>
+        <div class="card" style="margin-top:20px;">
+          <h3 style="font-size:15px; font-weight:600; margin-bottom:15px; color:var(--text-main);">Ganti PIN Keamanan</h3>
+          <input type="password" id="oldPin" placeholder="PIN Lama">
+          <input type="password" id="newPin" placeholder="PIN Baru (min 4 digit)">
+          <button class="btn-outline" onclick="gantiPin()">Simpan PIN Baru</button>
+          <div id="pinStatus" style="font-size:12px; font-weight:500; text-align:center; margin-top:10px;"></div>
+        </div>
+        <button class="btn-outline" style="border-color:#E2E8F0; color:var(--text-muted); margin-top:10px; background:#FFF;" onclick="tutupBrankas()">Tutup & Keluar 🔒</button>
+      </div>
+    </div>
+
+    <!-- Sub-Menu 2: Biodata Tim -->
+    <div id="sub-biodata" style="display:none;">
+      <div class="hero-header">
+        <div class="link-hero-top">
+          <div>
+            <div class="hero-title">Direktori & Biodata</div>
+            <div class="hero-name" style="font-size:21px;">Tim Digimap Roxy</div>
+            <div style="font-size:12px; opacity:0.9; margin-top:4px;">Profil, kontak WA, NIK & masa kerja tim</div>
+          </div>
+          <button class="btn-add-link" onclick="openAddBiodataModal()">+ Tambah</button>
+        </div>
+      </div>
+
+      <div class="dropdown-container" style="margin-bottom:16px;">
+        <input type="text" id="bioSearchInput" class="search-box" placeholder="🔍 Cari nama, jabatan, atau NIK..." onkeyup="renderBiodata()">
+      </div>
+
+      <div id="biodataListContainer"></div>
+    </div>
+
+    <!-- Sub-Menu 3: Jadwal Shift & Catatan Per Staf -->
+    <div id="sub-jadwal" style="display:none;">
+      <div class="hero-header">
+        <div class="link-hero-top">
+          <div>
+            <div class="hero-title">Weekly</div>
+            <div class="hero-name" style="font-size:21px;">Schedule</div>
+            <div style="font-size:12px; opacity:0.9; margin-top:4px;" id="scheduleHeroSub">Digimap Jember Roxy</div>
+          </div>
+          <button type="button" class="btn-add-link" onclick="openBulkMatrixModal()">Set Jadwal</button>
+        </div>
+      </div>
+
+      <div class="week-nav-bar">
+        <button type="button" class="btn-week-step" onclick="changeScheduleWeek(-7)" title="Minggu Sebelumnya">◀</button>
+        <div class="week-range-label" id="weekHeaderLabel">Minggu Ini</div>
+        <button type="button" class="btn-week-step" onclick="changeScheduleWeek(7)" title="Minggu Berikutnya">▶</button>
+      </div>
+
+      <div class="subview-tabs">
+        <button type="button" id="tabBtnPerDay" class="subview-tab-btn active" onclick="switchScheduleSubTab('perDay')">By Day</button>
+        <button type="button" id="tabBtnPerStaff" class="subview-tab-btn" onclick="switchScheduleSubTab('perStaff')">By Staff</button>
+      </div>
+
+      <!-- View 1: Per Hari (Tim) -->
+      <div id="panelSchedulePerDay">
+        <div class="day-selector-strip" id="daySelectorStrip"></div>
+        <div class="daily-summary-bar" id="dailySummaryBar"></div>
+        <div id="dailyStaffList"></div>
+      </div>
+
+      <!-- View 2: Per Staf (7 Hari - 1 Staf Terpilih) -->
+      <div id="panelSchedulePerStaff" style="display:none;">
+        <div class="dropdown-container" style="margin-bottom:12px;">
+          <select id="perStaffScheduleSelect" onchange="onSelectPerStaffSchedule(this.value)"></select>
+        </div>
+        <div id="staffWeekCardsContainer"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Tambah / Edit Link -->
+  <div class="link-modal-overlay" id="addFormModal" onclick="if(event.target===this) closeAddFormModal()">
+    <div class="link-modal-box">
+      <h3 id="formModalTitle" style="font-size:17px; font-weight:700; margin-bottom:14px;">➕ Tambah Link Form Baru</h3>
+      <input type="text" id="newFormTitle" placeholder="Nama Form (Contoh: Form Trade-In)">
+      <input type="text" id="newFormDesc" placeholder="Keterangan singkat (opsional)">
+      <select id="newFormCat">
+        <option value="Project">Kategori: Project</option>
+        <option value="Trainer">Kategori: Trainer</option>
+        <option value="SPV">Kategori: SPV</option>
+        <option value="Lainnya">Kategori: Lainnya</option>
+      </select>
+      <input type="url" id="newFormUrl" placeholder="Tempel URL Link (https://...)">
+      <div style="display:flex; gap:10px; margin-top:6px;">
+        <button class="btn-outline" style="margin-top:0;" onclick="closeAddFormModal()">Batal</button>
+        <button id="btnSaveLink" class="btn-primary" style="margin-top:0;" onclick="saveNewForm()">Simpan Link</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Tambah / Edit Biodata -->
+  <div class="link-modal-overlay" id="biodataModal" onclick="if(event.target===this) closeBiodataModal()">
+    <div class="link-modal-box">
+      <h3 id="bioModalTitle" style="font-size:17px; font-weight:700; margin-bottom:14px;">👤 Tambah Biodata Tim</h3>
+
+      <div class="photo-picker-wrap">
+        <div id="bioPhotoPreview" class="photo-preview-circle">📷</div>
+        <div style="flex:1;">
+          <div style="font-size:12px; font-weight:600; color:var(--text-main); margin-bottom:5px;">Foto Profil</div>
+          <input type="file" id="bioPhotoFile" accept="image/*" style="display:none;" onchange="handleBioPhotoSelect(this)">
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button type="button" class="btn-pick-photo" onclick="document.getElementById('bioPhotoFile').click()">Pilih Foto</button>
+            <button type="button" id="btnClearPhoto" class="btn-pick-photo" style="background:#FFF1F2; color:#FB7185; display:none;" onclick="clearBioPhoto()">Hapus</button>
+          </div>
+        </div>
+      </div>
+
+      <span class="modal-field-lbl">Nama Lengkap *</span>
+      <input type="text" id="bioName" placeholder="Contoh: Sigit Ardiyanto">
+
+      <span class="modal-field-lbl">Jabatan</span>
+      <input type="text" id="bioRole" placeholder="Contoh: Store Leader / Champion / Sales">
+
+      <span class="modal-field-lbl">NIK Karyawan</span>
+      <input type="text" id="bioNik" placeholder="Nomor Induk Karyawan">
+
+      <span class="modal-field-lbl">Tanggal Masuk Kerja</span>
+      <input type="date" id="bioJoinDate">
+
+      <span class="modal-field-lbl">No. WhatsApp</span>
+      <input type="tel" id="bioWa" placeholder="Contoh: 081234567890">
+
+      <span class="modal-field-lbl">Tanggal Lahir</span>
+      <input type="date" id="bioDob">
+
+      <span class="modal-field-lbl">Ukuran Baju / Seragam</span>
+      <select id="bioShirt">
+        <option value="">-- Pilih Ukuran Baju --</option>
+        <option value="XS">XS</option>
+        <option value="S">S</option>
+        <option value="M">M</option>
+        <option value="L">L</option>
+        <option value="XL">XL</option>
+        <option value="XXL">XXL</option>
+        <option value="XXXL">XXXL</option>
+      </select>
+
+      <span class="modal-field-lbl">Alamat Domisili</span>
+      <input type="text" id="bioAddress" placeholder="Alamat tempat tinggal saat ini">
+
+      <div style="display:flex; gap:10px; margin-top:8px;">
+        <button class="btn-outline" style="margin-top:0;" onclick="closeBiodataModal()">Batal</button>
+        <button id="btnSaveBio" class="btn-primary" style="margin-top:0;" onclick="saveBiodata()">Simpan Biodata</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL A JADWAL: ATUR ROSTER 7 HARI (SEMUA STAF) -->
+  <div class="link-modal-overlay" id="bulkMatrixModal" onclick="if(event.target===this) closeBulkModal()">
+    <div class="link-modal-box">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:12px;">
+        <div>
+          <div style="font-size:16px; font-weight:800; color:var(--text-main);" id="bulkModalTitle">⚡ Atur Roster 7 Hari</div>
+          <div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;" id="bulkModalSub">Minggu Ini</div>
+        </div>
+        <button type="button" style="background:#F4EEFF; color:var(--text-muted); border:none; width:32px; height:32px; border-radius:50%; font-weight:700; cursor:pointer;" onclick="closeBulkModal()">✕</button>
+      </div>
+
+      <div class="brush-panel">
+        <div class="brush-header">
+          <span>🖌️ Mode Kuas Cepat</span>
+          <span style="color:var(--primary);" id="brushHintLabel">Ketuk sel: 🌅 Pagi</span>
+        </div>
+        <div class="brush-pills">
+          <button type="button" id="brushBtn-P" class="brush-btn active-P" onclick="selectBrush('P')">🌅 Pagi</button>
+          <button type="button" id="brushBtn-M" class="brush-btn" onclick="selectBrush('M')">☀️ Middle</button>
+          <button type="button" id="brushBtn-S" class="brush-btn" onclick="selectBrush('S')">🌙 Siang</button>
+          <button type="button" id="brushBtn-OFF" class="brush-btn" onclick="selectBrush('OFF')">🏖️ Off</button>
+          <button type="button" id="brushBtn-NOTE" class="brush-btn" onclick="selectBrush('NOTE')">📌 Catatan</button>
+        </div>
+      </div>
+
+      <div id="matrixCellNotePrompt" class="matrix-cell-note-prompt" style="display:none;">
+        <div class="mcnp-head">
+          <span id="mcnpTitle">📌 Catatan Kegiatan</span>
+          <button type="button" style="background:none; border:none; color:#92400E; font-weight:800; cursor:pointer;" onclick="closeMatrixCellNotePrompt()">✕</button>
+        </div>
+        <div class="preset-chips-wrap" style="margin:0 0 8px 0;" id="matrixNotePresets"></div>
+        <input type="text" id="matrixCellNoteInput" style="padding:9px 12px; font-size:12px; background:#FFF; margin-bottom:8px;" placeholder="Tulis kegiatan staf ini...">
+        <div style="display:flex; gap:6px;">
+          <button type="button" id="btnMcnpDelete" class="btn-danger-modal" style="padding:8px; font-size:11px;" onclick="deleteMatrixCellNote()">Hapus</button>
+          <button type="button" class="btn-primary" style="margin-top:0; padding:8px; font-size:11px;" onclick="applyMatrixCellNote()">Terapkan</button>
+        </div>
+      </div>
+
+      <div class="matrix-scroll-wrap">
+        <table class="matrix-table">
+          <thead id="bulkMatrixThead"></thead>
+          <tbody id="bulkMatrixTbody"></tbody>
+        </table>
+      </div>
+
+      <div style="display:flex; gap:10px; margin-top:10px;">
+        <button type="button" class="btn-outline" style="margin-top:0; padding:13px;" onclick="closeBulkModal()">Batal</button>
+        <button type="button" id="btnSaveBulkMatrix" class="btn-primary" style="margin-top:0; padding:13px;" onclick="saveBulkMatrix()">Simpan Semua Jadwal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL B JADWAL: ATUR JADWAL 7 HARI PER STAF -->
+  <div class="link-modal-overlay" id="singleStaffModal" onclick="if(event.target===this) closeSingleModal()">
+    <div class="link-modal-box">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:12px;">
+        <div style="display:flex; align-items:center; gap:11px;">
+          <div class="sch-avatar av-P" id="singleModalAvatar">SA</div>
+          <div>
+            <div style="font-size:15.5px; font-weight:800; color:var(--text-main);" id="singleModalTitle">✏️ Atur 7 Hari</div>
+            <div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;" id="singleModalSub">Minggu Ini</div>
+          </div>
+        </div>
+        <button type="button" style="background:#F4EEFF; color:var(--text-muted); border:none; width:32px; height:32px; border-radius:50%; font-weight:700; cursor:pointer;" onclick="closeSingleModal()">✕</button>
+      </div>
+
+      <div class="preset-row">
+        <button type="button" class="btn-preset" onclick="applySinglePreset('P')">🌅 Semua Pagi</button>
+        <button type="button" class="btn-preset" onclick="applySinglePreset('M')">☀️ Semua Middle</button>
+        <button type="button" class="btn-preset" onclick="applySinglePreset('S')">🌙 Semua Siang</button>
+      </div>
+
+      <div id="singleDaysContainer"></div>
+
+      <div style="display:flex; gap:10px; margin-top:10px;">
+        <button type="button" class="btn-outline" style="margin-top:0; padding:13px;" onclick="closeSingleModal()">Batal</button>
+        <button type="button" id="btnSaveSingleStaff" class="btn-primary" style="margin-top:0; padding:13px;" onclick="saveSingleStaffSchedule()">Simpan Jadwal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL C JADWAL: CATATAN KEGIATAN PER STAF -->
+  <div class="link-modal-overlay" id="staffNoteModal" onclick="if(event.target===this) closeStaffNoteModal()">
+    <div class="link-modal-box">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:12px;">
+        <div style="display:flex; align-items:center; gap:11px;">
+          <div class="sch-avatar av-M" id="snmAvatar">SA</div>
+          <div>
+            <div style="font-size:15.5px; font-weight:800; color:var(--text-main);" id="snmTitle">📌 Catatan Staf</div>
+            <div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;" id="snmSub">Tanggal</div>
+          </div>
+        </div>
+        <button type="button" style="background:#F4EEFF; color:var(--text-muted); border:none; width:32px; height:32px; border-radius:50%; font-weight:700; cursor:pointer;" onclick="closeStaffNoteModal()">✕</button>
+      </div>
+
+      <div style="font-size:11.5px; font-weight:700; color:var(--text-muted);">Pilih Cepat:</div>
+      <div class="preset-chips-wrap" id="snmPresetChips"></div>
+
+      <span class="modal-field-lbl">Detail Kegiatan Khusus</span>
+      <input type="text" id="snmTextInput" placeholder="Contoh: Stock Opname, Meeting Area...">
+
+      <div style="display:flex; gap:8px; margin-top:10px;">
+        <button type="button" class="btn-outline" style="margin-top:0; padding:13px;" onclick="closeStaffNoteModal()">Batal</button>
+        <button type="button" id="btnSnmDelete" class="btn-danger-modal" style="display:none;" onclick="deleteStaffNoteFromModal()">Hapus</button>
+        <button type="button" id="btnSnmSave" class="btn-primary" style="margin-top:0; padding:13px;" onclick="saveStaffNoteFromModal()">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="link-toast" id="linkToast">Berhasil!</div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbwQafvOo2JU_75b2wF6h40oqotR101fh9bqml7UGnEsxBE4JHuO-C5EfrKAAmHiVJ4w/exec";
+    const GAJI_POKOK = 3013000;
+
+    let dashboardData = null;
+    let isDashboardLoading = false;
+    let sohList = [];
+    let isSohLoading = false;
+
+    // =========================================================
+    // HELPER UMUM & FORMATTER
+    // =========================================================
+    function formatRupiah(num) {
+      const n = Number(num) || 0;
+      return 'Rp ' + Math.round(n).toLocaleString('id-ID');
+    }
+
+    function escapeHtml(str) {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function escapeAttr(str) {
+      return String(str == null ? '' : str)
+        .replace(/\\/g, '\\\\')
+        .replace(/'/g, "\\'")
+        .replace(/"/g, '&quot;');
+    }
+
+    let toastTimer = null;
+    function showLinkToast(msg) {
+      const el = document.getElementById('linkToast');
+      if (!el) return;
+      el.innerText = msg;
+      el.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+    }
+
+    function getTodayLocalStr() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    function getMondayOfDate(dateObj) {
+      const d = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+      const day = d.getDay();
+      const diff = day === 0 ? -6 : 1 - day;
+      d.setDate(d.getDate() + diff);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    // =========================================================
+    // NAVIGASI TAB UTAMA & SUB-MENU STAF
+    // =========================================================
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav button').forEach(el => el.classList.remove('active'));
+      const targetTab = document.getElementById('tab-' + tabName);
+      if (targetTab) targetTab.classList.add('active');
+      const btnId = 'btnTab' + tabName.charAt(0).toUpperCase() + tabName.slice(1);
+      if (document.getElementById(btnId)) document.getElementById(btnId).classList.add('active');
+      
+      if (tabName === 'dashboard') loadDashboardData(); 
+      if (tabName === 'soh') loadSOHData();
+      if (tabName === 'links') loadLinksData();
+      if (tabName === 'staf') {
+        showStaffHubChoice();
+        loadDashboardData();
+        loadBiodataData();
+        loadScheduleData();
+      }
+    }
+
+    function showStaffHubChoice() {
+      document.getElementById('staffHubChoice').style.display = 'block';
+      document.getElementById('staffSubSwitcher').style.display = 'none';
+      document.getElementById('sub-bonus').style.display = 'none';
+      document.getElementById('sub-biodata').style.display = 'none';
+      document.getElementById('sub-jadwal').style.display = 'none';
+    }
+
+    function openStaffSubMenu(subName) {
+      document.getElementById('staffHubChoice').style.display = 'none';
+      document.getElementById('staffSubSwitcher').style.display = 'flex';
+      document.getElementById('sub-bonus').style.display = (subName === 'bonus') ? 'block' : 'none';
+      document.getElementById('sub-biodata').style.display = (subName === 'biodata') ? 'block' : 'none';
+      document.getElementById('sub-jadwal').style.display = (subName === 'jadwal') ? 'block' : 'none';
+
+      document.getElementById('btnSubBonus').classList.toggle('active', subName === 'bonus');
+      document.getElementById('btnSubBiodata').classList.toggle('active', subName === 'biodata');
+      document.getElementById('btnSubJadwal').classList.toggle('active', subName === 'jadwal');
+
+      if (subName === 'bonus') loadDashboardData();
+      if (subName === 'biodata') loadBiodataData();
+      if (subName === 'jadwal') {
+        loadBiodataData();
+        loadScheduleData();
+        renderAllScheduleViews();
+      }
+    }
+
+    // =========================================================
+    // 1. DASHBOARD TARGET & KLASEMEN & SALES HARIAN
+    // =========================================================
+    async function loadDashboardData(force = false) {
+      if (isDashboardLoading && !force) return;
+      if (dashboardData && !force) {
+        populateStaffDropdowns();
+        showPersonalData();
+        return;
+      }
+
+      isDashboardLoading = true;
+      const loadingEl = document.getElementById('loadingDash');
+      if (loadingEl) loadingEl.style.display = 'block';
+
+      try {
+        const res = await fetch(`${API_URL}?action=getDashboard`);
+        const json = await res.json();
+        dashboardData = json;
+        populateStaffDropdowns();
+        showPersonalData();
+      } catch (err) {
+        console.error('Gagal memuat dashboard:', err);
+        const sel = document.getElementById('staffSelect');
+        if (sel && sel.options.length <= 1) {
+          sel.innerHTML = '<option value="">Overview Toko (Digimap Jember Roxy)</option>';
+        }
+        document.getElementById('storeView').style.display = 'block';
+        showLinkToast('⚠️ Gagal menyambung ke server data');
+      } finally {
+        isDashboardLoading = false;
+        if (loadingEl) loadingEl.style.display = 'none';
+      }
+    }
+
+    function populateStaffDropdowns() {
+      const sel = document.getElementById('staffSelect');
+      const bonusSel = document.getElementById('bonusStaffSelect');
+      const currentVal = sel ? sel.value : '';
+      const currentBonusVal = bonusSel ? bonusSel.value : '';
+
+      const staffNames = [];
+      if (dashboardData) {
+        if (Array.isArray(dashboardData.ranking)) {
+          dashboardData.ranking.forEach(r => { if (r.name) staffNames.push(String(r.name).trim()); });
+        } else if (dashboardData.staff && typeof dashboardData.staff === 'object') {
+          Object.keys(dashboardData.staff).forEach(k => staffNames.push(k));
+        }
+      }
+
+      if (sel) {
+        sel.innerHTML = '<option value="">🏪 Overview Toko (Digimap Jember Roxy)</option>' +
+          staffNames.map(n => `<option value="${escapeHtml(n)}">👤 ${escapeHtml(n)}</option>`).join('');
+        if (currentVal && staffNames.includes(currentVal)) sel.value = currentVal;
+      }
+
+      if (bonusSel) {
+        bonusSel.innerHTML = '<option value="">👇 Pilih Nama Kamu 👇</option>' +
+          staffNames.map(n => `<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
+        if (currentBonusVal && staffNames.includes(currentBonusVal)) bonusSel.value = currentBonusVal;
+      }
+    }
+
+    function showPersonalData() {
+      const sel = document.getElementById('staffSelect');
+      const selectedStaff = sel ? sel.value : '';
+      const storeView = document.getElementById('storeView');
+      const staffView = document.getElementById('staffView');
+
+      if (!selectedStaff) {
+        storeView.style.display = 'block';
+        staffView.style.display = 'none';
+        renderStoreOverview();
+      } else {
+        storeView.style.display = 'none';
+        staffView.style.display = 'block';
+        renderStaffOverview(selectedStaff);
+      }
+    }
+
+    function renderStoreOverview() {
+      if (!dashboardData || !dashboardData.store) return;
+      const st = dashboardData.store;
+      const sales = Number(st.totalSales || st.sales || 0);
+      const target = Number(st.totalTarget || st.target || 0);
+      const point = Number(st.totalPoint || st.point || 0);
+      const pct = target > 0 ? Math.round((sales / target) * 100) : Number(st.pct || 0);
+
+      document.getElementById('valStoreSales').innerText = formatRupiah(sales);
+      document.getElementById('valStoreTarget').innerText = formatRupiah(target);
+      document.getElementById('valStorePoint').innerText = point.toLocaleString('id-ID');
+      document.getElementById('valStorePct').innerText = pct + '%';
+
+      const devS = Number(st.deviceSales || 0), devT = Number(st.deviceTarget || 0);
+      document.getElementById('valStoreDeviceSales').innerText = formatRupiah(devS);
+      document.getElementById('valStoreDeviceTarget').innerText = formatRupiah(devT);
+      document.getElementById('barStoreDevice').style.width = Math.min(100, devT > 0 ? (devS / devT) * 100 : 0) + '%';
+
+      const accS = Number(st.accSales || 0), accT = Number(st.accTarget || 0);
+      document.getElementById('valStoreAccSales').innerText = formatRupiah(accS);
+      document.getElementById('valStoreAccTarget').innerText = formatRupiah(accT);
+      document.getElementById('barStoreAcc').style.width = Math.min(100, accT > 0 ? (accS / accT) * 100 : 0) + '%';
+
+      const vasS = Number(st.vasSales || 0), vasT = Number(st.vasTarget || 0);
+      document.getElementById('valStoreVasSales').innerText = formatRupiah(vasS);
+      document.getElementById('valStoreVasTarget').innerText = formatRupiah(vasT);
+      document.getElementById('barStoreVas').style.width = Math.min(100, vasT > 0 ? (vasS / vasT) * 100 : 0) + '%';
+
+      const tbody = document.getElementById('rankTableBody');
+      const ranking = Array.isArray(dashboardData.ranking) ? dashboardData.ranking : [];
+      if (ranking.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--text-muted);">Belum ada data klasemen</td></tr>';
+      } else {
+        tbody.innerHTML = ranking.map((r, i) => {
+          const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
+          return `
+            <tr style="cursor:pointer;" onclick="document.getElementById('staffSelect').value='${escapeAttr(r.name)}'; showPersonalData();">
+              <td style="text-align:center; font-weight:700;">${medal}</td>
+              <td style="font-weight:600;">${escapeHtml(r.name)}</td>
+              <td style="text-align:right; font-weight:700; color:var(--primary);">${formatRupiah(r.sales)}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+
+    function renderStaffOverview(staffName) {
+      document.getElementById('heroStaffName').innerText = staffName;
+      const stObj = (dashboardData && dashboardData.staff && dashboardData.staff[staffName]) ? dashboardData.staff[staffName] : {};
+      const ranking = (dashboardData && Array.isArray(dashboardData.ranking)) ? dashboardData.ranking : [];
+      const rankIdx = ranking.findIndex(r => String(r.name).trim() === staffName);
+
+      const sales = Number(stObj.totalSales || stObj.sales || (rankIdx >= 0 ? ranking[rankIdx].sales : 0));
+      const target = Number(stObj.totalTarget || stObj.target || 0);
+      const sisa = Math.max(0, target - sales);
+      const pct = target > 0 ? Math.round((sales / target) * 100) : 0;
+
+      document.getElementById('valMyRank').innerText = rankIdx >= 0 ? '#' + (rankIdx + 1) : '#-';
+      document.getElementById('valMySales').innerText = formatRupiah(sales);
+      document.getElementById('valMyTarget').innerText = formatRupiah(target);
+      document.getElementById('valMySisa').innerText = sisa === 0 && target > 0 ? '🎉 Target Tercapai!' : formatRupiah(sisa);
+      document.getElementById('valMyPct').innerText = pct + '%';
+
+      document.getElementById('qtyIphone').innerText = Number(stObj.qtyIphone || stObj.iphone || 0);
+      document.getElementById('qtyIpad').innerText = Number(stObj.qtyIpad || stObj.ipad || 0);
+      document.getElementById('qtyMac').innerText = Number(stObj.qtyMac || stObj.mac || 0);
+      document.getElementById('qtyWatch').innerText = Number(stObj.qtyWatch || stObj.watch || 0);
+      document.getElementById('qtyAirpods').innerText = Number(stObj.qtyAirpods || stObj.airpods || 0);
+
+      const accS = Number(stObj.accSales || 0), accT = Number(stObj.accTarget || 0);
+      document.getElementById('valAccSales').innerText = formatRupiah(accS);
+      document.getElementById('valAccTarget').innerText = formatRupiah(accT);
+      document.getElementById('barAcc').style.width = Math.min(100, accT > 0 ? (accS / accT) * 100 : 0) + '%';
+
+      const qoalaS = Number(stObj.qoalaSales || stObj.vasSales || 0), qoalaT = Number(stObj.qoalaTarget || stObj.vasTarget || 0);
+      document.getElementById('valQoalaSales').innerText = formatRupiah(qoalaS);
+      document.getElementById('valQoalaTarget').innerText = formatRupiah(qoalaT);
+      document.getElementById('barQoala').style.width = Math.min(100, qoalaT > 0 ? (qoalaS / qoalaT) * 100 : 0) + '%';
+
+      const dateInput = document.getElementById('dailyDateInput');
+      if (dateInput && !dateInput.value) {
+        dateInput.value = getTodayLocalStr();
+      }
+      loadDailySales();
+    }
+
+    function stepDailyDate(deltaDays) {
+      const inp = document.getElementById('dailyDateInput');
+      if (!inp) return;
+      const base = inp.value ? new Date(inp.value + 'T00:00:00') : new Date();
+      base.setDate(base.getDate() + deltaDays);
+      inp.value = `${base.getFullYear()}-${String(base.getMonth() + 1).padStart(2, '0')}-${String(base.getDate()).padStart(2, '0')}`;
+      loadDailySales();
+    }
+
+    async function loadDailySales() {
+      const staffName = document.getElementById('staffSelect').value;
+      const dateStr = document.getElementById('dailyDateInput').value || getTodayLocalStr();
+      const metaEl = document.getElementById('dailyMetaInfo');
+      if (!staffName) return;
+
+      metaEl.innerText = `⏳ Memuat penjualan ${staffName} (${dateStr})...`;
+      try {
+        const res = await fetch(`${API_URL}?action=getDailySales&staff=${encodeURIComponent(staffName)}&date=${encodeURIComponent(dateStr)}`);
+        const data = await res.json();
+
+        const total = Number(data.totalSales || data.total || 0);
+        const device = Number(data.deviceSales || data.device || 0);
+        const acc = Number(data.accSales || data.acc || 0);
+        const qoala = Number(data.qoalaSales || data.qoala || data.vas || 0);
+
+        document.getElementById('valDailyTotal').innerText = formatRupiah(total);
+        document.getElementById('valDailyDevice').innerText = formatRupiah(device);
+        document.getElementById('valDailyAcc').innerText = formatRupiah(acc);
+        document.getElementById('valDailyQoala').innerText = formatRupiah(qoala);
+
+        document.getElementById('dailyQtyIphone').innerText = Number(data.qtyIphone || data.iphone || 0);
+        document.getElementById('dailyQtyIpad').innerText = Number(data.qtyIpad || data.ipad || 0);
+        document.getElementById('dailyQtyMac').innerText = Number(data.qtyMac || data.mac || 0);
+        document.getElementById('dailyQtyWatch').innerText = Number(data.qtyWatch || data.watch || 0);
+        document.getElementById('dailyQtyAirpods').innerText = Number(data.qtyAirpods || data.airpods || 0);
+
+        metaEl.innerText = total > 0
+          ? `✅ Menampilkan transaksi tanggal ${dateStr}`
+          : `ℹ️ Tidak ada catatan transaksi pada tanggal ${dateStr}`;
+      } catch (err) {
+        metaEl.innerText = `⚠️ Data harian belum tersedia untuk ${dateStr}`;
+      }
+    }
+
+    // =========================================================
+    // 2. CEK STOK (SOH)
+    // =========================================================
+    async function loadSOHData() {
+      if (isSohLoading) return;
+      if (sohList.length > 0) {
+        renderSOH();
+        return;
+      }
+
+      isSohLoading = true;
+      document.getElementById('loadingSOH').style.display = 'block';
+      document.getElementById('sohTableContainer').style.display = 'none';
+
+      try {
+        const res = await fetch(`${API_URL}?action=getSOH`);
+        const json = await res.json();
+        sohList = Array.isArray(json) ? json : (Array.isArray(json.items) ? json.items : (Array.isArray(json.soh) ? json.soh : []));
+        renderSOH();
+      } catch (err) {
+        document.getElementById('loadingSOH').innerText = '⚠️ Gagal memuat stok gudang.';
+      } finally {
+        isSohLoading = false;
+      }
+    }
+
+    function renderSOH() {
+      const loadingEl = document.getElementById('loadingSOH');
+      const tableCont = document.getElementById('sohTableContainer');
+      const tbody = document.getElementById('sohTableBody');
+
+      loadingEl.style.display = 'none';
+      tableCont.style.display = 'block';
+
+      const q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+      const cat = document.getElementById('catSelect').value;
+
+      const filtered = sohList.filter(item => {
+        const name = String(item.name || item.desc || item.description || '').toLowerCase();
+        const sku = String(item.sku || item.code || '').toLowerCase();
+        const itemCat = String(item.category || item.lob || '').toLowerCase();
+        const matchSearch = !q || name.includes(q) || sku.includes(q);
+        const matchCat = cat === 'Semua' || itemCat.includes(cat.toLowerCase()) || name.includes(cat.toLowerCase());
+        return matchSearch && matchCat;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="2" style="text-align:center; padding:25px; color:var(--text-muted);">Produk tidak ditemukan</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = filtered.slice(0, 150).map(item => {
+        const name = item.name || item.desc || item.description || 'Produk';
+        const sku = item.sku || item.code || '';
+        const qty = Number(item.qty || item.stock || item.soh || 0);
+        return `
+          <tr>
+            <td>
+              <div style="font-weight:600; color:var(--text-main); line-height:1.35;">${escapeHtml(name)}</div>
+              ${sku ? `<div style="font-size:11px; color:var(--text-muted); margin-top:2px;">SKU: ${escapeHtml(sku)}</div>` : ''}
+            </td>
+            <td style="text-align:center;"><span class="qty-badge">${qty}</span></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    // =========================================================
+    // 3. PUSAT FORM & LINK (KATEGORI: PROJECT, TRAINER, SPV, LAINNYA)
+    // =========================================================
+    const LINKS_LOCAL_KEY = 'digimap_links_cache_v2';
+    let allLinksList = [];
+    let activeLinkCat = 'Semua';
+    let editingLinkId = null;
+
+    async function loadLinksData() {
+      try {
+        const cached = localStorage.getItem(LINKS_LOCAL_KEY);
+        if (cached && allLinksList.length === 0) {
+          allLinksList = JSON.parse(cached);
+          renderLinks();
+        }
+      } catch (e) {}
+
+      try {
+        const res = await fetch(`${API_URL}?action=getLinks`);
+        const json = await res.json();
+        const list = Array.isArray(json) ? json : (Array.isArray(json.links) ? json.links : null);
+        if (list) {
+          allLinksList = list;
+          try { localStorage.setItem(LINKS_LOCAL_KEY, JSON.stringify(allLinksList)); } catch (e) {}
+        }
+      } catch (err) {
+        console.warn('Menggunakan cache link lokal:', err);
+      }
+      renderLinks();
+    }
+
+    function setLinkCat(cat, btnEl) {
+      activeLinkCat = cat;
+      document.querySelectorAll('#linkFilterChips .chip-btn').forEach(b => b.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+      renderLinks();
+    }
+
+    function renderLinks() {
+      const container = document.getElementById('formListContainer');
+      const q = (document.getElementById('linkSearchInput').value || '').toLowerCase().trim();
+
+      const filtered = allLinksList.filter(item => {
+        const cat = String(item.category || item.cat || 'Lainnya');
+        const title = String(item.title || '').toLowerCase();
+        const desc = String(item.desc || item.description || '').toLowerCase();
+        const matchCat = activeLinkCat === 'Semua' || cat.toLowerCase() === activeLinkCat.toLowerCase();
+        const matchSearch = !q || title.includes(q) || desc.includes(q) || cat.toLowerCase().includes(q);
+        return matchCat && matchSearch;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="card" style="text-align:center; padding:32px 20px;">
+            <div style="font-size:36px; margin-bottom:8px;">🔗</div>
+            <div style="font-weight:700; margin-bottom:4px;">Belum ada link di kategori ini</div>
+            <div style="font-size:12px; color:var(--text-muted);">Klik tombol <b>+ Tambah</b> di kanan atas untuk menambahkan link baru.</div>
+          </div>
+        `;
+        return;
+      }
+
+      const iconMap = { Project: '📁', Trainer: '🎓', SPV: '📋', Lainnya: '🔗' };
+
+      container.innerHTML = filtered.map((item, idx) => {
+        const id = item.id || ('link-' + idx);
+        const cat = item.category || item.cat || 'Lainnya';
+        const icon = iconMap[cat] || '🔗';
+        const url = item.url || '#';
+        return `
+          <div class="form-card">
+            <div class="form-top">
+              <div class="form-icon">${icon}</div>
+              <div class="form-info">
+                <span class="form-badge">${escapeHtml(cat)}</span>
+                <div class="form-title">${escapeHtml(item.title || 'Link Form')}</div>
+                <div class="form-desc">${escapeHtml(item.desc || item.description || url)}</div>
+              </div>
+            </div>
+            <div class="form-actions">
+              <button type="button" class="btn-copy-link" onclick="copyTextLink('${escapeAttr(url)}')">📋 Salin</button>
+              <a class="btn-open-link" href="${escapeAttr(url)}" target="_blank" rel="noopener noreferrer">Buka ↗</a>
+              <button type="button" class="btn-edit-custom" title="Edit" onclick="openEditFormModal('${escapeAttr(id)}')">✏️</button>
+              <button type="button" class="btn-del-custom" title="Hapus" onclick="deleteFormLink('${escapeAttr(id)}')">🗑️</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function copyTextLink(url) {
+      const ta = document.createElement('textarea');
+      ta.value = url;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showLinkToast('📋 Link berhasil disalin!');
+      } catch (e) {
+        showLinkToast('⚠️ Gagal menyalin link');
+      }
+      document.body.removeChild(ta);
+    }
+
+    function openAddFormModal() {
+      editingLinkId = null;
+      document.getElementById('formModalTitle').innerText = '➕ Tambah Link Form Baru';
+      document.getElementById('newFormTitle').value = '';
+      document.getElementById('newFormDesc').value = '';
+      document.getElementById('newFormCat').value = 'Project';
+      document.getElementById('newFormUrl').value = '';
+      document.getElementById('addFormModal').classList.add('open');
+    }
+
+    function openEditFormModal(id) {
+      const item = allLinksList.find((x, i) => String(x.id || ('link-' + i)) === String(id));
+      if (!item) return;
+      editingLinkId = id;
+      document.getElementById('formModalTitle').innerText = '✏️ Edit Link Form';
+      document.getElementById('newFormTitle').value = item.title || '';
+      document.getElementById('newFormDesc').value = item.desc || item.description || '';
+      document.getElementById('newFormCat').value = item.category || item.cat || 'Lainnya';
+      document.getElementById('newFormUrl').value = item.url || '';
+      document.getElementById('addFormModal').classList.add('open');
+    }
+
+    function closeAddFormModal() {
+      document.getElementById('addFormModal').classList.remove('open');
+    }
+
+    async function saveNewForm() {
+      const title = document.getElementById('newFormTitle').value.trim();
+      const desc = document.getElementById('newFormDesc').value.trim();
+      const category = document.getElementById('newFormCat').value;
+      let url = document.getElementById('newFormUrl').value.trim();
+
+      if (!title || !url) {
+        showLinkToast('⚠️ Judul dan URL wajib diisi!');
+        return;
+      }
+      if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+
+      const btn = document.getElementById('btnSaveLink');
+      btn.disabled = true;
+      btn.innerText = 'Menyimpan...';
+
+      const id = editingLinkId || ('link-' + Date.now());
+      const payloadItem = { id, title, desc, category, url };
+
+      if (editingLinkId) {
+        const idx = allLinksList.findIndex((x, i) => String(x.id || ('link-' + i)) === String(editingLinkId));
+        if (idx >= 0) allLinksList[idx] = payloadItem;
+      } else {
+        allLinksList.unshift(payloadItem);
+      }
+
+      try { localStorage.setItem(LINKS_LOCAL_KEY, JSON.stringify(allLinksList)); } catch (e) {}
+      closeAddFormModal();
+      renderLinks();
+
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'saveLink', link: payloadItem })
+        });
+        showLinkToast('✅ Link berhasil disimpan!');
+      } catch (err) {
+        showLinkToast('✅ Link tersimpan di perangkat');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Simpan Link';
+      }
+    }
+
+    async function deleteFormLink(id) {
+      allLinksList = allLinksList.filter((x, i) => String(x.id || ('link-' + i)) !== String(id));
+      try { localStorage.setItem(LINKS_LOCAL_KEY, JSON.stringify(allLinksList)); } catch (e) {}
+      renderLinks();
+      showLinkToast('🗑️ Link dihapus');
+
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'deleteLink', id })
+        });
+      } catch (e) {}
+    }
+
+    // =========================================================
+    // 4A. SUB-MENU STAF: SLIP GAJI & PIN
+    // =========================================================
+    let unlockedStaffName = '';
+
+    async function bukaBrankas() {
+      const staffName = document.getElementById('bonusStaffSelect').value;
+      const pin = document.getElementById('inputPin').value.trim();
+      const errEl = document.getElementById('bonusError');
+      const loadEl = document.getElementById('loadingBonus');
+
+      errEl.style.display = 'none';
+      if (!staffName) {
+        errEl.innerText = 'Pilih nama kamu terlebih dahulu.';
+        errEl.style.display = 'block';
+        return;
+      }
+      if (!pin) {
+        errEl.innerText = 'Masukkan PIN keamanan.';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      loadEl.style.display = 'block';
+      document.getElementById('btnUnlock').disabled = true;
+
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'verifyPin', staff: staffName, pin })
+        });
+        const data = await res.json();
+
+        if (data && data.success === false) {
+          errEl.innerText = data.message || 'PIN salah! Silakan coba lagi.';
+          errEl.style.display = 'block';
+          return;
+        }
+
+        unlockedStaffName = staffName;
+        const pokok = Number(data.gajiPokok || data.pokok || GAJI_POKOK);
+        const insentif = Number(data.insentif || data.bonus || 0);
+        const tunjangan = Number(data.tunjangan || 0);
+        const total = Number(data.total || (pokok + insentif + tunjangan));
+
+        document.getElementById('slipNamaHeader').innerText = staffName;
+        document.getElementById('slipPokok').innerText = formatRupiah(pokok);
+        document.getElementById('slipBonus').innerText = formatRupiah(insentif);
+
+        if (tunjangan > 0) {
+          document.getElementById('rowTunjangan').style.display = 'flex';
+          document.getElementById('slipTunjangan').innerText = formatRupiah(tunjangan);
+        } else {
+          document.getElementById('rowTunjangan').style.display = 'none';
+        }
+
+        document.getElementById('slipTotal').innerText = formatRupiah(total);
+        document.getElementById('authBox').style.display = 'none';
+        document.getElementById('payslipBox').style.display = 'block';
+      } catch (err) {
+        errEl.innerText = 'Gagal terhubung ke server verifikasi.';
+        errEl.style.display = 'block';
+      } finally {
+        loadEl.style.display = 'none';
+        document.getElementById('btnUnlock').disabled = false;
+      }
+    }
+
+    async function gantiPin() {
+      const oldPin = document.getElementById('oldPin').value.trim();
+      const newPin = document.getElementById('newPin').value.trim();
+      const stEl = document.getElementById('pinStatus');
+
+      if (!oldPin || newPin.length < 4) {
+        stEl.style.color = 'var(--accent-red)';
+        stEl.innerText = 'PIN baru minimal 4 digit.';
+        return;
+      }
+
+      stEl.style.color = 'var(--text-muted)';
+      stEl.innerText = 'Menyimpan PIN baru...';
+
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'changePin', staff: unlockedStaffName, oldPin, newPin })
+        });
+        const data = await res.json();
+        if (data && data.success) {
+          stEl.style.color = 'var(--accent-green)';
+          stEl.innerText = '✅ PIN berhasil diperbarui!';
+          document.getElementById('oldPin').value = '';
+          document.getElementById('newPin').value = '';
+        } else {
+          stEl.style.color = 'var(--accent-red)';
+          stEl.innerText = (data && data.message) || 'PIN lama tidak sesuai.';
+        }
+      } catch (err) {
+        stEl.style.color = 'var(--accent-red)';
+        stEl.innerText = 'Gagal menyimpan PIN baru.';
+      }
+    }
+
+    function tutupBrankas() {
+      unlockedStaffName = '';
+      document.getElementById('inputPin').value = '';
+      document.getElementById('payslipBox').style.display = 'none';
+      document.getElementById('authBox').style.display = 'block';
+    }
+
+    // =========================================================
+    // 4B. SUB-MENU STAF: BIODATA TIM
+    // =========================================================
+    let allBiodataList = [];
+    let isBiodataLoading = false;
+    let editingBioId = null;
+    let currentBioPhotoData = '';
+
+    async function loadBiodataData(force = false) {
+      if (isBiodataLoading && !force) return;
+      if (allBiodataList.length > 0 && !force) {
+        renderBiodata();
+        return;
+      }
+
+      isBiodataLoading = true;
+      const cont = document.getElementById('biodataListContainer');
+      if (cont && allBiodataList.length === 0) {
+        cont.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">⏳ Memuat biodata tim...</div>';
+      }
+
+      try {
+        const res = await fetch(`${API_URL}?action=getBiodata`);
+        const json = await res.json();
+        allBiodataList = Array.isArray(json) ? json : (Array.isArray(json.biodata) ? json.biodata : []);
+      } catch (err) {
+        console.error('Gagal memuat biodata:', err);
+      } finally {
+        isBiodataLoading = false;
+        renderBiodata();
+        renderAllScheduleViews();
+      }
+    }
+
+    function formatWaHref(waRaw) {
+      let digits = String(waRaw || '').replace(/\D/g, '');
+      if (!digits) return '';
+      if (digits.startsWith('0')) digits = '62' + digits.slice(1);
+      return 'https://wa.me/' + digits;
+    }
+
+    function getInitials(name) {
+      const parts = String(name || 'ST').trim().split(/\s+/);
+      return (parts[0][0] + (parts[1] ? parts[1][0] : (parts[0][1] || ''))).toUpperCase();
+    }
+
+    function renderBiodata() {
+      const cont = document.getElementById('biodataListContainer');
+      if (!cont) return;
+      const q = (document.getElementById('bioSearchInput').value || '').toLowerCase().trim();
+
+      const filtered = allBiodataList.filter(b => {
+        const n = String(b.name || '').toLowerCase();
+        const r = String(b.role || '').toLowerCase();
+        const nik = String(b.nik || '').toLowerCase();
+        return !q || n.includes(q) || r.includes(q) || nik.includes(q);
+      });
+
+      if (filtered.length === 0) {
+        cont.innerHTML = `
+          <div class="card" style="text-align:center; padding:32px 20px;">
+            <div style="font-size:36px; margin-bottom:8px;">👥</div>
+            <div style="font-weight:700; margin-bottom:4px;">Belum ada data profil</div>
+            <div style="font-size:12px; color:var(--text-muted);">Klik <b>+ Tambah</b> di atas untuk menambahkan anggota tim.</div>
+          </div>
+        `;
+        return;
+      }
+
+      cont.innerHTML = filtered.map((b, idx) => {
+        const id = b.id || ('bio-' + idx);
+        const avatarHtml = b.photo
+          ? `<img src="${escapeAttr(b.photo)}" class="bio-avatar" alt="${escapeAttr(b.name)}">`
+          : `<div class="bio-avatar">${escapeHtml(getInitials(b.name))}</div>`;
+        const waHref = formatWaHref(b.wa);
+
+        return `
+          <div class="bio-card">
+            <div class="bio-header">
+              ${avatarHtml}
+              <div class="bio-main-info">
+                <div class="bio-name">${escapeHtml(b.name || '-')}</div>
+                <div class="bio-badges">
+                  <span class="bio-role-badge">${escapeHtml(b.role || 'Staff Toko')}</span>
+                  ${b.dob ? `<span class="bio-bday-badge">🎂 ${escapeHtml(b.dob)}</span>` : ''}
+                </div>
+              </div>
+            </div>
+            <div class="bio-details">
+              <div class="bio-row"><span class="bio-lbl">NIK</span><span class="bio-val">${escapeHtml(b.nik || '-')}</span></div>
+              <div class="bio-row"><span class="bio-lbl">Tgl Masuk</span><span class="bio-val">${escapeHtml(b.joinDate || '-')}</span></div>
+              <div class="bio-row"><span class="bio-lbl">WhatsApp</span><span class="bio-val">${escapeHtml(b.wa || '-')}</span></div>
+              <div class="bio-row"><span class="bio-lbl">Ukuran Baju</span><span class="bio-val">${escapeHtml(b.shirt || '-')}</span></div>
+              <div class="bio-row"><span class="bio-lbl">Alamat</span><span class="bio-val">${escapeHtml(b.address || '-')}</span></div>
+            </div>
+            <div class="form-actions">
+              ${waHref ? `<a class="btn-wa-link" href="${escapeAttr(waHref)}" target="_blank" rel="noopener noreferrer">💬 Chat WA</a>` : ''}
+              <button type="button" class="btn-copy-link" onclick="openEditBiodataModal('${escapeAttr(id)}')">✏️ Edit Profil</button>
+              <button type="button" class="btn-del-custom" title="Hapus" onclick="deleteBiodata('${escapeAttr(id)}')">🗑️</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openAddBiodataModal() {
+      editingBioId = null;
+      currentBioPhotoData = '';
+      document.getElementById('bioModalTitle').innerText = '👤 Tambah Biodata Tim';
+      document.getElementById('bioName').value = '';
+      document.getElementById('bioRole').value = '';
+      document.getElementById('bioNik').value = '';
+      document.getElementById('bioJoinDate').value = '';
+      document.getElementById('bioWa').value = '';
+      document.getElementById('bioDob').value = '';
+      document.getElementById('bioShirt').value = '';
+      document.getElementById('bioAddress').value = '';
+      updateBioPhotoPreview('');
+      document.getElementById('biodataModal').classList.add('open');
+    }
+
+    function openEditBiodataModal(id) {
+      const b = allBiodataList.find((x, i) => String(x.id || ('bio-' + i)) === String(id));
+      if (!b) return;
+      editingBioId = id;
+      currentBioPhotoData = b.photo || '';
+      document.getElementById('bioModalTitle').innerText = '✏️ Edit Biodata Tim';
+      document.getElementById('bioName').value = b.name || '';
+      document.getElementById('bioRole').value = b.role || '';
+      document.getElementById('bioNik').value = b.nik || '';
+      document.getElementById('bioJoinDate').value = b.joinDate || '';
+      document.getElementById('bioWa').value = b.wa || '';
+      document.getElementById('bioDob').value = b.dob || '';
+      document.getElementById('bioShirt').value = b.shirt || '';
+      document.getElementById('bioAddress').value = b.address || '';
+      updateBioPhotoPreview(currentBioPhotoData);
+      document.getElementById('biodataModal').classList.add('open');
+    }
+
+    function closeBiodataModal() {
+      document.getElementById('biodataModal').classList.remove('open');
+    }
+
+    function updateBioPhotoPreview(src) {
+      const prev = document.getElementById('bioPhotoPreview');
+      const clearBtn = document.getElementById('btnClearPhoto');
+      if (src) {
+        prev.innerHTML = `<img src="${escapeAttr(src)}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+        clearBtn.style.display = 'inline-block';
+      } else {
+        prev.innerHTML = '📷';
+        clearBtn.style.display = 'none';
+      }
+    }
+
+    function handleBioPhotoSelect(input) {
+      const file = input.files && input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const maxSide = 220;
+          const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+          canvas.width = Math.round(img.width * scale);
+          canvas.height = Math.round(img.height * scale);
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          currentBioPhotoData = canvas.toDataURL('image/jpeg', 0.78);
+          updateBioPhotoPreview(currentBioPhotoData);
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearBioPhoto() {
+      currentBioPhotoData = '';
+      document.getElementById('bioPhotoFile').value = '';
+      updateBioPhotoPreview('');
+    }
+
+    async function saveBiodata() {
+      const name = document.getElementById('bioName').value.trim();
+      if (!name) {
+        showLinkToast('⚠️ Nama lengkap wajib diisi!');
+        return;
+      }
+
+      const btn = document.getElementById('btnSaveBio');
+      btn.disabled = true;
+      btn.innerText = 'Menyimpan...';
+
+      const bioObj = {
+        id: editingBioId || ('bio-' + Date.now()),
+        name,
+        role: document.getElementById('bioRole').value.trim(),
+        nik: document.getElementById('bioNik').value.trim(),
+        joinDate: document.getElementById('bioJoinDate').value,
+        wa: document.getElementById('bioWa').value.trim(),
+        dob: document.getElementById('bioDob').value,
+        shirt: document.getElementById('bioShirt').value,
+        address: document.getElementById('bioAddress').value.trim(),
+        photo: currentBioPhotoData
+      };
+
+      if (editingBioId) {
+        const idx = allBiodataList.findIndex((x, i) => String(x.id || ('bio-' + i)) === String(editingBioId));
+        if (idx >= 0) allBiodataList[idx] = bioObj;
+      } else {
+        allBiodataList.push(bioObj);
+      }
+
+      closeBiodataModal();
+      renderBiodata();
+      renderAllScheduleViews();
+
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'saveBiodata', biodata: bioObj })
+        });
+        showLinkToast('✅ Biodata berhasil disimpan!');
+      } catch (err) {
+        showLinkToast('⚠️ Gagal menyinkronkan ke server');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Simpan Biodata';
+      }
+    }
+
+    async function deleteBiodata(id) {
+      allBiodataList = allBiodataList.filter((x, i) => String(x.id || ('bio-' + i)) !== String(id));
+      renderBiodata();
+      renderAllScheduleViews();
+      showLinkToast('🗑️ Profil dihapus');
+
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'deleteBiodata', id })
+        });
+      } catch (e) {}
+    }
+
+    // =========================================================
+    // 4C. SUB-MENU STAF: JADWAL SHIFT & CATATAN PER STAF
+    // =========================================================
+    const SHIFTS = {
+      P:   { code: 'P',   shortLabel: 'P',   label: 'Pagi',   icon: '🌅', hours: '09:30–18:00', badgeClass: 'sh-P',   avClass: 'av-P' },
+      M:   { code: 'M',   shortLabel: 'M',   label: 'Middle', icon: '☀️', hours: '11:30–20:00', badgeClass: 'sh-M',   avClass: 'av-M' },
+      S:   { code: 'S',   shortLabel: 'S',   label: 'Siang',  icon: '🌙', hours: '13:30–22:00', badgeClass: 'sh-S',   avClass: 'av-S' },
+      OFF: { code: 'OFF', shortLabel: 'OFF', label: 'Off',    icon: '🏖️', hours: 'Libur',       badgeClass: 'sh-OFF', avClass: 'av-OFF' }
+    };
+
+    const NOTE_PRESETS = ['Stock Opname', 'Meeting Area', 'Training Produk', 'Cek Display', 'Admin & Laporan'];
+    const SHIFT_ORDER = ['P', 'M', 'S', 'OFF'];
+    const DAY_NAMES_SHORT = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+    const DAY_NAMES_FULL  = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const MONTH_NAMES_ID  = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+
+    let currentScheduleWeekStart = getMondayOfDate(new Date());
+    let activeScheduleSubTab = 'perDay';
+    let selectedScheduleDayIdx = (() => {
+      const d = new Date().getDay();
+      return d === 0 ? 6 : d - 1;
+    })();
+    let selectedPerStaffName = '';
+    let scheduleDatabase = {};
+    let isScheduleLoading = false;
+
+    function getScheduleStaffList() {
+      const seen = {};
+      const list = [];
+      allBiodataList.forEach(b => {
+        const cleanName = String(b.name || '').trim();
+        if (!cleanName) return;
+        const key = cleanName.toLowerCase();
+        if (seen[key]) return;
+        seen[key] = true;
+        list.push({
+          name: cleanName,
+          shortName: cleanName.split(' ')[0],
+          role: b.role ? String(b.role).trim() : 'Staff Toko'
+        });
+      });
+      return list;
+    }
+
+    function parseScheduleKey(key) {
+      const [y, m, d] = key.split('-').map(Number);
+      return new Date(y, m - 1, d);
+    }
+
+    function formatScheduleKey(dt) {
+      return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+    }
+
+    function shiftScheduleDateKey(key, deltaDays) {
+      const dt = parseScheduleKey(key);
+      dt.setDate(dt.getDate() + deltaDays);
+      return formatScheduleKey(dt);
+    }
+
+    function getWeekList(startKey) {
+      const list = [];
+      for (let i = 0; i < 7; i++) {
+        const k = shiftScheduleDateKey(startKey, i);
+        const dt = parseScheduleKey(k);
+        list.push({
+          key: k,
+          dayShort: DAY_NAMES_SHORT[dt.getDay()],
+          dayFull: DAY_NAMES_FULL[dt.getDay()],
+          dateNum: dt.getDate(),
+          monthShort: MONTH_NAMES_ID[dt.getMonth()],
+          year: dt.getFullYear()
+        });
+      }
+      return list;
+    }
+
+    function getWeekRangeText(startKey) {
+      const days = getWeekList(startKey);
+      return `${days[0].dateNum} ${days[0].monthShort} – ${days[6].dateNum} ${days[6].monthShort} ${days[6].year}`;
+    }
+
+    function getScheduleCell(dateKey, staffName) {
+      if (!scheduleDatabase[dateKey]) scheduleDatabase[dateKey] = {};
+      if (!scheduleDatabase[dateKey][staffName]) {
+        scheduleDatabase[dateKey][staffName] = { shift: 'P', note: '' };
+      }
+      return scheduleDatabase[dateKey][staffName];
+    }
+
+    async function loadScheduleData() {
+      if (isScheduleLoading) return;
+      isScheduleLoading = true;
+      const weekDays = getWeekList(currentScheduleWeekStart);
+      const startDate = weekDays[0].key;
+      const endDate = weekDays[6].key;
+
+      try {
+        const res = await fetch(`${API_URL}?action=getSchedule&startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`);
+        const json = await res.json();
+        if (json && json.schedule && typeof json.schedule === 'object') {
+          Object.keys(json.schedule).forEach(dKey => {
+            if (!scheduleDatabase[dKey]) scheduleDatabase[dKey] = {};
+            Object.assign(scheduleDatabase[dKey], json.schedule[dKey]);
+          });
+        }
+      } catch (err) {
+        console.warn('Gagal memuat jadwal dari server:', err);
+      } finally {
+        isScheduleLoading = false;
+        renderAllScheduleViews();
+      }
+    }
+
+    async function syncScheduleItemsToServer(items) {
+      if (!items || items.length === 0) return;
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'saveScheduleBatch', items })
+        });
+      } catch (err) {
+        showLinkToast('⚠️ Jadwal tersimpan lokal (gagal sync server)');
+      }
+    }
+
+    function changeScheduleWeek(deltaDays) {
+      currentScheduleWeekStart = shiftScheduleDateKey(currentScheduleWeekStart, deltaDays);
+      renderAllScheduleViews();
+      loadScheduleData();
+    }
+
+    function switchScheduleSubTab(tab) {
+      activeScheduleSubTab = tab;
+      document.getElementById('tabBtnPerDay').classList.toggle('active', tab === 'perDay');
+      document.getElementById('tabBtnPerStaff').classList.toggle('active', tab === 'perStaff');
+      document.getElementById('panelSchedulePerDay').style.display = tab === 'perDay' ? 'block' : 'none';
+      document.getElementById('panelSchedulePerStaff').style.display = tab === 'perStaff' ? 'block' : 'none';
+      renderAllScheduleViews();
+    }
+
+    function renderAllScheduleViews() {
+      const staffList = getScheduleStaffList();
+      const subEl = document.getElementById('scheduleHeroSub');
+      if (subEl) subEl.innerText = `Digimap Jember Roxy • ${staffList.length} Staf`;
+      const weekLbl = document.getElementById('weekHeaderLabel');
+      if (weekLbl) weekLbl.innerText = getWeekRangeText(currentScheduleWeekStart);
+
+      renderPerDayView();
+      renderPerStaffView();
+    }
+
+    function quickToggleStaffDay(staffName, dateKey) {
+      const cell = getScheduleCell(dateKey, staffName);
+      const next = SHIFT_ORDER[(SHIFT_ORDER.indexOf(cell.shift || 'P') + 1) % SHIFT_ORDER.length];
+      cell.shift = next;
+      renderAllScheduleViews();
+      showLinkToast(`${SHIFTS[next].icon} ${staffName}: ${SHIFTS[next].label} (${SHIFTS[next].hours})`);
+      syncScheduleItemsToServer([{ date: dateKey, staff: staffName, shift: next, note: cell.note || '' }]);
+    }
+
+    function renderPerDayView() {
+      const stripEl = document.getElementById('daySelectorStrip');
+      const sumEl = document.getElementById('dailySummaryBar');
+      const listEl = document.getElementById('dailyStaffList');
+      if (!stripEl || !sumEl || !listEl) return;
+
+      const weekDays = getWeekList(currentScheduleWeekStart);
+      const staffList = getScheduleStaffList();
+
+      stripEl.innerHTML = weekDays.map((d, idx) => {
+        const hasAnyNote = staffList.some(m => (getScheduleCell(d.key, m.name).note || '').trim() !== '');
+        return `
+          <button type="button" class="day-pill ${idx === selectedScheduleDayIdx ? 'active' : ''}" onclick="selectedScheduleDayIdx=${idx}; renderPerDayView();">
+            ${hasAnyNote ? '<span class="note-dot-indicator"></span>' : ''}
+            <span class="dp-name">${d.dayShort}</span>
+            <span class="dp-num">${d.dateNum}</span>
+          </button>
+        `;
+      }).join('');
+
+      const activeDay = weekDays[selectedScheduleDayIdx];
+      if (staffList.length === 0) {
+        sumEl.innerHTML = `<div class="dsb-top"><span>${activeDay.dayFull}, ${activeDay.dateNum} ${activeDay.monthShort} ${activeDay.year}</span></div>`;
+        listEl.innerHTML = isBiodataLoading
+          ? '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">⏳ Memuat daftar staf dari Biodata...</div>'
+          : '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">Belum ada nama staf di <b>Biodata</b>. Tambahkan profil tim di menu Biodata terlebih dahulu.</div>';
+        return;
+      }
+
+      let cP = 0, cM = 0, cS = 0, cOff = 0;
+      const rowsData = staffList.map(m => {
+        const cell = getScheduleCell(activeDay.key, m.name);
+        const code = SHIFTS[cell.shift] ? cell.shift : 'P';
+        if (code === 'P') cP++;
+        else if (code === 'M') cM++;
+        else if (code === 'S') cS++;
+        else cOff++;
+        return { member: m, code, note: (cell.note || '').trim() };
+      });
+
+      const orderRank = { P: 1, M: 2, S: 3, OFF: 4 };
+      rowsData.sort((a, b) => orderRank[a.code] - orderRank[b.code]);
+
+      sumEl.innerHTML = `
+        <div class="dsb-top">
+          <span>${activeDay.dayFull}, ${activeDay.dateNum} ${activeDay.monthShort} ${activeDay.year}</span>
+          <span style="color:var(--primary);">${staffList.length - cOff}/${staffList.length} Masuk</span>
+        </div>
+        <div class="dsb-grid">
+          <div class="dsb-chip sh-P">🌅 Pagi: ${cP}</div>
+          <div class="dsb-chip sh-M">☀️ Mid: ${cM}</div>
+          <div class="dsb-chip sh-S">🌙 Siang: ${cS}</div>
+          <div class="dsb-chip sh-OFF">🏖️ Off: ${cOff}</div>
+        </div>
+      `;
+
+      listEl.innerHTML = rowsData.map(({ member, code, note }) => {
+        const sh = SHIFTS[code];
+        const isOff = code === 'OFF';
+        const shiftText = isOff ? `${sh.icon} Off / Libur` : `${sh.icon} ${sh.label} • ${sh.hours}`;
+
+        const rightNoteHtml = note
+          ? `<button type="button" class="btn-active-note-right" onclick="openStaffNoteModal('${escapeAttr(member.name)}', '${activeDay.key}')" title="${escapeAttr(note)}">
+               <span>📌</span>
+               <span class="note-label-clamp">${escapeHtml(note)}</span>
+               <span>✏️</span>
+             </button>`
+          : `<button type="button" class="btn-add-note-right" onclick="openStaffNoteModal('${escapeAttr(member.name)}', '${activeDay.key}')">+ Catatan</button>`;
+
+        return `
+          <div class="daily-staff-row ${isOff ? 'is-off' : ''}">
+            <div class="dsr-left">
+              <div class="sch-avatar ${sh.avClass}">${escapeHtml(getInitials(member.name))}</div>
+              <div class="dsr-text-col">
+                <div class="dsr-name">${escapeHtml(member.name)}</div>
+                <div class="dsr-shift-line ${sh.badgeClass}" onclick="quickToggleStaffDay('${escapeAttr(member.name)}', '${activeDay.key}')" title="Ketuk untuk ubah shift">
+                  ${shiftText}
+                </div>
+              </div>
+            </div>
+            <div class="dsr-right">
+              ${rightNoteHtml}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function onSelectPerStaffSchedule(staffName) {
+      selectedPerStaffName = staffName;
+      renderPerStaffView();
+    }
+
+    function renderPerStaffView() {
+      const pickerEl = document.getElementById('perStaffScheduleSelect');
+      const container = document.getElementById('staffWeekCardsContainer');
+      if (!pickerEl || !container) return;
+
+      const staffList = getScheduleStaffList();
+      if (staffList.length === 0) {
+        pickerEl.innerHTML = isBiodataLoading
+          ? '<option value="">⏳ Memuat Biodata Staf...</option>'
+          : '<option value="">Belum ada data di Biodata</option>';
+        container.innerHTML = isBiodataLoading
+          ? '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">⏳ Memuat daftar staf dari Biodata...</div>'
+          : '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">Belum ada nama staf di <b>Biodata</b>. Tambahkan profil tim di menu Biodata terlebih dahulu.</div>';
+        return;
+      }
+
+      if (!selectedPerStaffName || !staffList.some(m => m.name === selectedPerStaffName)) {
+        selectedPerStaffName = staffList[0].name;
+      }
+
+      pickerEl.innerHTML = staffList.map(m =>
+        `<option value="${escapeHtml(m.name)}" ${m.name === selectedPerStaffName ? 'selected' : ''}>👤 ${escapeHtml(m.name)} (${escapeHtml(m.role)})</option>`
+      ).join('');
+
       const member = staffList.find(m => m.name === selectedPerStaffName) || staffList[0];
       const weekDays = getWeekList(currentScheduleWeekStart);
 
@@ -268,4 +2053,363 @@
 
     // =========================================================
     // MODAL A JADWAL: MATRIKS 7 HARI (SEMUA STAF)
-// ... existing code ... -->
+    // =========================================================
+    let draftBulkData = {};
+    let activeBrushMode = 'P';
+    let editingMatrixCell = null;
+
+    function selectBrush(mode) {
+      activeBrushMode = mode;
+      ['P', 'M', 'S', 'OFF', 'NOTE'].forEach(m => {
+        const btn = document.getElementById('brushBtn-' + m);
+        if (btn) btn.className = 'brush-btn' + (m === mode ? ' active-' + m : '');
+      });
+      if (mode === 'NOTE') {
+        document.getElementById('brushHintLabel').innerText = 'Ketuk sel: 📌 Catatan';
+      } else {
+        closeMatrixCellNotePrompt();
+        document.getElementById('brushHintLabel').innerText = `Ketuk sel: ${SHIFTS[mode].icon} ${SHIFTS[mode].label}`;
+      }
+    }
+
+    function openBulkMatrixModal() {
+      const staffList = getScheduleStaffList();
+      if (staffList.length === 0) {
+        showLinkToast(isBiodataLoading ? '⏳ Memuat data dari Biodata...' : '⚠️ Isi data staf di menu Biodata terlebih dahulu!');
+        return;
+      }
+      const weekDays = getWeekList(currentScheduleWeekStart);
+      document.getElementById('bulkModalTitle').innerText = `⚡ Atur Roster 7 Hari (${staffList.length} Staf)`;
+      document.getElementById('bulkModalSub').innerText = getWeekRangeText(currentScheduleWeekStart);
+      draftBulkData = {};
+      staffList.forEach(m => {
+        draftBulkData[m.name] = weekDays.map(d => {
+          const c = getScheduleCell(d.key, m.name);
+          return { shift: SHIFTS[c.shift] ? c.shift : 'P', note: c.note || '' };
+        });
+      });
+      closeMatrixCellNotePrompt();
+      selectBrush('P');
+      renderBulkMatrix();
+      document.getElementById('bulkMatrixModal').classList.add('open');
+    }
+
+    function closeBulkModal() {
+      closeMatrixCellNotePrompt();
+      document.getElementById('bulkMatrixModal').classList.remove('open');
+    }
+
+    function handleMatrixCellTap(staffIdx, dayIdx) {
+      const staffList = getScheduleStaffList();
+      const member = staffList[staffIdx];
+      if (!member) return;
+
+      if (activeBrushMode === 'NOTE') {
+        editingMatrixCell = { staffName: member.name, dayIdx };
+        const day = getWeekList(currentScheduleWeekStart)[dayIdx];
+        const currNote = draftBulkData[member.name][dayIdx].note || '';
+        document.getElementById('mcnpTitle').innerText = `📌 Catatan: ${member.shortName} • ${day.dayShort} ${day.dateNum}`;
+        document.getElementById('matrixCellNoteInput').value = currNote;
+        document.getElementById('btnMcnpDelete').style.display = currNote ? 'block' : 'none';
+        document.getElementById('matrixNotePresets').innerHTML = NOTE_PRESETS.map(p => `
+          <button type="button" class="note-preset-chip ${currNote === p ? 'active-chip' : ''}" onclick="document.getElementById('matrixCellNoteInput').value='${escapeAttr(p)}'">${escapeHtml(p)}</button>
+        `).join('');
+        document.getElementById('matrixCellNotePrompt').style.display = 'block';
+        return;
+      }
+      draftBulkData[member.name][dayIdx].shift = activeBrushMode;
+      renderBulkMatrix();
+    }
+
+    function closeMatrixCellNotePrompt() {
+      editingMatrixCell = null;
+      const el = document.getElementById('matrixCellNotePrompt');
+      if (el) el.style.display = 'none';
+    }
+
+    function applyMatrixCellNote() {
+      if (!editingMatrixCell) return;
+      draftBulkData[editingMatrixCell.staffName][editingMatrixCell.dayIdx].note = document.getElementById('matrixCellNoteInput').value.trim();
+      closeMatrixCellNotePrompt();
+      renderBulkMatrix();
+    }
+
+    function deleteMatrixCellNote() {
+      if (!editingMatrixCell) return;
+      draftBulkData[editingMatrixCell.staffName][editingMatrixCell.dayIdx].note = '';
+      closeMatrixCellNotePrompt();
+      renderBulkMatrix();
+    }
+
+    function renderBulkMatrix() {
+      const staffList = getScheduleStaffList();
+      const weekDays = getWeekList(currentScheduleWeekStart);
+      document.getElementById('bulkMatrixThead').innerHTML = `
+        <tr>
+          <th>Staf</th>
+          ${weekDays.map(d => `<th>${d.dayShort}<br>${d.dateNum}</th>`).join('')}
+        </tr>
+      `;
+
+      const rowsHtml = staffList.map((m, sIdx) => `
+        <tr>
+          <td>${escapeHtml(m.shortName)}</td>
+          ${weekDays.map((d, dIdx) => {
+            const c = draftBulkData[m.name][dIdx];
+            const sh = SHIFTS[c.shift] || SHIFTS.P;
+            return `
+              <td>
+                <button type="button" class="m-cell-btn ${sh.badgeClass}" onclick="handleMatrixCellTap(${sIdx}, ${dIdx})">
+                  ${c.note ? '<span class="m-cell-pin">📌</span>' : ''}
+                  ${sh.shortLabel}
+                </button>
+              </td>
+            `;
+          }).join('')}
+        </tr>
+      `).join('');
+
+      const sumCells = weekDays.map((d, idx) => {
+        let onDuty = 0;
+        staffList.forEach(m => { if (draftBulkData[m.name][idx].shift !== 'OFF') onDuty++; });
+        const okThreshold = Math.max(1, Math.ceil(staffList.length * 0.6));
+        return `<td><span class="duty-badge ${onDuty >= okThreshold ? 'duty-ok' : 'duty-warn'}">${onDuty}/${staffList.length}</span></td>`;
+      }).join('');
+
+      document.getElementById('bulkMatrixTbody').innerHTML = rowsHtml + `<tr class="matrix-sum-row"><td>Masuk</td>${sumCells}</tr>`;
+    }
+
+    async function saveBulkMatrix() {
+      const staffList = getScheduleStaffList();
+      const weekDays = getWeekList(currentScheduleWeekStart);
+      const batchItems = [];
+
+      weekDays.forEach((d, idx) => {
+        if (!scheduleDatabase[d.key]) scheduleDatabase[d.key] = {};
+        staffList.forEach(m => {
+          const entry = draftBulkData[m.name][idx];
+          scheduleDatabase[d.key][m.name] = { shift: entry.shift, note: entry.note };
+          batchItems.push({ date: d.key, staff: m.name, shift: entry.shift, note: entry.note });
+        });
+      });
+
+      closeBulkModal();
+      renderAllScheduleViews();
+      showLinkToast('✅ Semua jadwal minggu ini disimpan!');
+      await syncScheduleItemsToServer(batchItems);
+    }
+
+    // =========================================================
+    // MODAL B JADWAL: ATUR JADWAL 7 HARI PER STAF
+    // =========================================================
+    let editingSingleStaffName = '';
+    let draftSingleDays = [];
+
+    function openSingleStaffModal(staffName) {
+      editingSingleStaffName = staffName;
+      const weekDays = getWeekList(currentScheduleWeekStart);
+      document.getElementById('singleModalAvatar').innerText = getInitials(staffName);
+      document.getElementById('singleModalTitle').innerText = `✏️ Atur 7 Hari - ${staffName}`;
+      document.getElementById('singleModalSub').innerText = getWeekRangeText(currentScheduleWeekStart);
+
+      draftSingleDays = weekDays.map(d => {
+        const c = getScheduleCell(d.key, staffName);
+        return { shift: SHIFTS[c.shift] ? c.shift : 'P', note: c.note || '' };
+      });
+      renderSingleStaffDays();
+      document.getElementById('singleStaffModal').classList.add('open');
+    }
+
+    function closeSingleModal() {
+      editingSingleStaffName = '';
+      document.getElementById('singleStaffModal').classList.remove('open');
+    }
+
+    function applySinglePreset(code) {
+      draftSingleDays.forEach(d => d.shift = code);
+      renderSingleStaffDays();
+    }
+
+    function renderSingleStaffDays() {
+      const weekDays = getWeekList(currentScheduleWeekStart);
+      document.getElementById('singleDaysContainer').innerHTML = weekDays.map((d, idx) => {
+        const row = draftSingleDays[idx];
+        return `
+          <div class="single-day-item">
+            <div class="sdi-top-row">
+              <div class="sdi-left">
+                <div class="sdi-day">${d.dayFull}</div>
+                <div class="sdi-date">${d.dateNum} ${d.monthShort}</div>
+              </div>
+              <div class="sdi-choices">
+                ${SHIFT_ORDER.map(code => `
+                  <button type="button" class="sdi-choice-btn ${row.shift === code ? 'sel-' + code : ''}" onclick="draftSingleDays[${idx}].shift='${code}'; renderSingleStaffDays();">
+                    ${SHIFTS[code].label}
+                  </button>
+                `).join('')}
+              </div>
+            </div>
+            <input type="text" class="sdi-note-input" value="${escapeHtml(row.note)}" placeholder="📌 Catatan kegiatan ${d.dayShort} (opsional)..." oninput="draftSingleDays[${idx}].note=this.value">
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function saveSingleStaffSchedule() {
+      if (!editingSingleStaffName) return;
+      const targetName = editingSingleStaffName;
+      const weekDays = getWeekList(currentScheduleWeekStart);
+      const batchItems = [];
+
+      weekDays.forEach((d, idx) => {
+        if (!scheduleDatabase[d.key]) scheduleDatabase[d.key] = {};
+        const cleanNote = draftSingleDays[idx].note.trim();
+        scheduleDatabase[d.key][targetName] = { shift: draftSingleDays[idx].shift, note: cleanNote };
+        batchItems.push({ date: d.key, staff: targetName, shift: draftSingleDays[idx].shift, note: cleanNote });
+      });
+
+      closeSingleModal();
+      renderAllScheduleViews();
+      showLinkToast(`✅ Jadwal 7 hari ${targetName} disimpan!`);
+      await syncScheduleItemsToServer(batchItems);
+    }
+
+    // =========================================================
+    // MODAL C JADWAL: CATATAN KEGIATAN PER STAF
+    // =========================================================
+    let noteModalContext = null;
+
+    function openStaffNoteModal(staffName, dateKey) {
+      noteModalContext = { staffName, dateKey };
+      const dt = parseScheduleKey(dateKey);
+      const currNote = getScheduleCell(dateKey, staffName).note || '';
+
+      document.getElementById('snmAvatar').innerText = getInitials(staffName);
+      document.getElementById('snmTitle').innerText = currNote ? '✏️ Edit Catatan Staf' : '📌 Tambah Catatan Staf';
+      document.getElementById('snmSub').innerText = `${staffName} • ${DAY_NAMES_FULL[dt.getDay()]}, ${dt.getDate()} ${MONTH_NAMES_ID[dt.getMonth()]} ${dt.getFullYear()}`;
+      document.getElementById('snmTextInput').value = currNote;
+      document.getElementById('btnSnmDelete').style.display = currNote ? 'block' : 'none';
+
+      renderSnmPresets(currNote);
+      document.getElementById('staffNoteModal').classList.add('open');
+    }
+
+    function renderSnmPresets(activeText) {
+      document.getElementById('snmPresetChips').innerHTML = NOTE_PRESETS.map(p => `
+        <button type="button" class="note-preset-chip ${activeText === p ? 'active-chip' : ''}" onclick="document.getElementById('snmTextInput').value='${escapeAttr(p)}'; renderSnmPresets('${escapeAttr(p)}')">${escapeHtml(p)}</button>
+      `).join('');
+    }
+
+    function closeStaffNoteModal() {
+      noteModalContext = null;
+      document.getElementById('staffNoteModal').classList.remove('open');
+    }
+
+    async function saveStaffNoteFromModal() {
+      if (!noteModalContext) return;
+      const { staffName, dateKey } = noteModalContext;
+      const val = document.getElementById('snmTextInput').value.trim();
+      const cell = getScheduleCell(dateKey, staffName);
+      cell.note = val;
+      closeStaffNoteModal();
+      renderAllScheduleViews();
+      showLinkToast(val ? `📌 Catatan ${staffName} disimpan!` : `Catatan ${staffName} dikosongkan`);
+      await syncScheduleItemsToServer([{ date: dateKey, staff: staffName, shift: cell.shift || 'P', note: val }]);
+    }
+
+    async function deleteStaffNoteFromModal() {
+      if (!noteModalContext) return;
+      const { staffName, dateKey } = noteModalContext;
+      const cell = getScheduleCell(dateKey, staffName);
+      cell.note = '';
+      closeStaffNoteModal();
+      renderAllScheduleViews();
+      showLinkToast(`🗑️ Catatan ${staffName} dihapus`);
+      await syncScheduleItemsToServer([{ date: dateKey, staff: staffName, shift: cell.shift || 'P', note: '' }]);
+    }
+
+    // =========================================================
+    // 5. ADMIN PANEL UPLOAD EXCEL/CSV
+    // =========================================================
+    function readExcelFile(file) {
+      return new Promise((resolve, reject) => {
+        if (!file) return resolve(null);
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          try {
+            const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+            const firstSheet = wb.Sheets[wb.SheetNames[0]];
+            const rows = XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
+            resolve(rows);
+          } catch (err) {
+            reject(err);
+          }
+        };
+        reader.onerror = reject;
+        reader.readAsArrayBuffer(file);
+      });
+    }
+
+    async function uploadData() {
+      const fSPW = document.getElementById('fileSPW').files[0];
+      const fMSR = document.getElementById('fileMSR').files[0];
+      const fSTOCK = document.getElementById('fileSTOCK').files[0];
+      const statusEl = document.getElementById('status');
+      const btn = document.getElementById('btnUpload');
+
+      if (!fSPW && !fMSR && !fSTOCK) {
+        statusEl.style.color = 'var(--accent-red)';
+        statusEl.innerText = '⚠️ Pilih minimal satu file Excel/CSV terlebih dahulu.';
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = 'Membaca & Mengunggah...';
+      statusEl.style.color = 'var(--text-muted)';
+      statusEl.innerText = '⏳ Memproses file...';
+
+      try {
+        const [spwRows, msrRows, stockRows] = await Promise.all([
+          readExcelFile(fSPW),
+          readExcelFile(fMSR),
+          readExcelFile(fSTOCK)
+        ]);
+
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: 'uploadData',
+            spw: spwRows,
+            msr: msrRows,
+            stock: stockRows
+          })
+        });
+        const result = await res.json();
+        if (result && result.success !== false) {
+          statusEl.style.color = 'var(--accent-green)';
+          statusEl.innerText = '✅ ' + (result.message || 'Sinkronisasi data berhasil!');
+          dashboardData = null;
+          sohList = [];
+        } else {
+          statusEl.style.color = 'var(--accent-red)';
+          statusEl.innerText = '⚠️ ' + ((result && result.message) || 'Gagal menyinkronkan data.');
+        }
+      } catch (err) {
+        statusEl.style.color = 'var(--accent-red)';
+        statusEl.innerText = '⚠️ Terjadi kesalahan saat memproses file.';
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Sinkronisasi Data';
+      }
+    }
+
+    // Inisialisasi saat halaman dimuat
+    document.addEventListener('DOMContentLoaded', () => {
+      const dailyInp = document.getElementById('dailyDateInput');
+      if (dailyInp) dailyInp.value = getTodayLocalStr();
+      loadDashboardData();
+    });
+  </script>
+</body>
+</html>
