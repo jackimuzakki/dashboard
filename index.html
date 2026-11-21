@@ -806,19 +806,74 @@
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbwQafvOo2JU_75b2wF6h40oqotR101fh9bqml7UGnEsxBE4JHuO-C5EfrKAAmHiVJ4w/exec";
-    const GAJI_POKOK = 3013000; 
+    const GAJI_POKOK = 3013000;
 
+    let dashboardData = null;
+    let isDashboardLoading = false;
+    let sohList = [];
+    let isSohLoading = false;
+
+    // =========================================================
+    // HELPER UMUM & FORMATTER
+    // =========================================================
+    function formatRupiah(num) {
+      const n = Number(num) || 0;
+      return 'Rp ' + Math.round(n).toLocaleString('id-ID');
+    }
+
+    function escapeHtml(str) {
+      return String(str == null ? '' : str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function escapeAttr(str) {
+      return String(str == null ? '' : str)
+        .replace(/\\/g, '\\\\')
+        .replace(/'/g, "\\'")
+        .replace(/"/g, '&quot;');
+    }
+
+    let toastTimer = null;
+    function showLinkToast(msg) {
+      const el = document.getElementById('linkToast');
+      if (!el) return;
+      el.innerText = msg;
+      el.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+    }
+
+    function getTodayLocalStr() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    function getMondayOfDate(dateObj) {
+      const d = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+      const day = d.getDay();
+      const diff = day === 0 ? -6 : 1 - day;
+      d.setDate(d.getDate() + diff);
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    // =========================================================
+    // NAVIGASI TAB UTAMA & SUB-MENU STAF
+    // =========================================================
     function switchTab(tabName) {
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       document.querySelectorAll('.nav button').forEach(el => el.classList.remove('active'));
-      document.getElementById('tab-' + tabName).classList.add('active');
-      let btnId = 'btnTab' + tabName.charAt(0).toUpperCase() + tabName.slice(1);
-      if(document.getElementById(btnId)) document.getElementById(btnId).classList.add('active');
+      const targetTab = document.getElementById('tab-' + tabName);
+      if (targetTab) targetTab.classList.add('active');
+      const btnId = 'btnTab' + tabName.charAt(0).toUpperCase() + tabName.slice(1);
+      if (document.getElementById(btnId)) document.getElementById(btnId).classList.add('active');
       
-      if(tabName === 'dashboard') loadDashboardData(); 
-      if(tabName === 'soh') loadSOHData();
-      if(tabName === 'links') loadLinksData();
-      if(tabName === 'staf') {
+      if (tabName === 'dashboard') loadDashboardData(); 
+      if (tabName === 'soh') loadSOHData();
+      if (tabName === 'links') loadLinksData();
+      if (tabName === 'staf') {
         showStaffHubChoice();
         loadDashboardData();
         loadBiodataData();
@@ -848,628 +903,701 @@
       if (subName === 'bonus') loadDashboardData();
       if (subName === 'biodata') loadBiodataData();
       if (subName === 'jadwal') {
-        loadDashboardData();
         loadBiodataData();
         loadScheduleData();
         renderAllScheduleViews();
       }
     }
 
-    function formatRp(angka) { return 'Rp ' + Math.round(Number(angka)).toLocaleString('id-ID').replace(/,/g, '.'); }
+    // =========================================================
+    // 1. DASHBOARD TARGET & KLASEMEN & SALES HARIAN
+    // =========================================================
+    async function loadDashboardData(force = false) {
+      if (isDashboardLoading && !force) return;
+      if (dashboardData && !force) {
+        populateStaffDropdowns();
+        showPersonalData();
+        return;
+      }
 
-    let dashboardData = [];
-    let storeDataGlobal = null;
+      isDashboardLoading = true;
+      const loadingEl = document.getElementById('loadingDash');
+      if (loadingEl) loadingEl.style.display = 'block';
 
-    function loadDashboardData() {
-      if(dashboardData.length > 0) return;
-      document.getElementById('loadingDash').style.display = 'block';
-      fetch(API_URL + "?action=getDashboard")
-        .then(response => response.json())
-        .then(data => renderDashboard(data))
-        .catch(err => console.error(err));
+      try {
+        const res = await fetch(`${API_URL}?action=getDashboard`);
+        const json = await res.json();
+        dashboardData = json;
+        populateStaffDropdowns();
+        showPersonalData();
+      } catch (err) {
+        console.error('Gagal memuat dashboard:', err);
+        const sel = document.getElementById('staffSelect');
+        if (sel && sel.options.length <= 1) {
+          sel.innerHTML = '<option value="">Overview Toko (Digimap Jember Roxy)</option>';
+        }
+        document.getElementById('storeView').style.display = 'block';
+        showLinkToast('⚠️ Gagal menyambung ke server data');
+      } finally {
+        isDashboardLoading = false;
+        if (loadingEl) loadingEl.style.display = 'none';
+      }
     }
 
-    function renderDashboard(data) {
-      document.getElementById('loadingDash').style.display = 'none';
-      dashboardData = data.staffList || [];
-      storeDataGlobal = data.storeData;
-      
-      const select = document.getElementById('staffSelect');
-      const bonusSelect = document.getElementById('bonusStaffSelect');
-      
-      select.innerHTML = '<option value="">🏢 Lihat Overview Toko</option>';
-      bonusSelect.innerHTML = '<option value="">👇 Pilih Nama Kamu 👇</option>';
-      
-      dashboardData.forEach(s => { 
-        select.innerHTML += `<option value="${s.name}">${s.name}</option>`; 
-        bonusSelect.innerHTML += `<option value="${s.name}">${s.name}</option>`; 
-      });
-      
-      document.getElementById('valStoreSales').innerText = formatRp(storeDataGlobal.totalSales);
-      document.getElementById('valStoreTarget').innerText = formatRp(storeDataGlobal.target);
-      document.getElementById('valStorePoint').innerText = Math.round(storeDataGlobal.point);
-      document.getElementById('valStorePct').innerText = Math.round(storeDataGlobal.achieved) + '%';
-      
-      document.getElementById('valStoreDeviceSales').innerText = formatRp(storeDataGlobal.deviceSales);
-      document.getElementById('valStoreDeviceTarget').innerText = formatRp(storeDataGlobal.deviceTarget);
-      document.getElementById('barStoreDevice').style.width = Math.min((storeDataGlobal.deviceTarget > 0 ? storeDataGlobal.deviceSales/storeDataGlobal.deviceTarget*100 : 0), 100) + '%';
-      
-      document.getElementById('valStoreAccSales').innerText = formatRp(storeDataGlobal.accSales);
-      document.getElementById('valStoreAccTarget').innerText = formatRp(storeDataGlobal.accTarget);
-      document.getElementById('barStoreAcc').style.width = Math.min((storeDataGlobal.accTarget > 0 ? storeDataGlobal.accSales/storeDataGlobal.accTarget*100 : 0), 100) + '%';
-      
-      document.getElementById('valStoreVasSales').innerText = formatRp(storeDataGlobal.vasSales);
-      document.getElementById('valStoreVasTarget').innerText = formatRp(storeDataGlobal.vasTarget);
-      document.getElementById('barStoreVas').style.width = Math.min((storeDataGlobal.vasTarget > 0 ? storeDataGlobal.vasSales/storeDataGlobal.vasTarget*100 : 0), 100) + '%';
-      
-      const tbody = document.getElementById('rankTableBody');
-      tbody.innerHTML = '';
-      let rankList = [...dashboardData].sort((a,b) => b.sales - a.sales);
-      
-      rankList.forEach((s, idx) => {
-        let tr = document.createElement('tr');
-        let rankIcon = (idx === 0) ? '🥇' : (idx === 1) ? '🥈' : (idx === 2) ? '🥉' : (idx + 1);
-        let weightClass = (idx < 3) ? 'font-weight:700; font-size:16px;' : 'font-weight:600; color:var(--text-muted);';
-        tr.innerHTML = `<td style="text-align:center; ${weightClass}">${rankIcon}</td>
-           <td style="font-weight:600;">${s.name.split(' ')[0]}</td>
-           <td style="text-align:right; font-weight:700; color:var(--primary);">${formatRp(s.sales)}</td>`;
-        tbody.appendChild(tr);
-      });
-      showPersonalData();
-      renderAllScheduleViews();
+    function populateStaffDropdowns() {
+      const sel = document.getElementById('staffSelect');
+      const bonusSel = document.getElementById('bonusStaffSelect');
+      const currentVal = sel ? sel.value : '';
+      const currentBonusVal = bonusSel ? bonusSel.value : '';
+
+      const staffNames = [];
+      if (dashboardData) {
+        if (Array.isArray(dashboardData.ranking)) {
+          dashboardData.ranking.forEach(r => { if (r.name) staffNames.push(String(r.name).trim()); });
+        } else if (dashboardData.staff && typeof dashboardData.staff === 'object') {
+          Object.keys(dashboardData.staff).forEach(k => staffNames.push(k));
+        }
+      }
+
+      if (sel) {
+        sel.innerHTML = '<option value="">🏪 Overview Toko (Digimap Jember Roxy)</option>' +
+          staffNames.map(n => `<option value="${escapeHtml(n)}">👤 ${escapeHtml(n)}</option>`).join('');
+        if (currentVal && staffNames.includes(currentVal)) sel.value = currentVal;
+      }
+
+      if (bonusSel) {
+        bonusSel.innerHTML = '<option value="">👇 Pilih Nama Kamu 👇</option>' +
+          staffNames.map(n => `<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
+        if (currentBonusVal && staffNames.includes(currentBonusVal)) bonusSel.value = currentBonusVal;
+      }
     }
 
     function showPersonalData() {
-      const selectedName = document.getElementById('staffSelect').value;
+      const sel = document.getElementById('staffSelect');
+      const selectedStaff = sel ? sel.value : '';
       const storeView = document.getElementById('storeView');
       const staffView = document.getElementById('staffView');
-      
-      if (!selectedName) { staffView.style.display = 'none'; storeView.style.display = 'block'; return; }
-      storeView.style.display = 'none'; staffView.style.display = 'block';
-      
-      const staff = dashboardData.find(s => s.name === selectedName);
-      if (staff) {
-        document.getElementById('heroStaffName').innerText = staff.name;
-        document.getElementById('valMySales').innerText = formatRp(staff.sales);
-        document.getElementById('valMyTarget').innerText = formatRp(staff.target);
-        document.getElementById('valMyRank').innerText = "#" + staff.rank;
-        document.getElementById('valMyPct').innerText = Math.round(staff.achieved) + '%';
-        
-        const sisaEl = document.getElementById('valMySisa');
-        if (staff.sales >= staff.target && staff.target > 0) { sisaEl.innerText = "🎉 TERCAPAI"; sisaEl.style.color = "var(--accent-green)"; } 
-        else if (staff.target === 0) { sisaEl.innerText = "Target Kosong"; sisaEl.style.color = "var(--text-muted)"; } 
-        else { sisaEl.innerText = formatRp(staff.kekurangan); sisaEl.style.color = "var(--accent-red)"; }
 
-        document.getElementById('qtyIphone').innerText = staff.qty_iphone;
-        document.getElementById('qtyIpad').innerText = staff.qty_ipad;
-        document.getElementById('qtyMac').innerText = staff.qty_mac;
-        document.getElementById('qtyWatch').innerText = staff.qty_aw;
-        document.getElementById('qtyAirpods').innerText = staff.qty_airpods;
-
-        document.getElementById('valAccSales').innerText = formatRp(staff.accSales);
-        document.getElementById('valAccTarget').innerText = formatRp(staff.accTarget);
-        document.getElementById('barAcc').style.width = Math.min((staff.accTarget > 0 ? staff.accSales/staff.accTarget*100 : 0), 100) + '%';
-
-        document.getElementById('valQoalaSales').innerText = formatRp(staff.qoalaSales);
-        document.getElementById('valQoalaTarget').innerText = formatRp(staff.qoalaTarget);
-        document.getElementById('barQoala').style.width = Math.min((staff.qoalaTarget > 0 ? staff.qoalaSales/staff.qoalaTarget*100 : 0), 100) + '%';
-
-        loadDailySales();
+      if (!selectedStaff) {
+        storeView.style.display = 'block';
+        staffView.style.display = 'none';
+        renderStoreOverview();
+      } else {
+        storeView.style.display = 'none';
+        staffView.style.display = 'block';
+        renderStaffOverview(selectedStaff);
       }
     }
 
-    let sohDataGlobal = [];
-    function loadSOHData() {
-      if (sohDataGlobal.length > 0) { renderSOH(); return; }
+    function renderStoreOverview() {
+      if (!dashboardData || !dashboardData.store) return;
+      const st = dashboardData.store;
+      const sales = Number(st.totalSales || st.sales || 0);
+      const target = Number(st.totalTarget || st.target || 0);
+      const point = Number(st.totalPoint || st.point || 0);
+      const pct = target > 0 ? Math.round((sales / target) * 100) : Number(st.pct || 0);
+
+      document.getElementById('valStoreSales').innerText = formatRupiah(sales);
+      document.getElementById('valStoreTarget').innerText = formatRupiah(target);
+      document.getElementById('valStorePoint').innerText = point.toLocaleString('id-ID');
+      document.getElementById('valStorePct').innerText = pct + '%';
+
+      const devS = Number(st.deviceSales || 0), devT = Number(st.deviceTarget || 0);
+      document.getElementById('valStoreDeviceSales').innerText = formatRupiah(devS);
+      document.getElementById('valStoreDeviceTarget').innerText = formatRupiah(devT);
+      document.getElementById('barStoreDevice').style.width = Math.min(100, devT > 0 ? (devS / devT) * 100 : 0) + '%';
+
+      const accS = Number(st.accSales || 0), accT = Number(st.accTarget || 0);
+      document.getElementById('valStoreAccSales').innerText = formatRupiah(accS);
+      document.getElementById('valStoreAccTarget').innerText = formatRupiah(accT);
+      document.getElementById('barStoreAcc').style.width = Math.min(100, accT > 0 ? (accS / accT) * 100 : 0) + '%';
+
+      const vasS = Number(st.vasSales || 0), vasT = Number(st.vasTarget || 0);
+      document.getElementById('valStoreVasSales').innerText = formatRupiah(vasS);
+      document.getElementById('valStoreVasTarget').innerText = formatRupiah(vasT);
+      document.getElementById('barStoreVas').style.width = Math.min(100, vasT > 0 ? (vasS / vasT) * 100 : 0) + '%';
+
+      const tbody = document.getElementById('rankTableBody');
+      const ranking = Array.isArray(dashboardData.ranking) ? dashboardData.ranking : [];
+      if (ranking.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--text-muted);">Belum ada data klasemen</td></tr>';
+      } else {
+        tbody.innerHTML = ranking.map((r, i) => {
+          const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1);
+          return `
+            <tr style="cursor:pointer;" onclick="document.getElementById('staffSelect').value='${escapeAttr(r.name)}'; showPersonalData();">
+              <td style="text-align:center; font-weight:700;">${medal}</td>
+              <td style="font-weight:600;">${escapeHtml(r.name)}</td>
+              <td style="text-align:right; font-weight:700; color:var(--primary);">${formatRupiah(r.sales)}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+
+    function renderStaffOverview(staffName) {
+      document.getElementById('heroStaffName').innerText = staffName;
+      const stObj = (dashboardData && dashboardData.staff && dashboardData.staff[staffName]) ? dashboardData.staff[staffName] : {};
+      const ranking = (dashboardData && Array.isArray(dashboardData.ranking)) ? dashboardData.ranking : [];
+      const rankIdx = ranking.findIndex(r => String(r.name).trim() === staffName);
+
+      const sales = Number(stObj.totalSales || stObj.sales || (rankIdx >= 0 ? ranking[rankIdx].sales : 0));
+      const target = Number(stObj.totalTarget || stObj.target || 0);
+      const sisa = Math.max(0, target - sales);
+      const pct = target > 0 ? Math.round((sales / target) * 100) : 0;
+
+      document.getElementById('valMyRank').innerText = rankIdx >= 0 ? '#' + (rankIdx + 1) : '#-';
+      document.getElementById('valMySales').innerText = formatRupiah(sales);
+      document.getElementById('valMyTarget').innerText = formatRupiah(target);
+      document.getElementById('valMySisa').innerText = sisa === 0 && target > 0 ? '🎉 Target Tercapai!' : formatRupiah(sisa);
+      document.getElementById('valMyPct').innerText = pct + '%';
+
+      document.getElementById('qtyIphone').innerText = Number(stObj.qtyIphone || stObj.iphone || 0);
+      document.getElementById('qtyIpad').innerText = Number(stObj.qtyIpad || stObj.ipad || 0);
+      document.getElementById('qtyMac').innerText = Number(stObj.qtyMac || stObj.mac || 0);
+      document.getElementById('qtyWatch').innerText = Number(stObj.qtyWatch || stObj.watch || 0);
+      document.getElementById('qtyAirpods').innerText = Number(stObj.qtyAirpods || stObj.airpods || 0);
+
+      const accS = Number(stObj.accSales || 0), accT = Number(stObj.accTarget || 0);
+      document.getElementById('valAccSales').innerText = formatRupiah(accS);
+      document.getElementById('valAccTarget').innerText = formatRupiah(accT);
+      document.getElementById('barAcc').style.width = Math.min(100, accT > 0 ? (accS / accT) * 100 : 0) + '%';
+
+      const qoalaS = Number(stObj.qoalaSales || stObj.vasSales || 0), qoalaT = Number(stObj.qoalaTarget || stObj.vasTarget || 0);
+      document.getElementById('valQoalaSales').innerText = formatRupiah(qoalaS);
+      document.getElementById('valQoalaTarget').innerText = formatRupiah(qoalaT);
+      document.getElementById('barQoala').style.width = Math.min(100, qoalaT > 0 ? (qoalaS / qoalaT) * 100 : 0) + '%';
+
+      const dateInput = document.getElementById('dailyDateInput');
+      if (dateInput && !dateInput.value) {
+        dateInput.value = getTodayLocalStr();
+      }
+      loadDailySales();
+    }
+
+    function stepDailyDate(deltaDays) {
+      const inp = document.getElementById('dailyDateInput');
+      if (!inp) return;
+      const base = inp.value ? new Date(inp.value + 'T00:00:00') : new Date();
+      base.setDate(base.getDate() + deltaDays);
+      inp.value = `${base.getFullYear()}-${String(base.getMonth() + 1).padStart(2, '0')}-${String(base.getDate()).padStart(2, '0')}`;
+      loadDailySales();
+    }
+
+    async function loadDailySales() {
+      const staffName = document.getElementById('staffSelect').value;
+      const dateStr = document.getElementById('dailyDateInput').value || getTodayLocalStr();
+      const metaEl = document.getElementById('dailyMetaInfo');
+      if (!staffName) return;
+
+      metaEl.innerText = `⏳ Memuat penjualan ${staffName} (${dateStr})...`;
+      try {
+        const res = await fetch(`${API_URL}?action=getDailySales&staff=${encodeURIComponent(staffName)}&date=${encodeURIComponent(dateStr)}`);
+        const data = await res.json();
+
+        const total = Number(data.totalSales || data.total || 0);
+        const device = Number(data.deviceSales || data.device || 0);
+        const acc = Number(data.accSales || data.acc || 0);
+        const qoala = Number(data.qoalaSales || data.qoala || data.vas || 0);
+
+        document.getElementById('valDailyTotal').innerText = formatRupiah(total);
+        document.getElementById('valDailyDevice').innerText = formatRupiah(device);
+        document.getElementById('valDailyAcc').innerText = formatRupiah(acc);
+        document.getElementById('valDailyQoala').innerText = formatRupiah(qoala);
+
+        document.getElementById('dailyQtyIphone').innerText = Number(data.qtyIphone || data.iphone || 0);
+        document.getElementById('dailyQtyIpad').innerText = Number(data.qtyIpad || data.ipad || 0);
+        document.getElementById('dailyQtyMac').innerText = Number(data.qtyMac || data.mac || 0);
+        document.getElementById('dailyQtyWatch').innerText = Number(data.qtyWatch || data.watch || 0);
+        document.getElementById('dailyQtyAirpods').innerText = Number(data.qtyAirpods || data.airpods || 0);
+
+        metaEl.innerText = total > 0
+          ? `✅ Menampilkan transaksi tanggal ${dateStr}`
+          : `ℹ️ Tidak ada catatan transaksi pada tanggal ${dateStr}`;
+      } catch (err) {
+        metaEl.innerText = `⚠️ Data harian belum tersedia untuk ${dateStr}`;
+      }
+    }
+
+    // =========================================================
+    // 2. CEK STOK (SOH)
+    // =========================================================
+    async function loadSOHData() {
+      if (isSohLoading) return;
+      if (sohList.length > 0) {
+        renderSOH();
+        return;
+      }
+
+      isSohLoading = true;
       document.getElementById('loadingSOH').style.display = 'block';
       document.getElementById('sohTableContainer').style.display = 'none';
-      fetch(API_URL + "?action=getSOH")
-        .then(res => res.json())
-        .then(data => { sohDataGlobal = data; document.getElementById('loadingSOH').style.display = 'none'; document.getElementById('sohTableContainer').style.display = 'block'; renderSOH(); })
-        .catch(err => console.error(err));
+
+      try {
+        const res = await fetch(`${API_URL}?action=getSOH`);
+        const json = await res.json();
+        sohList = Array.isArray(json) ? json : (Array.isArray(json.items) ? json.items : (Array.isArray(json.soh) ? json.soh : []));
+        renderSOH();
+      } catch (err) {
+        document.getElementById('loadingSOH').innerText = '⚠️ Gagal memuat stok gudang.';
+      } finally {
+        isSohLoading = false;
+      }
     }
 
     function renderSOH() {
-      const selectedCat = document.getElementById('catSelect').value;
-      const searchText = document.getElementById('searchInput').value.toLowerCase().trim();
+      const loadingEl = document.getElementById('loadingSOH');
+      const tableCont = document.getElementById('sohTableContainer');
       const tbody = document.getElementById('sohTableBody');
-      tbody.innerHTML = '';
-      
-      let filtered = sohDataGlobal;
-      if (selectedCat !== 'Semua') filtered = filtered.filter(item => item.category === selectedCat);
-      if (searchText !== '') filtered = filtered.filter(item => item.description.toLowerCase().includes(searchText));
-      
-      if (filtered.length === 0) { tbody.innerHTML = '<tr><td colspan="2" style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">❌ Produk tidak ditemukan.</td></tr>'; return; }
-      
-      filtered.forEach(item => {
-        let tr = document.createElement('tr');
-        tr.innerHTML = `<td>${item.description}</td><td style="text-align:center;"><span class="qty-badge">${item.qty}</span></td>`;
-        tbody.appendChild(tr);
+
+      loadingEl.style.display = 'none';
+      tableCont.style.display = 'block';
+
+      const q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+      const cat = document.getElementById('catSelect').value;
+
+      const filtered = sohList.filter(item => {
+        const name = String(item.name || item.desc || item.description || '').toLowerCase();
+        const sku = String(item.sku || item.code || '').toLowerCase();
+        const itemCat = String(item.category || item.lob || '').toLowerCase();
+        const matchSearch = !q || name.includes(q) || sku.includes(q);
+        const matchCat = cat === 'Semua' || itemCat.includes(cat.toLowerCase()) || name.includes(cat.toLowerCase());
+        return matchSearch && matchCat;
       });
-    }
 
-    function processFile(file, callback) {
-      var r = new FileReader();
-      r.onload = function(e) { var d = new Uint8Array(e.target.result), wb = XLSX.read(d, {type:"array"}), csv = XLSX.utils.sheet_to_csv(wb.Sheets[wb.SheetNames[0]], {raw:false, dateNF:"DD-MM-YYYY"}); callback(csv); };
-      r.readAsArrayBuffer(file);
-    }
-
-    function uploadData() {
-      var fSPW = document.getElementById("fileSPW").files[0];
-      var fMSR = document.getElementById("fileMSR").files[0];
-      var fSTOCK = document.getElementById("fileSTOCK").files[0];
-      if (!fSPW && !fMSR && !fSTOCK) { showLinkToast("⚠️ Pilih minimal satu file untuk diupload!"); return; }
-      
-      var btn = document.getElementById("btnUpload");
-      var statusEl = document.getElementById("status");
-      
-      btn.disabled = true;
-      btn.innerText = "⏳ Mengirim & Memproses Data...";
-      statusEl.style.color = "var(--primary)";
-      statusEl.innerText = "Mohon tunggu, sedang mengolah data ke spreadsheet (sekitar 5-15 detik)...";
-
-      var spwT = "", msrT = "", stockT = "";
-
-      function selesaiSukses(pesan) {
-        statusEl.style.color = "#10B981";
-        statusEl.innerText = pesan || "✅ Sinkronisasi Selesai! Semua data telah diperbarui.";
-        btn.disabled = false;
-        btn.innerText = "Sinkronisasi Data";
-        
-        document.getElementById("fileSPW").value = "";
-        document.getElementById("fileMSR").value = "";
-        document.getElementById("fileSTOCK").value = "";
-        
-        dashboardData = [];
-        sohDataGlobal = [];
-        dailySalesCache = {};
-        loadDashboardData();
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="2" style="text-align:center; padding:25px; color:var(--text-muted);">Produk tidak ditemukan</td></tr>';
+        return;
       }
 
-      function sendAll() {
-        fetch(API_URL, {
-          method: "POST",
-          redirect: "follow",
-          headers: { "Content-Type": "text/plain;charset=utf-8" },
-          body: JSON.stringify({ action: "uploadData", spw: spwT, msr: msrT, stock: stockT })
-        })
-        .then(res => res.text())
-        .then(txt => {
-          try {
-            var res = JSON.parse(txt);
-            selesaiSukses(res.message);
-          } catch (e) {
-            selesaiSukses("✅ Data berhasil dikirim dan diproses!");
-          }
-        })
-        .catch(() => {
-          statusEl.innerText = "⏳ Memverifikasi hasil sinkronisasi...";
-          fetch(API_URL + "?action=getDashboard")
-            .then(r => r.json())
-            .then(() => {
-              selesaiSukses("✅ Sinkronisasi Selesai! Data dashboard & stok telah diperbarui.");
-            })
-            .catch(() => {
-              statusEl.style.color = "var(--accent-red)";
-              statusEl.innerText = "❌ Koneksi terputus. Silakan cek Spreadsheet atau coba lagi.";
-              btn.disabled = false;
-              btn.innerText = "Sinkronisasi Data";
-            });
-        });
-      }
-
-      var tasks = [];
-      if (fSPW) tasks.push(function(next) { processFile(fSPW, function(c) { spwT = c; next(); }); });
-      if (fMSR) tasks.push(function(next) { processFile(fMSR, function(c) { msrT = c; next(); }); });
-      if (fSTOCK) tasks.push(function(next) { processFile(fSTOCK, function(c) { stockT = c; next(); }); });
-
-      var step = 0;
-      function runNext() { if (step < tasks.length) { tasks[step++](runNext); } else { sendAll(); } }
-      runNext();
+      tbody.innerHTML = filtered.slice(0, 150).map(item => {
+        const name = item.name || item.desc || item.description || 'Produk';
+        const sku = item.sku || item.code || '';
+        const qty = Number(item.qty || item.stock || item.soh || 0);
+        return `
+          <tr>
+            <td>
+              <div style="font-weight:600; color:var(--text-main); line-height:1.35;">${escapeHtml(name)}</div>
+              ${sku ? `<div style="font-size:11px; color:var(--text-muted); margin-top:2px;">SKU: ${escapeHtml(sku)}</div>` : ''}
+            </td>
+            <td style="text-align:center;"><span class="qty-badge">${qty}</span></td>
+          </tr>
+        `;
+      }).join('');
     }
-
-    let currentLockedStaff = "";
-    function bukaBrankas() {
-      const name = document.getElementById("bonusStaffSelect").value;
-      const pin = document.getElementById("inputPin").value;
-      const errBox = document.getElementById("bonusError");
-      const btn = document.getElementById("btnUnlock");
-      
-      if(!name) { errBox.style.display = 'block'; errBox.innerText = "Pilih nama kamu dulu!"; return; }
-      if(!pin) { errBox.style.display = 'block'; errBox.innerText = "Masukkan PIN keamanan kamu!"; return; }
-
-      errBox.style.display = 'none'; btn.disabled = true; document.getElementById("loadingBonus").style.display = 'block';
-
-      fetch(API_URL + "?action=getBonus&name=" + encodeURIComponent(name) + "&pin=" + encodeURIComponent(pin))
-        .then(res => res.json())
-        .then(res => {
-          btn.disabled = false; document.getElementById("loadingBonus").style.display = 'none';
-          if(res.success) {
-            currentLockedStaff = name;
-            let tunjanganKhusus = (name.toUpperCase().indexOf("HERMINIA") !== -1) ? 300000 : 0;
-            if(tunjanganKhusus > 0) { document.getElementById("rowTunjangan").style.display = "flex"; document.getElementById("slipTunjangan").innerText = formatRp(tunjanganKhusus); }
-            else { document.getElementById("rowTunjangan").style.display = "none"; }
-
-            document.getElementById("slipNamaHeader").innerText = name.split(" ")[0]; 
-            document.getElementById("slipPokok").innerText = formatRp(GAJI_POKOK);
-            document.getElementById("slipBonus").innerText = formatRp(res.bonus);
-            document.getElementById("slipTotal").innerText = formatRp(GAJI_POKOK + res.bonus + tunjanganKhusus);
-            
-            document.getElementById("authBox").style.display = 'none'; document.getElementById("payslipBox").style.display = 'block';
-            document.getElementById("inputPin").value = ""; document.getElementById("pinStatus").innerText = "";
-          } else { errBox.style.display = 'block'; errBox.innerText = res.message; }
-        }).catch(() => {
-          btn.disabled = false; document.getElementById("loadingBonus").style.display = 'none'; errBox.style.display = 'block'; errBox.innerText = "Gagal terhubung ke server.";
-        });
-    }
-
-    function gantiPin() {
-      const oldPin = document.getElementById("oldPin").value, newPin = document.getElementById("newPin").value;
-      const statusBox = document.getElementById("pinStatus");
-      if(!oldPin || !newPin) { statusBox.style.color = "var(--accent-red)"; statusBox.innerText = "Isi PIN lama & baru terlebih dahulu."; return; }
-      statusBox.style.color = "var(--text-muted)"; statusBox.innerText = "Sedang menyimpan...";
-
-      fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ action: "updatePin", name: currentLockedStaff, oldPin: oldPin, newPin: newPin })
-      }).then(res => res.json()).then(res => {
-        if(res.success) { statusBox.style.color = "var(--accent-green)"; statusBox.innerText = "✅ Berhasil diperbarui!"; document.getElementById("oldPin").value = ""; document.getElementById("newPin").value = ""; } 
-        else { statusBox.style.color = "var(--accent-red)"; statusBox.innerText = "❌ " + res.message; }
-      });
-    }
-
-    function tutupBrankas() { currentLockedStaff = ""; document.getElementById("payslipBox").style.display = 'none'; document.getElementById("authBox").style.display = 'block'; }
 
     // =========================================================
-    // SINKRONISASI LINK FORM KE GOOGLE SHEETS (GLOBAL TIM)
+    // 3. PUSAT FORM & LINK (KATEGORI: PROJECT, TRAINER, SPV, LAINNYA)
     // =========================================================
-    let allLinksData = [];
-    let isLinksLoading = false;
+    const LINKS_LOCAL_KEY = 'digimap_links_cache_v2';
+    let allLinksList = [];
     let activeLinkCat = 'Semua';
+    let editingLinkId = null;
 
-    function loadLinksData() {
-      isLinksLoading = true;
+    async function loadLinksData() {
+      try {
+        const cached = localStorage.getItem(LINKS_LOCAL_KEY);
+        if (cached && allLinksList.length === 0) {
+          allLinksList = JSON.parse(cached);
+          renderLinks();
+        }
+      } catch (e) {}
+
+      try {
+        const res = await fetch(`${API_URL}?action=getLinks`);
+        const json = await res.json();
+        const list = Array.isArray(json) ? json : (Array.isArray(json.links) ? json.links : null);
+        if (list) {
+          allLinksList = list;
+          try { localStorage.setItem(LINKS_LOCAL_KEY, JSON.stringify(allLinksList)); } catch (e) {}
+        }
+      } catch (err) {
+        console.warn('Menggunakan cache link lokal:', err);
+      }
       renderLinks();
-      fetch(API_URL + "?action=getLinks")
-        .then(res => res.json())
-        .then(data => {
-          allLinksData = data.links || [];
-          isLinksLoading = false;
-          renderLinks();
-        })
-        .catch(() => {
-          isLinksLoading = false;
-          renderLinks();
-        });
     }
 
-    function setLinkCat(cat, btn) {
+    function setLinkCat(cat, btnEl) {
       activeLinkCat = cat;
       document.querySelectorAll('#linkFilterChips .chip-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+      if (btnEl) btnEl.classList.add('active');
       renderLinks();
     }
 
     function renderLinks() {
       const container = document.getElementById('formListContainer');
-      if (!container) return;
-
-      if (isLinksLoading && allLinksData.length === 0) {
-        container.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">⏳ Memuat daftar link toko...</div>';
-        return;
-      }
-
       const q = (document.getElementById('linkSearchInput').value || '').toLowerCase().trim();
-      const filtered = allLinksData.filter(f => {
-        const matchCat = activeLinkCat === 'Semua' || f.cat === activeLinkCat;
-        const matchQ = !q || f.title.toLowerCase().includes(q) || (f.desc && f.desc.toLowerCase().includes(q));
-        return matchCat && matchQ;
+
+      const filtered = allLinksList.filter(item => {
+        const cat = String(item.category || item.cat || 'Lainnya');
+        const title = String(item.title || '').toLowerCase();
+        const desc = String(item.desc || item.description || '').toLowerCase();
+        const matchCat = activeLinkCat === 'Semua' || cat.toLowerCase() === activeLinkCat.toLowerCase();
+        const matchSearch = !q || title.includes(q) || desc.includes(q) || cat.toLowerCase().includes(q);
+        return matchCat && matchSearch;
       });
 
       if (filtered.length === 0) {
-        container.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">Belum ada link di kategori ini. Klik <b>+ Tambah</b> di atas untuk menambahkan.</div>';
-        return;
-      }
-
-      container.innerHTML = filtered.map(f => `
-        <div class="form-card">
-          <div class="form-top">
-            <div class="form-icon">${f.icon || '🔗'}</div>
-            <div class="form-info">
-              <div class="form-badge">${f.cat}</div>
-              <div class="form-title">${f.title}</div>
-              <div class="form-desc">${f.desc || 'Klik tombol di bawah untuk membuka form'}</div>
-            </div>
+        container.innerHTML = `
+          <div class="card" style="text-align:center; padding:32px 20px;">
+            <div style="font-size:36px; margin-bottom:8px;">🔗</div>
+            <div style="font-weight:700; margin-bottom:4px;">Belum ada link di kategori ini</div>
+            <div style="font-size:12px; color:var(--text-muted);">Klik tombol <b>+ Tambah</b> di kanan atas untuk menambahkan link baru.</div>
           </div>
-          <div class="form-actions">
-            <button class="btn-copy-link" onclick="copyFormLink('${f.id}')">📋 Salin</button>
-            <a class="btn-open-link" href="${f.url}" target="_blank" rel="noopener">Buka Form ↗</a>
-            <button class="btn-edit-custom" onclick="openEditFormModal('${f.id}')" title="Edit Link">✏️</button>
-            <button class="btn-del-custom" onclick="deleteForm('${f.id}')" title="Hapus Link">🗑️</button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function copyFormLink(id) {
-      const item = allLinksData.find(f => f.id === id);
-      if (!item) return;
-      const tmp = document.createElement('textarea');
-      tmp.value = item.url;
-      tmp.style.position = 'fixed';
-      tmp.style.left = '-9999px';
-      document.body.appendChild(tmp);
-      tmp.select();
-      try { document.execCommand('copy'); } catch (e) {}
-      document.body.removeChild(tmp);
-      showLinkToast('📋 Link berhasil disalin!');
-    }
-
-    let editingLinkId = null;
-
-    function openAddFormModal() {
-      editingLinkId = null;
-      document.getElementById('formModalTitle').innerText = '➕ Tambah Link Form Baru';
-      document.getElementById('newFormTitle').value = '';
-      document.getElementById('newFormDesc').value = '';
-      document.getElementById('newFormCat').value = 'Harian';
-      document.getElementById('newFormUrl').value = '';
-      document.getElementById('addFormModal').classList.add('open');
-    }
-
-    function openEditFormModal(id) {
-      const item = allLinksData.find(f => f.id === id);
-      if (!item) return;
-      editingLinkId = id;
-      document.getElementById('formModalTitle').innerText = '✏️ Edit Link Form';
-      document.getElementById('newFormTitle').value = item.title || '';
-      document.getElementById('newFormDesc').value = item.desc || '';
-      document.getElementById('newFormCat').value = item.cat || 'Harian';
-      document.getElementById('newFormUrl').value = item.url || '';
-      document.getElementById('addFormModal').classList.add('open');
-    }
-
-    function closeAddFormModal() {
-      editingLinkId = null;
-      document.getElementById('addFormModal').classList.remove('open');
-    }
-
-    function saveNewForm() {
-      const title = document.getElementById('newFormTitle').value.trim();
-      const desc = document.getElementById('newFormDesc').value.trim();
-      const cat = document.getElementById('newFormCat').value;
-      let url = document.getElementById('newFormUrl').value.trim();
-      if (!title || !url) { showLinkToast('⚠️ Nama Form dan URL wajib diisi!'); return; }
-      if (!url.startsWith('http')) url = 'https://' + url;
-
-      const icons = { 'Project': '', 'Trainer': '', 'SPV': '', 'Lainnya': '' };
-      const icon = icons[cat] || '🔗';
-      const btnSave = document.getElementById('btnSaveLink');
-      const isEdit = editingLinkId !== null;
-      const targetId = editingLinkId;
-
-      btnSave.disabled = true;
-      btnSave.innerText = '⏳ Menyimpan...';
-
-      function selesaiSimpan() {
-        document.getElementById('newFormTitle').value = '';
-        document.getElementById('newFormDesc').value = '';
-        document.getElementById('newFormUrl').value = '';
-        btnSave.disabled = false;
-        btnSave.innerText = 'Simpan Link';
-        closeAddFormModal();
-        loadLinksData();
-        showLinkToast(isEdit ? '✅ Perubahan link disimpan!' : '✅ Link tersimpan untuk semua staf!');
-      }
-
-      fetch(API_URL, {
-        method: 'POST',
-        redirect: 'follow',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          action: isEdit ? 'editLink' : 'addLink',
-          id: targetId,
-          title,
-          desc,
-          cat,
-          icon,
-          url
-        })
-      })
-      .then(() => selesaiSimpan())
-      .catch(() => selesaiSimpan());
-    }
-
-    function deleteForm(id) {
-      showLinkToast('⏳ Menghapus link...');
-      fetch(API_URL, {
-        method: 'POST',
-        redirect: 'follow',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'deleteLink', id })
-      })
-      .then(() => {
-        loadLinksData();
-        showLinkToast('🗑️ Link dihapus untuk semua staf!');
-      })
-      .catch(() => {
-        loadLinksData();
-        showLinkToast('🗑️ Link dihapus!');
-      });
-    }
-
-    function showLinkToast(msg) {
-      const t = document.getElementById('linkToast');
-      t.innerText = msg;
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 2300);
-    }
-
-    // =========================================================
-    // FITUR BIODATA & DIREKTORI TIM (DENGAN FOTO PROFIL)
-    // =========================================================
-    let allBiodataList = [];
-    let isBiodataLoading = false;
-    let editingBioId = null;
-    let currentBioPhotoBase64 = '';
-
-    function loadBiodataData() {
-      isBiodataLoading = true;
-      renderBiodata();
-      fetch(API_URL + "?action=getBiodata")
-        .then(res => res.json())
-        .then(data => {
-          allBiodataList = data.biodata || [];
-          isBiodataLoading = false;
-          renderBiodata();
-          renderAllScheduleViews();
-        })
-        .catch(() => {
-          isBiodataLoading = false;
-          renderBiodata();
-        });
-    }
-
-    function formatIndoDate(yyyyMmDd) {
-      if (!yyyyMmDd || yyyyMmDd.indexOf('-') === -1) return yyyyMmDd || '-';
-      const p = yyyyMmDd.split('-');
-      const bulan = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-      const mIdx = parseInt(p[1], 10) - 1;
-      return `${parseInt(p[2], 10)} ${bulan[mIdx] || p[1]} ${p[0]}`;
-    }
-
-    function isBirthdayThisMonth(yyyyMmDd) {
-      if (!yyyyMmDd || yyyyMmDd.indexOf('-') === -1) return false;
-      const m = parseInt(yyyyMmDd.split('-')[1], 10);
-      return m === (new Date().getMonth() + 1);
-    }
-
-    function formatWaHref(wa) {
-      let clean = String(wa || '').replace(/[^0-9]/g, '');
-      if (!clean) return '';
-      if (clean.startsWith('0')) clean = '62' + clean.slice(1);
-      return 'https://wa.me/' + clean;
-    }
-
-    function getInitials(name) {
-      const parts = String(name || '').trim().split(/\s+/);
-      if (parts.length === 0 || !parts[0]) return '👤';
-      return (parts[0][0] + (parts[1] ? parts[1][0] : parts[0][1] || '')).toUpperCase();
-    }
-
-    function renderBiodata() {
-      const container = document.getElementById('biodataListContainer');
-      if (!container) return;
-
-      if (isBiodataLoading && allBiodataList.length === 0) {
-        container.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">⏳ Memuat biodata tim...</div>';
+        `;
         return;
       }
 
-      const q = (document.getElementById('bioSearchInput').value || '').toLowerCase().trim();
-      const filtered = allBiodataList.filter(b => {
-        return !q ||
-          (b.name && b.name.toLowerCase().includes(q)) ||
-          (b.role && b.role.toLowerCase().includes(q)) ||
-          (b.nik && b.nik.toLowerCase().includes(q));
-      });
+      const iconMap = { Project: '📁', Trainer: '🎓', SPV: '📋', Lainnya: '🔗' };
 
-      if (filtered.length === 0) {
-        container.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">Belum ada data biodata. Klik <b>+ Tambah</b> di pojok kanan atas untuk mengisi profil pertama.</div>';
-        return;
-      }
-
-      container.innerHTML = filtered.map(b => {
-        const avatarHtml = b.photo
-          ? `<img src="${b.photo}" class="bio-avatar" alt="${b.name}">`
-          : `<div class="bio-avatar">${getInitials(b.name)}</div>`;
-        const bdayBadge = isBirthdayThisMonth(b.dob)
-          ? `<span class="bio-bday-badge">🎂 Ultah Bulan Ini</span>`
-          : '';
-        const waUrl = formatWaHref(b.wa);
-
+      container.innerHTML = filtered.map((item, idx) => {
+        const id = item.id || ('link-' + idx);
+        const cat = item.category || item.cat || 'Lainnya';
+        const icon = iconMap[cat] || '🔗';
+        const url = item.url || '#';
         return `
-          <div class="bio-card">
-            <div class="bio-header">
-              ${avatarHtml}
-              <div class="bio-main-info">
-                <div class="bio-name">${b.name}</div>
-                <div class="bio-badges">
-                  <span class="bio-role-badge">${b.role || 'Staff Toko'}</span>
-                  ${bdayBadge}
-                </div>
+          <div class="form-card">
+            <div class="form-top">
+              <div class="form-icon">${icon}</div>
+              <div class="form-info">
+                <span class="form-badge">${escapeHtml(cat)}</span>
+                <div class="form-title">${escapeHtml(item.title || 'Link Form')}</div>
+                <div class="form-desc">${escapeHtml(item.desc || item.description || url)}</div>
               </div>
             </div>
-
-            <div class="bio-details">
-              <div class="bio-row"><span class="bio-lbl">🪪 NIK Karyawan</span><span class="bio-val">${b.nik || '-'}</span></div>
-              <div class="bio-row"><span class="bio-lbl">📅 Masuk Kerja</span><span class="bio-val">${formatIndoDate(b.joinDate)}</span></div>
-              <div class="bio-row"><span class="bio-lbl">📱 No. WhatsApp</span><span class="bio-val">${b.wa || '-'}</span></div>
-              <div class="bio-row"><span class="bio-lbl">🎂 Tanggal Lahir</span><span class="bio-val">${formatIndoDate(b.dob)}</span></div>
-              <div class="bio-row"><span class="bio-lbl">👕 Ukuran Baju</span><span class="bio-val">${b.shirt || '-'}</span></div>
-              <div class="bio-row"><span class="bio-lbl">📍 Alamat</span><span class="bio-val">${b.address || '-'}</span></div>
-            </div>
-
             <div class="form-actions">
-              ${waUrl ? `<a class="btn-wa-link" href="${waUrl}" target="_blank" rel="noopener">💬 Chat WA ↗</a>` : `<button class="btn-copy-link" disabled style="opacity:0.5;">Belum ada WA</button>`}
-              <button class="btn-edit-custom" style="padding:10px 14px; font-size:12px; font-weight:600;" onclick="openEditBiodataModal('${b.id}')">✏️ Edit</button>
-              <button class="btn-del-custom" onclick="deleteBiodata('${b.id}')" title="Hapus Biodata">🗑️</button>
+              <button type="button" class="btn-copy-link" onclick="copyTextLink('${escapeAttr(url)}')">📋 Salin</button>
+              <a class="btn-open-link" href="${escapeAttr(url)}" target="_blank" rel="noopener noreferrer">Buka ↗</a>
+              <button type="button" class="btn-edit-custom" title="Edit" onclick="openEditFormModal('${escapeAttr(id)}')">✏️</button>
+              <button type="button" class="btn-del-custom" title="Hapus" onclick="deleteFormLink('${escapeAttr(id)}')">🗑️</button>
             </div>
           </div>
         `;
       }).join('');
     }
 
-    function updateBioPhotoPreview() {
-      const box = document.getElementById('bioPhotoPreview');
-      const btnClear = document.getElementById('btnClearPhoto');
-      if (currentBioPhotoBase64) {
-        box.innerHTML = `<img src="${currentBioPhotoBase64}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
-        btnClear.style.display = 'inline-block';
+    function copyTextLink(url) {
+      const ta = document.createElement('textarea');
+      ta.value = url;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        showLinkToast('📋 Link berhasil disalin!');
+      } catch (e) {
+        showLinkToast('⚠️ Gagal menyalin link');
+      }
+      document.body.removeChild(ta);
+    }
+
+    function openAddFormModal() {
+      editingLinkId = null;
+      document.getElementById('formModalTitle').innerText = '➕ Tambah Link Form Baru';
+      document.getElementById('newFormTitle').value = '';
+      document.getElementById('newFormDesc').value = '';
+      document.getElementById('newFormCat').value = 'Project';
+      document.getElementById('newFormUrl').value = '';
+      document.getElementById('addFormModal').classList.add('open');
+    }
+
+    function openEditFormModal(id) {
+      const item = allLinksList.find((x, i) => String(x.id || ('link-' + i)) === String(id));
+      if (!item) return;
+      editingLinkId = id;
+      document.getElementById('formModalTitle').innerText = '✏️ Edit Link Form';
+      document.getElementById('newFormTitle').value = item.title || '';
+      document.getElementById('newFormDesc').value = item.desc || item.description || '';
+      document.getElementById('newFormCat').value = item.category || item.cat || 'Lainnya';
+      document.getElementById('newFormUrl').value = item.url || '';
+      document.getElementById('addFormModal').classList.add('open');
+    }
+
+    function closeAddFormModal() {
+      document.getElementById('addFormModal').classList.remove('open');
+    }
+
+    async function saveNewForm() {
+      const title = document.getElementById('newFormTitle').value.trim();
+      const desc = document.getElementById('newFormDesc').value.trim();
+      const category = document.getElementById('newFormCat').value;
+      let url = document.getElementById('newFormUrl').value.trim();
+
+      if (!title || !url) {
+        showLinkToast('⚠️ Judul dan URL wajib diisi!');
+        return;
+      }
+      if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
+
+      const btn = document.getElementById('btnSaveLink');
+      btn.disabled = true;
+      btn.innerText = 'Menyimpan...';
+
+      const id = editingLinkId || ('link-' + Date.now());
+      const payloadItem = { id, title, desc, category, url };
+
+      if (editingLinkId) {
+        const idx = allLinksList.findIndex((x, i) => String(x.id || ('link-' + i)) === String(editingLinkId));
+        if (idx >= 0) allLinksList[idx] = payloadItem;
       } else {
-        box.innerHTML = '📷';
-        btnClear.style.display = 'none';
+        allLinksList.unshift(payloadItem);
+      }
+
+      try { localStorage.setItem(LINKS_LOCAL_KEY, JSON.stringify(allLinksList)); } catch (e) {}
+      closeAddFormModal();
+      renderLinks();
+
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'saveLink', link: payloadItem })
+        });
+        showLinkToast('✅ Link berhasil disimpan!');
+      } catch (err) {
+        showLinkToast('✅ Link tersimpan di perangkat');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Simpan Link';
       }
     }
 
-    function clearBioPhoto() {
-      currentBioPhotoBase64 = '';
-      document.getElementById('bioPhotoFile').value = '';
-      updateBioPhotoPreview();
+    async function deleteFormLink(id) {
+      allLinksList = allLinksList.filter((x, i) => String(x.id || ('link-' + i)) !== String(id));
+      try { localStorage.setItem(LINKS_LOCAL_KEY, JSON.stringify(allLinksList)); } catch (e) {}
+      renderLinks();
+      showLinkToast('🗑️ Link dihapus');
+
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'deleteLink', id })
+        });
+      } catch (e) {}
     }
 
-    function handleBioPhotoSelect(input) {
-      const file = input.files && input.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const img = new Image();
-        img.onload = function() {
-          const canvas = document.createElement('canvas');
-          const size = 160;
-          canvas.width = size;
-          canvas.height = size;
-          const ctx = canvas.getContext('2d');
-          const minSide = Math.min(img.width, img.height);
-          const sx = (img.width - minSide) / 2;
-          const sy = (img.height - minSide) / 2;
-          ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, size, size);
+    // =========================================================
+    // 4A. SUB-MENU STAF: SLIP GAJI & PIN
+    // =========================================================
+    let unlockedStaffName = '';
 
-          let compressed = canvas.toDataURL('image/jpeg', 0.72);
-          if (compressed.length > 45000) {
-            compressed = canvas.toDataURL('image/jpeg', 0.45);
-          }
-          currentBioPhotoBase64 = compressed;
-          updateBioPhotoPreview();
-        };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
+    async function bukaBrankas() {
+      const staffName = document.getElementById('bonusStaffSelect').value;
+      const pin = document.getElementById('inputPin').value.trim();
+      const errEl = document.getElementById('bonusError');
+      const loadEl = document.getElementById('loadingBonus');
+
+      errEl.style.display = 'none';
+      if (!staffName) {
+        errEl.innerText = 'Pilih nama kamu terlebih dahulu.';
+        errEl.style.display = 'block';
+        return;
+      }
+      if (!pin) {
+        errEl.innerText = 'Masukkan PIN keamanan.';
+        errEl.style.display = 'block';
+        return;
+      }
+
+      loadEl.style.display = 'block';
+      document.getElementById('btnUnlock').disabled = true;
+
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'verifyPin', staff: staffName, pin })
+        });
+        const data = await res.json();
+
+        if (data && data.success === false) {
+          errEl.innerText = data.message || 'PIN salah! Silakan coba lagi.';
+          errEl.style.display = 'block';
+          return;
+        }
+
+        unlockedStaffName = staffName;
+        const pokok = Number(data.gajiPokok || data.pokok || GAJI_POKOK);
+        const insentif = Number(data.insentif || data.bonus || 0);
+        const tunjangan = Number(data.tunjangan || 0);
+        const total = Number(data.total || (pokok + insentif + tunjangan));
+
+        document.getElementById('slipNamaHeader').innerText = staffName;
+        document.getElementById('slipPokok').innerText = formatRupiah(pokok);
+        document.getElementById('slipBonus').innerText = formatRupiah(insentif);
+
+        if (tunjangan > 0) {
+          document.getElementById('rowTunjangan').style.display = 'flex';
+          document.getElementById('slipTunjangan').innerText = formatRupiah(tunjangan);
+        } else {
+          document.getElementById('rowTunjangan').style.display = 'none';
+        }
+
+        document.getElementById('slipTotal').innerText = formatRupiah(total);
+        document.getElementById('authBox').style.display = 'none';
+        document.getElementById('payslipBox').style.display = 'block';
+      } catch (err) {
+        errEl.innerText = 'Gagal terhubung ke server verifikasi.';
+        errEl.style.display = 'block';
+      } finally {
+        loadEl.style.display = 'none';
+        document.getElementById('btnUnlock').disabled = false;
+      }
+    }
+
+    async function gantiPin() {
+      const oldPin = document.getElementById('oldPin').value.trim();
+      const newPin = document.getElementById('newPin').value.trim();
+      const stEl = document.getElementById('pinStatus');
+
+      if (!oldPin || newPin.length < 4) {
+        stEl.style.color = 'var(--accent-red)';
+        stEl.innerText = 'PIN baru minimal 4 digit.';
+        return;
+      }
+
+      stEl.style.color = 'var(--text-muted)';
+      stEl.innerText = 'Menyimpan PIN baru...';
+
+      try {
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'changePin', staff: unlockedStaffName, oldPin, newPin })
+        });
+        const data = await res.json();
+        if (data && data.success) {
+          stEl.style.color = 'var(--accent-green)';
+          stEl.innerText = '✅ PIN berhasil diperbarui!';
+          document.getElementById('oldPin').value = '';
+          document.getElementById('newPin').value = '';
+        } else {
+          stEl.style.color = 'var(--accent-red)';
+          stEl.innerText = (data && data.message) || 'PIN lama tidak sesuai.';
+        }
+      } catch (err) {
+        stEl.style.color = 'var(--accent-red)';
+        stEl.innerText = 'Gagal menyimpan PIN baru.';
+      }
+    }
+
+    function tutupBrankas() {
+      unlockedStaffName = '';
+      document.getElementById('inputPin').value = '';
+      document.getElementById('payslipBox').style.display = 'none';
+      document.getElementById('authBox').style.display = 'block';
+    }
+
+    // =========================================================
+    // 4B. SUB-MENU STAF: BIODATA TIM
+    // =========================================================
+    let allBiodataList = [];
+    let isBiodataLoading = false;
+    let editingBioId = null;
+    let currentBioPhotoData = '';
+
+    async function loadBiodataData(force = false) {
+      if (isBiodataLoading && !force) return;
+      if (allBiodataList.length > 0 && !force) {
+        renderBiodata();
+        return;
+      }
+
+      isBiodataLoading = true;
+      const cont = document.getElementById('biodataListContainer');
+      if (cont && allBiodataList.length === 0) {
+        cont.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">⏳ Memuat biodata tim...</div>';
+      }
+
+      try {
+        const res = await fetch(`${API_URL}?action=getBiodata`);
+        const json = await res.json();
+        allBiodataList = Array.isArray(json) ? json : (Array.isArray(json.biodata) ? json.biodata : []);
+      } catch (err) {
+        console.error('Gagal memuat biodata:', err);
+      } finally {
+        isBiodataLoading = false;
+        renderBiodata();
+        renderAllScheduleViews();
+      }
+    }
+
+    function formatWaHref(waRaw) {
+      let digits = String(waRaw || '').replace(/\D/g, '');
+      if (!digits) return '';
+      if (digits.startsWith('0')) digits = '62' + digits.slice(1);
+      return 'https://wa.me/' + digits;
+    }
+
+    function getInitials(name) {
+      const parts = String(name || 'ST').trim().split(/\s+/);
+      return (parts[0][0] + (parts[1] ? parts[1][0] : (parts[0][1] || ''))).toUpperCase();
+    }
+
+    function renderBiodata() {
+      const cont = document.getElementById('biodataListContainer');
+      if (!cont) return;
+      const q = (document.getElementById('bioSearchInput').value || '').toLowerCase().trim();
+
+      const filtered = allBiodataList.filter(b => {
+        const n = String(b.name || '').toLowerCase();
+        const r = String(b.role || '').toLowerCase();
+        const nik = String(b.nik || '').toLowerCase();
+        return !q || n.includes(q) || r.includes(q) || nik.includes(q);
+      });
+
+      if (filtered.length === 0) {
+        cont.innerHTML = `
+          <div class="card" style="text-align:center; padding:32px 20px;">
+            <div style="font-size:36px; margin-bottom:8px;">👥</div>
+            <div style="font-weight:700; margin-bottom:4px;">Belum ada data profil</div>
+            <div style="font-size:12px; color:var(--text-muted);">Klik <b>+ Tambah</b> di atas untuk menambahkan anggota tim.</div>
+          </div>
+        `;
+        return;
+      }
+
+      cont.innerHTML = filtered.map((b, idx) => {
+        const id = b.id || ('bio-' + idx);
+        const avatarHtml = b.photo
+          ? `<img src="${escapeAttr(b.photo)}" class="bio-avatar" alt="${escapeAttr(b.name)}">`
+          : `<div class="bio-avatar">${escapeHtml(getInitials(b.name))}</div>`;
+        const waHref = formatWaHref(b.wa);
+
+        return `
+          <div class="bio-card">
+            <div class="bio-header">
+              ${avatarHtml}
+              <div class="bio-main-info">
+                <div class="bio-name">${escapeHtml(b.name || '-')}</div>
+                <div class="bio-badges">
+                  <span class="bio-role-badge">${escapeHtml(b.role || 'Staff Toko')}</span>
+                  ${b.dob ? `<span class="bio-bday-badge">🎂 ${escapeHtml(b.dob)}</span>` : ''}
+                </div>
+              </div>
+            </div>
+            <div class="bio-details">
+              <div class="bio-row"><span class="bio-lbl">NIK</span><span class="bio-val">${escapeHtml(b.nik || '-')}</span></div>
+              <div class="bio-row"><span class="bio-lbl">Tgl Masuk</span><span class="bio-val">${escapeHtml(b.joinDate || '-')}</span></div>
+              <div class="bio-row"><span class="bio-lbl">WhatsApp</span><span class="bio-val">${escapeHtml(b.wa || '-')}</span></div>
+              <div class="bio-row"><span class="bio-lbl">Ukuran Baju</span><span class="bio-val">${escapeHtml(b.shirt || '-')}</span></div>
+              <div class="bio-row"><span class="bio-lbl">Alamat</span><span class="bio-val">${escapeHtml(b.address || '-')}</span></div>
+            </div>
+            <div class="form-actions">
+              ${waHref ? `<a class="btn-wa-link" href="${escapeAttr(waHref)}" target="_blank" rel="noopener noreferrer">💬 Chat WA</a>` : ''}
+              <button type="button" class="btn-copy-link" onclick="openEditBiodataModal('${escapeAttr(id)}')">✏️ Edit Profil</button>
+              <button type="button" class="btn-del-custom" title="Hapus" onclick="deleteBiodata('${escapeAttr(id)}')">🗑️</button>
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
     function openAddBiodataModal() {
       editingBioId = null;
+      currentBioPhotoData = '';
       document.getElementById('bioModalTitle').innerText = '👤 Tambah Biodata Tim';
       document.getElementById('bioName').value = '';
       document.getElementById('bioRole').value = '';
@@ -1479,98 +1607,141 @@
       document.getElementById('bioDob').value = '';
       document.getElementById('bioShirt').value = '';
       document.getElementById('bioAddress').value = '';
-      clearBioPhoto();
+      updateBioPhotoPreview('');
       document.getElementById('biodataModal').classList.add('open');
     }
 
     function openEditBiodataModal(id) {
-      const item = allBiodataList.find(b => b.id === id);
-      if (!item) return;
+      const b = allBiodataList.find((x, i) => String(x.id || ('bio-' + i)) === String(id));
+      if (!b) return;
       editingBioId = id;
-      document.getElementById('bioModalTitle').innerText = '✏️ Edit Biodata';
-      document.getElementById('bioName').value = item.name || '';
-      document.getElementById('bioRole').value = item.role || '';
-      document.getElementById('bioNik').value = item.nik || '';
-      document.getElementById('bioJoinDate').value = item.joinDate || '';
-      document.getElementById('bioWa').value = item.wa || '';
-      document.getElementById('bioDob').value = item.dob || '';
-      document.getElementById('bioShirt').value = item.shirt || '';
-      document.getElementById('bioAddress').value = item.address || '';
-      currentBioPhotoBase64 = item.photo || '';
-      document.getElementById('bioPhotoFile').value = '';
-      updateBioPhotoPreview();
+      currentBioPhotoData = b.photo || '';
+      document.getElementById('bioModalTitle').innerText = '✏️ Edit Biodata Tim';
+      document.getElementById('bioName').value = b.name || '';
+      document.getElementById('bioRole').value = b.role || '';
+      document.getElementById('bioNik').value = b.nik || '';
+      document.getElementById('bioJoinDate').value = b.joinDate || '';
+      document.getElementById('bioWa').value = b.wa || '';
+      document.getElementById('bioDob').value = b.dob || '';
+      document.getElementById('bioShirt').value = b.shirt || '';
+      document.getElementById('bioAddress').value = b.address || '';
+      updateBioPhotoPreview(currentBioPhotoData);
       document.getElementById('biodataModal').classList.add('open');
     }
 
     function closeBiodataModal() {
-      editingBioId = null;
       document.getElementById('biodataModal').classList.remove('open');
     }
 
-    function saveBiodata() {
+    function updateBioPhotoPreview(src) {
+      const prev = document.getElementById('bioPhotoPreview');
+      const clearBtn = document.getElementById('btnClearPhoto');
+      if (src) {
+        prev.innerHTML = `<img src="${escapeAttr(src)}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+        clearBtn.style.display = 'inline-block';
+      } else {
+        prev.innerHTML = '📷';
+        clearBtn.style.display = 'none';
+      }
+    }
+
+    function handleBioPhotoSelect(input) {
+      const file = input.files && input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const maxSide = 220;
+          const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+          canvas.width = Math.round(img.width * scale);
+          canvas.height = Math.round(img.height * scale);
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          currentBioPhotoData = canvas.toDataURL('image/jpeg', 0.78);
+          updateBioPhotoPreview(currentBioPhotoData);
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearBioPhoto() {
+      currentBioPhotoData = '';
+      document.getElementById('bioPhotoFile').value = '';
+      updateBioPhotoPreview('');
+    }
+
+    async function saveBiodata() {
       const name = document.getElementById('bioName').value.trim();
-      const role = document.getElementById('bioRole').value.trim();
-      const nik = document.getElementById('bioNik').value.trim();
-      const joinDate = document.getElementById('bioJoinDate').value;
-      const wa = document.getElementById('bioWa').value.trim();
-      const dob = document.getElementById('bioDob').value;
-      const shirt = document.getElementById('bioShirt').value;
-      const address = document.getElementById('bioAddress').value.trim();
-
-      if (!name) { showLinkToast('⚠️ Nama Lengkap wajib diisi!'); return; }
-
-      const btn = document.getElementById('btnSaveBio');
-      const isEdit = editingBioId !== null;
-      const targetId = editingBioId;
-
-      btn.disabled = true;
-      btn.innerText = '⏳ Menyimpan...';
-
-      function selesaiSimpanBio() {
-        btn.disabled = false;
-        btn.innerText = 'Simpan Biodata';
-        closeBiodataModal();
-        loadBiodataData();
-        showLinkToast(isEdit ? '✅ Biodata berhasil diperbarui!' : '✅ Biodata tim ditambahkan!');
+      if (!name) {
+        showLinkToast('⚠️ Nama lengkap wajib diisi!');
+        return;
       }
 
-      fetch(API_URL, {
-        method: 'POST',
-        redirect: 'follow',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          action: isEdit ? 'editBiodata' : 'addBiodata',
-          id: targetId,
-          name, role, nik, joinDate, wa, dob, shirt, address,
-          photo: currentBioPhotoBase64
-        })
-      })
-      .then(() => selesaiSimpanBio())
-      .catch(() => selesaiSimpanBio());
+      const btn = document.getElementById('btnSaveBio');
+      btn.disabled = true;
+      btn.innerText = 'Menyimpan...';
+
+      const bioObj = {
+        id: editingBioId || ('bio-' + Date.now()),
+        name,
+        role: document.getElementById('bioRole').value.trim(),
+        nik: document.getElementById('bioNik').value.trim(),
+        joinDate: document.getElementById('bioJoinDate').value,
+        wa: document.getElementById('bioWa').value.trim(),
+        dob: document.getElementById('bioDob').value,
+        shirt: document.getElementById('bioShirt').value,
+        address: document.getElementById('bioAddress').value.trim(),
+        photo: currentBioPhotoData
+      };
+
+      if (editingBioId) {
+        const idx = allBiodataList.findIndex((x, i) => String(x.id || ('bio-' + i)) === String(editingBioId));
+        if (idx >= 0) allBiodataList[idx] = bioObj;
+      } else {
+        allBiodataList.push(bioObj);
+      }
+
+      closeBiodataModal();
+      renderBiodata();
+      renderAllScheduleViews();
+
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'saveBiodata', biodata: bioObj })
+        });
+        showLinkToast('✅ Biodata berhasil disimpan!');
+      } catch (err) {
+        showLinkToast('⚠️ Gagal menyinkronkan ke server');
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Simpan Biodata';
+      }
     }
 
-    function deleteBiodata(id) {
-      showLinkToast('⏳ Menghapus biodata...');
-      fetch(API_URL, {
-        method: 'POST',
-        redirect: 'follow',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({ action: 'deleteBiodata', id })
-      })
-      .then(() => {
-        loadBiodataData();
-        showLinkToast('🗑️ Biodata dihapus');
-      })
-      .catch(() => {
-        loadBiodataData();
-        showLinkToast('🗑️ Biodata dihapus');
-      });
+    async function deleteBiodata(id) {
+      allBiodataList = allBiodataList.filter((x, i) => String(x.id || ('bio-' + i)) !== String(id));
+      renderBiodata();
+      renderAllScheduleViews();
+      showLinkToast('🗑️ Profil dihapus');
+
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'deleteBiodata', id })
+        });
+      } catch (e) {}
     }
 
     // =========================================================
-    // FITUR JADWAL SHIFT & CATATAN PER STAF (GOOGLE SHEETS)
+    // 4C. SUB-MENU STAF: JADWAL SHIFT & CATATAN PER STAF
     // =========================================================
-    const SHIFTS_DEF = {
+    const SHIFTS = {
       P:   { code: 'P',   shortLabel: 'P',   label: 'Pagi',   icon: '🌅', hours: '09:30–18:00', badgeClass: 'sh-P',   avClass: 'av-P' },
       M:   { code: 'M',   shortLabel: 'M',   label: 'Middle', icon: '☀️', hours: '11:30–20:00', badgeClass: 'sh-M',   avClass: 'av-M' },
       S:   { code: 'S',   shortLabel: 'S',   label: 'Siang',  icon: '🌙', hours: '13:30–22:00', badgeClass: 'sh-S',   avClass: 'av-S' },
@@ -1583,59 +1754,54 @@
     const DAY_NAMES_FULL  = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
     const MONTH_NAMES_ID  = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
 
-    function parseSchKey(key) {
-      const [y, m, d] = key.split('-').map(Number);
-      return new Date(y, m - 1, d);
-    }
-
-    function formatSchKey(dt) {
-      return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
-    }
-
-    function shiftSchDateKey(key, deltaDays) {
-      const dt = parseSchKey(key);
-      dt.setDate(dt.getDate() + deltaDays);
-      return formatSchKey(dt);
-    }
-
-    function getMondayOfCurrentWeekStr() {
-      const now = new Date();
-      const dayOfWeek = now.getDay();
-      const diffToMon = (dayOfWeek === 0) ? -6 : (1 - dayOfWeek);
-      const mon = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diffToMon);
-      return formatSchKey(mon);
-    }
-
-    let currentScheduleWeekStart = getMondayOfCurrentWeekStr();
+    let currentScheduleWeekStart = getMondayOfDate(new Date());
     let activeScheduleSubTab = 'perDay';
-    let selectedScheduleDayIdx = (new Date().getDay() + 6) % 7;
+    let selectedScheduleDayIdx = (() => {
+      const d = new Date().getDay();
+      return d === 0 ? 6 : d - 1;
+    })();
     let selectedPerStaffName = '';
     let scheduleDatabase = {};
     let isScheduleLoading = false;
 
     function getScheduleStaffList() {
-      const names = [];
-      dashboardData.forEach(s => {
-        if (s.name && names.indexOf(s.name) === -1) names.push(s.name);
-      });
+      const seen = {};
+      const list = [];
       allBiodataList.forEach(b => {
-        if (b.name && names.indexOf(b.name) === -1) names.push(b.name);
+        const cleanName = String(b.name || '').trim();
+        if (!cleanName) return;
+        const key = cleanName.toLowerCase();
+        if (seen[key]) return;
+        seen[key] = true;
+        list.push({
+          name: cleanName,
+          shortName: cleanName.split(' ')[0],
+          role: b.role ? String(b.role).trim() : 'Staff Toko'
+        });
       });
-      return names.map(name => {
-        const bio = allBiodataList.find(b => b.name.toLowerCase() === name.toLowerCase());
-        return {
-          name: name,
-          shortName: name.split(' ')[0],
-          role: (bio && bio.role) ? bio.role : 'Staff Toko'
-        };
-      });
+      return list;
+    }
+
+    function parseScheduleKey(key) {
+      const [y, m, d] = key.split('-').map(Number);
+      return new Date(y, m - 1, d);
+    }
+
+    function formatScheduleKey(dt) {
+      return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+    }
+
+    function shiftScheduleDateKey(key, deltaDays) {
+      const dt = parseScheduleKey(key);
+      dt.setDate(dt.getDate() + deltaDays);
+      return formatScheduleKey(dt);
     }
 
     function getWeekList(startKey) {
       const list = [];
       for (let i = 0; i < 7; i++) {
-        const k = shiftSchDateKey(startKey, i);
-        const dt = parseSchKey(k);
+        const k = shiftScheduleDateKey(startKey, i);
+        const dt = parseScheduleKey(k);
         list.push({
           key: k,
           dayShort: DAY_NAMES_SHORT[dt.getDay()],
@@ -1661,41 +1827,47 @@
       return scheduleDatabase[dateKey][staffName];
     }
 
-    function loadScheduleData() {
+    async function loadScheduleData() {
+      if (isScheduleLoading) return;
       isScheduleLoading = true;
-      renderAllScheduleViews();
-      fetch(API_URL + "?action=getSchedule")
-        .then(res => res.json())
-        .then(res => {
-          if (res.success && res.schedule) {
-            scheduleDatabase = res.schedule;
-          }
-          isScheduleLoading = false;
-          renderAllScheduleViews();
-        })
-        .catch(() => {
-          isScheduleLoading = false;
-          renderAllScheduleViews();
-        });
+      const weekDays = getWeekList(currentScheduleWeekStart);
+      const startDate = weekDays[0].key;
+      const endDate = weekDays[6].key;
+
+      try {
+        const res = await fetch(`${API_URL}?action=getSchedule&startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`);
+        const json = await res.json();
+        if (json && json.schedule && typeof json.schedule === 'object') {
+          Object.keys(json.schedule).forEach(dKey => {
+            if (!scheduleDatabase[dKey]) scheduleDatabase[dKey] = {};
+            Object.assign(scheduleDatabase[dKey], json.schedule[dKey]);
+          });
+        }
+      } catch (err) {
+        console.warn('Gagal memuat jadwal dari server:', err);
+      } finally {
+        isScheduleLoading = false;
+        renderAllScheduleViews();
+      }
     }
 
-    function pushScheduleBatchToServer(items, onDone) {
-      fetch(API_URL, {
-        method: 'POST',
-        redirect: 'follow',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify({
-          action: 'saveScheduleBatch',
-          items: items
-        })
-      })
-      .then(() => { if (onDone) onDone(); })
-      .catch(() => { if (onDone) onDone(); });
+    async function syncScheduleItemsToServer(items) {
+      if (!items || items.length === 0) return;
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'saveScheduleBatch', items })
+        });
+      } catch (err) {
+        showLinkToast('⚠️ Jadwal tersimpan lokal (gagal sync server)');
+      }
     }
 
     function changeScheduleWeek(deltaDays) {
-      currentScheduleWeekStart = shiftSchDateKey(currentScheduleWeekStart, deltaDays);
+      currentScheduleWeekStart = shiftScheduleDateKey(currentScheduleWeekStart, deltaDays);
       renderAllScheduleViews();
+      loadScheduleData();
     }
 
     function switchScheduleSubTab(tab) {
@@ -1708,48 +1880,38 @@
     }
 
     function renderAllScheduleViews() {
-      const weekLabelEl = document.getElementById('weekHeaderLabel');
-      if (!weekLabelEl) return;
-      weekLabelEl.innerText = getWeekRangeText(currentScheduleWeekStart);
-
       const staffList = getScheduleStaffList();
       const subEl = document.getElementById('scheduleHeroSub');
-      if (subEl) {
-        subEl.innerText = staffList.length > 0
-          ? `Digimap Jember Roxy • ${staffList.length} Staf`
-          : 'Digimap Jember Roxy';
-      }
+      if (subEl) subEl.innerText = `Digimap Jember Roxy • ${staffList.length} Staf`;
+      const weekLbl = document.getElementById('weekHeaderLabel');
+      if (weekLbl) weekLbl.innerText = getWeekRangeText(currentScheduleWeekStart);
 
-      renderSchedulePerDayView(staffList);
-      renderSchedulePerStaffView(staffList);
+      renderPerDayView();
+      renderPerStaffView();
     }
 
-    function quickToggleStaffShift(staffName, dateKey) {
+    function quickToggleStaffDay(staffName, dateKey) {
       const cell = getScheduleCell(dateKey, staffName);
       const next = SHIFT_ORDER[(SHIFT_ORDER.indexOf(cell.shift || 'P') + 1) % SHIFT_ORDER.length];
       cell.shift = next;
       renderAllScheduleViews();
-      const shortName = staffName.split(' ')[0];
-      showLinkToast(`${SHIFTS_DEF[next].icon} ${shortName}: ${SHIFTS_DEF[next].label} (${SHIFTS_DEF[next].hours})`);
-      pushScheduleBatchToServer([{
-        date: dateKey,
-        staff: staffName,
-        shift: cell.shift,
-        note: cell.note || ''
-      }]);
+      showLinkToast(`${SHIFTS[next].icon} ${staffName}: ${SHIFTS[next].label} (${SHIFTS[next].hours})`);
+      syncScheduleItemsToServer([{ date: dateKey, staff: staffName, shift: next, note: cell.note || '' }]);
     }
 
-    function renderSchedulePerDayView(staffList) {
-      const weekDays = getWeekList(currentScheduleWeekStart);
+    function renderPerDayView() {
       const stripEl = document.getElementById('daySelectorStrip');
       const sumEl = document.getElementById('dailySummaryBar');
       const listEl = document.getElementById('dailyStaffList');
       if (!stripEl || !sumEl || !listEl) return;
 
+      const weekDays = getWeekList(currentScheduleWeekStart);
+      const staffList = getScheduleStaffList();
+
       stripEl.innerHTML = weekDays.map((d, idx) => {
         const hasAnyNote = staffList.some(m => (getScheduleCell(d.key, m.name).note || '').trim() !== '');
         return `
-          <button type="button" class="day-pill ${idx === selectedScheduleDayIdx ? 'active' : ''}" onclick="selectedScheduleDayIdx=${idx}; renderAllScheduleViews();">
+          <button type="button" class="day-pill ${idx === selectedScheduleDayIdx ? 'active' : ''}" onclick="selectedScheduleDayIdx=${idx}; renderPerDayView();">
             ${hasAnyNote ? '<span class="note-dot-indicator"></span>' : ''}
             <span class="dp-name">${d.dayShort}</span>
             <span class="dp-num">${d.dateNum}</span>
@@ -1760,14 +1922,16 @@
       const activeDay = weekDays[selectedScheduleDayIdx];
       if (staffList.length === 0) {
         sumEl.innerHTML = `<div class="dsb-top"><span>${activeDay.dayFull}, ${activeDay.dateNum} ${activeDay.monthShort} ${activeDay.year}</span></div>`;
-        listEl.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">⏳ Memuat daftar staf & jadwal...</div>';
+        listEl.innerHTML = isBiodataLoading
+          ? '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">⏳ Memuat daftar staf dari Biodata...</div>'
+          : '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">Belum ada nama staf di <b>Biodata</b>. Tambahkan profil tim di menu Biodata terlebih dahulu.</div>';
         return;
       }
 
       let cP = 0, cM = 0, cS = 0, cOff = 0;
       const rowsData = staffList.map(m => {
         const cell = getScheduleCell(activeDay.key, m.name);
-        const code = SHIFTS_DEF[cell.shift] ? cell.shift : 'P';
+        const code = SHIFTS[cell.shift] ? cell.shift : 'P';
         if (code === 'P') cP++;
         else if (code === 'M') cM++;
         else if (code === 'S') cS++;
@@ -1792,26 +1956,25 @@
       `;
 
       listEl.innerHTML = rowsData.map(({ member, code, note }) => {
-        const sh = SHIFTS_DEF[code];
+        const sh = SHIFTS[code];
         const isOff = code === 'OFF';
         const shiftText = isOff ? `${sh.icon} Off / Libur` : `${sh.icon} ${sh.label} • ${sh.hours}`;
-        const safeName = member.name.replace(/'/g, "\\'");
 
         const rightNoteHtml = note
-          ? `<button type="button" class="btn-active-note-right" onclick="openStaffNoteModal('${safeName}', '${activeDay.key}')" title="${note.replace(/"/g, '&quot;')}">
+          ? `<button type="button" class="btn-active-note-right" onclick="openStaffNoteModal('${escapeAttr(member.name)}', '${activeDay.key}')" title="${escapeAttr(note)}">
                <span>📌</span>
-               <span class="note-label-clamp">${note}</span>
+               <span class="note-label-clamp">${escapeHtml(note)}</span>
                <span>✏️</span>
              </button>`
-          : `<button type="button" class="btn-add-note-right" onclick="openStaffNoteModal('${safeName}', '${activeDay.key}')">+ Catatan</button>`;
+          : `<button type="button" class="btn-add-note-right" onclick="openStaffNoteModal('${escapeAttr(member.name)}', '${activeDay.key}')">+ Catatan</button>`;
 
         return `
           <div class="daily-staff-row ${isOff ? 'is-off' : ''}">
             <div class="dsr-left">
-              <div class="sch-avatar ${sh.avClass}">${getInitials(member.name)}</div>
+              <div class="sch-avatar ${sh.avClass}">${escapeHtml(getInitials(member.name))}</div>
               <div class="dsr-text-col">
-                <div class="dsr-name">${member.name}</div>
-                <div class="dsr-shift-line ${sh.badgeClass}" onclick="quickToggleStaffShift('${safeName}', '${activeDay.key}')" title="Ketuk untuk ubah shift">
+                <div class="dsr-name">${escapeHtml(member.name)}</div>
+                <div class="dsr-shift-line ${sh.badgeClass}" onclick="quickToggleStaffDay('${escapeAttr(member.name)}', '${activeDay.key}')" title="Ketuk untuk ubah shift">
                   ${shiftText}
                 </div>
               </div>
@@ -1826,17 +1989,22 @@
 
     function onSelectPerStaffSchedule(staffName) {
       selectedPerStaffName = staffName;
-      renderAllScheduleViews();
+      renderPerStaffView();
     }
 
-    function renderSchedulePerStaffView(staffList) {
+    function renderPerStaffView() {
       const pickerEl = document.getElementById('perStaffScheduleSelect');
       const container = document.getElementById('staffWeekCardsContainer');
       if (!pickerEl || !container) return;
 
+      const staffList = getScheduleStaffList();
       if (staffList.length === 0) {
-        pickerEl.innerHTML = '<option value="">⏳ Memuat Data Staff...</option>';
-        container.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">⏳ Memuat daftar staf...</div>';
+        pickerEl.innerHTML = isBiodataLoading
+          ? '<option value="">⏳ Memuat Biodata Staf...</option>'
+          : '<option value="">Belum ada data di Biodata</option>';
+        container.innerHTML = isBiodataLoading
+          ? '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">⏳ Memuat daftar staf dari Biodata...</div>'
+          : '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">Belum ada nama staf di <b>Biodata</b>. Tambahkan profil tim di menu Biodata terlebih dahulu.</div>';
         return;
       }
 
@@ -1845,11 +2013,10 @@
       }
 
       pickerEl.innerHTML = staffList.map(m =>
-        `<option value="${m.name.replace(/"/g, '&quot;')}" ${m.name === selectedPerStaffName ? 'selected' : ''}>👤 ${m.name}</option>`
+        `<option value="${escapeHtml(m.name)}" ${m.name === selectedPerStaffName ? 'selected' : ''}>👤 ${escapeHtml(m.name)} (${escapeHtml(m.role)})</option>`
       ).join('');
 
       const member = staffList.find(m => m.name === selectedPerStaffName) || staffList[0];
-      const safeName = member.name.replace(/'/g, "\\'");
       const weekDays = getWeekList(currentScheduleWeekStart);
 
       let onDutyCount = 0;
@@ -1858,8 +2025,8 @@
 
       const dayRowsHtml = weekDays.map(d => {
         const cell = getScheduleCell(d.key, member.name);
-        const code = SHIFTS_DEF[cell.shift] ? cell.shift : 'P';
-        const sh = SHIFTS_DEF[code];
+        const code = SHIFTS[cell.shift] ? cell.shift : 'P';
+        const sh = SHIFTS[code];
         const isOff = code === 'OFF';
         const noteText = (cell.note || '').trim();
 
@@ -1867,17 +2034,14 @@
         else onDutyCount++;
         if (noteText) noteCount++;
 
-        const shiftDisplay = isOff
-          ? `${sh.icon} Off / Libur`
-          : `${sh.icon} ${sh.label} • ${sh.hours}`;
-
+        const shiftDisplay = isOff ? `${sh.icon} Off / Libur` : `${sh.icon} ${sh.label} • ${sh.hours}`;
         const rightActionHtml = noteText
-          ? `<button type="button" class="btn-active-note-right" onclick="openStaffNoteModal('${safeName}', '${d.key}')" title="${noteText.replace(/"/g, '&quot;')}">
+          ? `<button type="button" class="btn-active-note-right" onclick="openStaffNoteModal('${escapeAttr(member.name)}', '${d.key}')" title="${escapeAttr(noteText)}">
                <span>📌</span>
-               <span class="note-label-clamp">${noteText}</span>
+               <span class="note-label-clamp">${escapeHtml(noteText)}</span>
                <span>✏️</span>
              </button>`
-          : `<button type="button" class="btn-add-note-right" onclick="openStaffNoteModal('${safeName}', '${d.key}')">+ Catatan</button>`;
+          : `<button type="button" class="btn-add-note-right" onclick="openStaffNoteModal('${escapeAttr(member.name)}', '${d.key}')">+ Catatan</button>`;
 
         return `
           <div class="staff-day-row ${isOff ? 'is-off' : ''}">
@@ -1888,7 +2052,7 @@
               </div>
               <div class="sdr-text-col">
                 <div class="sdr-date-title">${d.dayFull}, ${d.dateNum} ${d.monthShort}</div>
-                <div class="dsr-shift-line ${sh.badgeClass}" onclick="quickToggleStaffShift('${safeName}', '${d.key}')" title="Ketuk untuk ubah shift">
+                <div class="dsr-shift-line ${sh.badgeClass}" onclick="quickToggleStaffDay('${escapeAttr(member.name)}', '${d.key}')" title="Ketuk untuk ubah shift">
                   ${shiftDisplay}
                 </div>
               </div>
@@ -1903,24 +2067,24 @@
       container.innerHTML = `
         <div class="staff-focus-card">
           <div class="swc-profile">
-            <div class="sch-avatar av-P">${getInitials(member.name)}</div>
+            <div class="sch-avatar av-P">${escapeHtml(getInitials(member.name))}</div>
             <div>
-              <div class="swc-name">${member.name}</div>
+              <div class="swc-name">${escapeHtml(member.name)}</div>
               <div class="swc-meta">
-                <span class="role-badge">${member.role}</span>
+                <span class="role-badge">${escapeHtml(member.role)}</span>
                 <span class="summary-pill">${onDutyCount} Masuk • ${offCount} Off</span>
                 ${noteCount > 0 ? `<span class="summary-pill" style="background:#FFFBEB; color:#B45309; border-color:#FDE68A;">📌 ${noteCount}</span>` : ''}
               </div>
             </div>
           </div>
-          <button type="button" class="btn-edit-staff-week" onclick="openSingleStaffModal('${safeName}')">✏️ Atur 7 Hari</button>
+          <button type="button" class="btn-edit-staff-week" onclick="openSingleStaffModal('${escapeAttr(member.name)}')">✏️ Atur 7 Hari</button>
         </div>
         ${dayRowsHtml}
       `;
     }
 
     // =========================================================
-    // MODAL A: BATCH 7-DAY MATRIX (SEMUA STAF)
+    // MODAL A JADWAL: MATRIKS 7 HARI (SEMUA STAF)
     // =========================================================
     let draftBulkData = {};
     let activeBrushMode = 'P';
@@ -1930,20 +2094,20 @@
       activeBrushMode = mode;
       ['P', 'M', 'S', 'OFF', 'NOTE'].forEach(m => {
         const btn = document.getElementById('brushBtn-' + m);
-        btn.className = 'brush-btn' + (m === mode ? ' active-' + m : '');
+        if (btn) btn.className = 'brush-btn' + (m === mode ? ' active-' + m : '');
       });
       if (mode === 'NOTE') {
         document.getElementById('brushHintLabel').innerText = 'Ketuk sel: 📌 Catatan';
       } else {
         closeMatrixCellNotePrompt();
-        document.getElementById('brushHintLabel').innerText = `Ketuk sel: ${SHIFTS_DEF[mode].icon} ${SHIFTS_DEF[mode].label}`;
+        document.getElementById('brushHintLabel').innerText = `Ketuk sel: ${SHIFTS[mode].icon} ${SHIFTS[mode].label}`;
       }
     }
 
     function openBulkMatrixModal() {
       const staffList = getScheduleStaffList();
       if (staffList.length === 0) {
-        showLinkToast('⏳ Daftar staf sedang dimuat...');
+        showLinkToast(isBiodataLoading ? '⏳ Memuat data dari Biodata...' : '⚠️ Isi data staf di menu Biodata terlebih dahulu!');
         return;
       }
       const weekDays = getWeekList(currentScheduleWeekStart);
@@ -1953,7 +2117,7 @@
       staffList.forEach(m => {
         draftBulkData[m.name] = weekDays.map(d => {
           const c = getScheduleCell(d.key, m.name);
-          return { shift: SHIFTS_DEF[c.shift] ? c.shift : 'P', note: c.note || '' };
+          return { shift: SHIFTS[c.shift] ? c.shift : 'P', note: c.note || '' };
         });
       });
       closeMatrixCellNotePrompt();
@@ -1967,27 +2131,32 @@
       document.getElementById('bulkMatrixModal').classList.remove('open');
     }
 
-    function handleMatrixCellTap(staffName, dayIdx) {
+    function handleMatrixCellTap(staffIdx, dayIdx) {
+      const staffList = getScheduleStaffList();
+      const member = staffList[staffIdx];
+      if (!member) return;
+
       if (activeBrushMode === 'NOTE') {
-        editingMatrixCell = { staffName, dayIdx };
+        editingMatrixCell = { staffName: member.name, dayIdx };
         const day = getWeekList(currentScheduleWeekStart)[dayIdx];
-        const currNote = draftBulkData[staffName][dayIdx].note || '';
-        document.getElementById('mcnpTitle').innerText = `📌 Catatan: ${staffName.split(' ')[0]} • ${day.dayShort} ${day.dateNum}`;
+        const currNote = draftBulkData[member.name][dayIdx].note || '';
+        document.getElementById('mcnpTitle').innerText = `📌 Catatan: ${member.shortName} • ${day.dayShort} ${day.dateNum}`;
         document.getElementById('matrixCellNoteInput').value = currNote;
         document.getElementById('btnMcnpDelete').style.display = currNote ? 'block' : 'none';
         document.getElementById('matrixNotePresets').innerHTML = NOTE_PRESETS.map(p => `
-          <button type="button" class="note-preset-chip ${currNote === p ? 'active-chip' : ''}" onclick="document.getElementById('matrixCellNoteInput').value='${p}'">${p}</button>
+          <button type="button" class="note-preset-chip ${currNote === p ? 'active-chip' : ''}" onclick="document.getElementById('matrixCellNoteInput').value='${escapeAttr(p)}'">${escapeHtml(p)}</button>
         `).join('');
         document.getElementById('matrixCellNotePrompt').style.display = 'block';
         return;
       }
-      draftBulkData[staffName][dayIdx].shift = activeBrushMode;
+      draftBulkData[member.name][dayIdx].shift = activeBrushMode;
       renderBulkMatrix();
     }
 
     function closeMatrixCellNotePrompt() {
       editingMatrixCell = null;
-      document.getElementById('matrixCellNotePrompt').style.display = 'none';
+      const el = document.getElementById('matrixCellNotePrompt');
+      if (el) el.style.display = 'none';
     }
 
     function applyMatrixCellNote() {
@@ -2014,37 +2183,35 @@
         </tr>
       `;
 
-      const rowsHtml = staffList.map(m => {
-        const safeName = m.name.replace(/'/g, "\\'");
-        return `
-          <tr>
-            <td>${m.shortName}</td>
-            ${weekDays.map((d, idx) => {
-              const c = draftBulkData[m.name][idx];
-              const sh = SHIFTS_DEF[c.shift] || SHIFTS_DEF.P;
-              return `
-                <td>
-                  <button type="button" class="m-cell-btn ${sh.badgeClass}" onclick="handleMatrixCellTap('${safeName}', ${idx})">
-                    ${c.note ? '<span class="m-cell-pin">📌</span>' : ''}
-                    ${sh.shortLabel}
-                  </button>
-                </td>
-              `;
-            }).join('')}
-          </tr>
-        `;
-      }).join('');
+      const rowsHtml = staffList.map((m, sIdx) => `
+        <tr>
+          <td>${escapeHtml(m.shortName)}</td>
+          ${weekDays.map((d, dIdx) => {
+            const c = draftBulkData[m.name][dIdx];
+            const sh = SHIFTS[c.shift] || SHIFTS.P;
+            return `
+              <td>
+                <button type="button" class="m-cell-btn ${sh.badgeClass}" onclick="handleMatrixCellTap(${sIdx}, ${dIdx})">
+                  ${c.note ? '<span class="m-cell-pin">📌</span>' : ''}
+                  ${sh.shortLabel}
+                </button>
+              </td>
+            `;
+          }).join('')}
+        </tr>
+      `).join('');
 
       const sumCells = weekDays.map((d, idx) => {
         let onDuty = 0;
         staffList.forEach(m => { if (draftBulkData[m.name][idx].shift !== 'OFF') onDuty++; });
-        return `<td><span class="duty-badge ${onDuty >= Math.max(1, staffList.length - 2) ? 'duty-ok' : 'duty-warn'}">${onDuty}/${staffList.length}</span></td>`;
+        const okThreshold = Math.max(1, Math.ceil(staffList.length * 0.6));
+        return `<td><span class="duty-badge ${onDuty >= okThreshold ? 'duty-ok' : 'duty-warn'}">${onDuty}/${staffList.length}</span></td>`;
       }).join('');
 
       document.getElementById('bulkMatrixTbody').innerHTML = rowsHtml + `<tr class="matrix-sum-row"><td>Masuk</td>${sumCells}</tr>`;
     }
 
-    function saveBulkMatrix() {
+    async function saveBulkMatrix() {
       const staffList = getScheduleStaffList();
       const weekDays = getWeekList(currentScheduleWeekStart);
       const batchItems = [];
@@ -2053,55 +2220,40 @@
         if (!scheduleDatabase[d.key]) scheduleDatabase[d.key] = {};
         staffList.forEach(m => {
           const entry = draftBulkData[m.name][idx];
-          scheduleDatabase[d.key][m.name] = {
-            shift: entry.shift,
-            note: entry.note
-          };
-          batchItems.push({
-            date: d.key,
-            staff: m.name,
-            shift: entry.shift,
-            note: entry.note
-          });
+          scheduleDatabase[d.key][m.name] = { shift: entry.shift, note: entry.note };
+          batchItems.push({ date: d.key, staff: m.name, shift: entry.shift, note: entry.note });
         });
       });
 
-      const btn = document.getElementById('btnSaveBulkMatrix');
-      btn.disabled = true;
-      btn.innerText = '⏳ Menyimpan...';
-
-      pushScheduleBatchToServer(batchItems, () => {
-        btn.disabled = false;
-        btn.innerText = 'Simpan Semua Jadwal';
-        closeBulkModal();
-        renderAllScheduleViews();
-        showLinkToast('✅ Semua jadwal minggu ini disimpan!');
-      });
+      closeBulkModal();
+      renderAllScheduleViews();
+      showLinkToast('✅ Semua jadwal minggu ini disimpan!');
+      await syncScheduleItemsToServer(batchItems);
     }
 
     // =========================================================
-    // MODAL B: SINGLE STAFF 7-DAY MODAL
+    // MODAL B JADWAL: ATUR JADWAL 7 HARI PER STAF
     // =========================================================
-    let editingSingleStaffName = null;
+    let editingSingleStaffName = '';
     let draftSingleDays = [];
 
     function openSingleStaffModal(staffName) {
       editingSingleStaffName = staffName;
       const weekDays = getWeekList(currentScheduleWeekStart);
       document.getElementById('singleModalAvatar').innerText = getInitials(staffName);
-      document.getElementById('singleModalTitle').innerText = `✏️ Atur 7 Hari - ${staffName.split(' ')[0]}`;
+      document.getElementById('singleModalTitle').innerText = `✏️ Atur 7 Hari - ${staffName}`;
       document.getElementById('singleModalSub').innerText = getWeekRangeText(currentScheduleWeekStart);
 
       draftSingleDays = weekDays.map(d => {
         const c = getScheduleCell(d.key, staffName);
-        return { shift: SHIFTS_DEF[c.shift] ? c.shift : 'P', note: c.note || '' };
+        return { shift: SHIFTS[c.shift] ? c.shift : 'P', note: c.note || '' };
       });
       renderSingleStaffDays();
       document.getElementById('singleStaffModal').classList.add('open');
     }
 
     function closeSingleModal() {
-      editingSingleStaffName = null;
+      editingSingleStaffName = '';
       document.getElementById('singleStaffModal').classList.remove('open');
     }
 
@@ -2124,59 +2276,44 @@
               <div class="sdi-choices">
                 ${SHIFT_ORDER.map(code => `
                   <button type="button" class="sdi-choice-btn ${row.shift === code ? 'sel-' + code : ''}" onclick="draftSingleDays[${idx}].shift='${code}'; renderSingleStaffDays();">
-                    ${SHIFTS_DEF[code].label}
+                    ${SHIFTS[code].label}
                   </button>
                 `).join('')}
               </div>
             </div>
-            <input type="text" class="sdi-note-input" value="${row.note.replace(/"/g, '&quot;')}" placeholder="📌 Catatan kegiatan ${d.dayShort} (opsional)..." oninput="draftSingleDays[${idx}].note=this.value">
+            <input type="text" class="sdi-note-input" value="${escapeHtml(row.note)}" placeholder="📌 Catatan kegiatan ${d.dayShort} (opsional)..." oninput="draftSingleDays[${idx}].note=this.value">
           </div>
         `;
       }).join('');
     }
 
-    function saveSingleStaffSchedule() {
+    async function saveSingleStaffSchedule() {
       if (!editingSingleStaffName) return;
-      const staffName = editingSingleStaffName;
+      const targetName = editingSingleStaffName;
       const weekDays = getWeekList(currentScheduleWeekStart);
       const batchItems = [];
 
       weekDays.forEach((d, idx) => {
         if (!scheduleDatabase[d.key]) scheduleDatabase[d.key] = {};
-        const noteTrimmed = draftSingleDays[idx].note.trim();
-        scheduleDatabase[d.key][staffName] = {
-          shift: draftSingleDays[idx].shift,
-          note: noteTrimmed
-        };
-        batchItems.push({
-          date: d.key,
-          staff: staffName,
-          shift: draftSingleDays[idx].shift,
-          note: noteTrimmed
-        });
+        const cleanNote = draftSingleDays[idx].note.trim();
+        scheduleDatabase[d.key][targetName] = { shift: draftSingleDays[idx].shift, note: cleanNote };
+        batchItems.push({ date: d.key, staff: targetName, shift: draftSingleDays[idx].shift, note: cleanNote });
       });
 
-      const btn = document.getElementById('btnSaveSingleStaff');
-      btn.disabled = true;
-      btn.innerText = '⏳ Menyimpan...';
-
-      pushScheduleBatchToServer(batchItems, () => {
-        btn.disabled = false;
-        btn.innerText = 'Simpan Jadwal';
-        closeSingleModal();
-        renderAllScheduleViews();
-        showLinkToast(`✅ Jadwal 7 hari ${staffName.split(' ')[0]} disimpan!`);
-      });
+      closeSingleModal();
+      renderAllScheduleViews();
+      showLinkToast(`✅ Jadwal 7 hari ${targetName} disimpan!`);
+      await syncScheduleItemsToServer(batchItems);
     }
 
     // =========================================================
-    // MODAL C: INDIVIDUAL STAFF NOTE MODAL
+    // MODAL C JADWAL: CATATAN KEGIATAN PER STAF
     // =========================================================
     let noteModalContext = null;
 
     function openStaffNoteModal(staffName, dateKey) {
       noteModalContext = { staffName, dateKey };
-      const dt = parseSchKey(dateKey);
+      const dt = parseScheduleKey(dateKey);
       const currNote = getScheduleCell(dateKey, staffName).note || '';
 
       document.getElementById('snmAvatar').innerText = getInitials(staffName);
@@ -2191,7 +2328,7 @@
 
     function renderSnmPresets(activeText) {
       document.getElementById('snmPresetChips').innerHTML = NOTE_PRESETS.map(p => `
-        <button type="button" class="note-preset-chip ${activeText === p ? 'active-chip' : ''}" onclick="document.getElementById('snmTextInput').value='${p}'; renderSnmPresets('${p}')">${p}</button>
+        <button type="button" class="note-preset-chip ${activeText === p ? 'active-chip' : ''}" onclick="document.getElementById('snmTextInput').value='${escapeAttr(p)}'; renderSnmPresets('${escapeAttr(p)}')">${escapeHtml(p)}</button>
       `).join('');
     }
 
@@ -2200,129 +2337,111 @@
       document.getElementById('staffNoteModal').classList.remove('open');
     }
 
-    function saveStaffNoteFromModal() {
+    async function saveStaffNoteFromModal() {
       if (!noteModalContext) return;
       const { staffName, dateKey } = noteModalContext;
       const val = document.getElementById('snmTextInput').value.trim();
       const cell = getScheduleCell(dateKey, staffName);
       cell.note = val;
-
-      const btn = document.getElementById('btnSnmSave');
-      btn.disabled = true;
-      btn.innerText = '⏳...';
-
-      pushScheduleBatchToServer([{
-        date: dateKey,
-        staff: staffName,
-        shift: cell.shift || 'P',
-        note: val
-      }], () => {
-        btn.disabled = false;
-        btn.innerText = 'Simpan';
-        closeStaffNoteModal();
-        renderAllScheduleViews();
-        showLinkToast(val ? `📌 Catatan ${staffName.split(' ')[0]} disimpan!` : `Catatan ${staffName.split(' ')[0]} dikosongkan`);
-      });
+      closeStaffNoteModal();
+      renderAllScheduleViews();
+      showLinkToast(val ? `📌 Catatan ${staffName} disimpan!` : `Catatan ${staffName} dikosongkan`);
+      await syncScheduleItemsToServer([{ date: dateKey, staff: staffName, shift: cell.shift || 'P', note: val }]);
     }
 
-    function deleteStaffNoteFromModal() {
+    async function deleteStaffNoteFromModal() {
       if (!noteModalContext) return;
       const { staffName, dateKey } = noteModalContext;
       const cell = getScheduleCell(dateKey, staffName);
       cell.note = '';
+      closeStaffNoteModal();
+      renderAllScheduleViews();
+      showLinkToast(`🗑️ Catatan ${staffName} dihapus`);
+      await syncScheduleItemsToServer([{ date: dateKey, staff: staffName, shift: cell.shift || 'P', note: '' }]);
+    }
 
-      pushScheduleBatchToServer([{
-        date: dateKey,
-        staff: staffName,
-        shift: cell.shift || 'P',
-        note: ''
-      }], () => {
-        closeStaffNoteModal();
-        renderAllScheduleViews();
-        showLinkToast(`🗑️ Catatan ${staffName.split(' ')[0]} dihapus`);
+    // =========================================================
+    // 5. ADMIN PANEL UPLOAD EXCEL/CSV
+    // =========================================================
+    function readExcelFile(file) {
+      return new Promise((resolve, reject) => {
+        if (!file) return resolve(null);
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          try {
+            const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+            const firstSheet = wb.Sheets[wb.SheetNames[0]];
+            const rows = XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
+            resolve(rows);
+          } catch (err) {
+            reject(err);
+          }
+        };
+        reader.onerror = reject;
+        reader.readAsArrayBuffer(file);
       });
     }
 
-    // =========================================================
-    // FITUR SALES HARIAN PER STAFF & PILIH TANGGAL
-    // =========================================================
-    let dailySalesCache = {};
+    async function uploadData() {
+      const fSPW = document.getElementById('fileSPW').files[0];
+      const fMSR = document.getElementById('fileMSR').files[0];
+      const fSTOCK = document.getElementById('fileSTOCK').files[0];
+      const statusEl = document.getElementById('status');
+      const btn = document.getElementById('btnUpload');
 
-    function getTodayLocalStr() {
-      const now = new Date();
-      const y = now.getFullYear();
-      const m = String(now.getMonth() + 1).padStart(2, '0');
-      const d = String(now.getDate()).padStart(2, '0');
-      return `${y}-${m}-${d}`;
-    }
-
-    function stepDailyDate(delta) {
-      const input = document.getElementById('dailyDateInput');
-      const current = input.value || getTodayLocalStr();
-      const parts = current.split('-').map(Number);
-      const dt = new Date(parts[0], parts[1] - 1, parts[2] + delta);
-      const y = dt.getFullYear();
-      const m = String(dt.getMonth() + 1).padStart(2, '0');
-      const d = String(dt.getDate()).padStart(2, '0');
-      input.value = `${y}-${m}-${d}`;
-      loadDailySales();
-    }
-
-    function loadDailySales() {
-      const selectedStaff = document.getElementById('staffSelect').value;
-      if (!selectedStaff) return;
-
-      const input = document.getElementById('dailyDateInput');
-      if (!input.value) input.value = getTodayLocalStr();
-      const dateStr = input.value;
-      const metaEl = document.getElementById('dailyMetaInfo');
-
-      if (dailySalesCache[dateStr]) {
-        renderDailySalesCard(selectedStaff, dateStr, dailySalesCache[dateStr]);
+      if (!fSPW && !fMSR && !fSTOCK) {
+        statusEl.style.color = 'var(--accent-red)';
+        statusEl.innerText = '⚠️ Pilih minimal satu file Excel/CSV terlebih dahulu.';
         return;
       }
 
-      metaEl.innerText = '⏳ Mengambil data tanggal ' + dateStr + '...';
-      fetch(API_URL + "?action=getDailySales&date=" + encodeURIComponent(dateStr))
-        .then(res => res.json())
-        .then(res => {
-          if (res.success) {
-            dailySalesCache[dateStr] = res.staff || {};
-            renderDailySalesCard(selectedStaff, dateStr, dailySalesCache[dateStr]);
-          } else {
-            metaEl.innerText = '❌ Gagal memuat data harian.';
-          }
-        })
-        .catch(() => {
-          metaEl.innerText = '❌ Gagal terhubung ke server.';
+      btn.disabled = true;
+      btn.innerText = 'Membaca & Mengunggah...';
+      statusEl.style.color = 'var(--text-muted)';
+      statusEl.innerText = '⏳ Memproses file...';
+
+      try {
+        const [spwRows, msrRows, stockRows] = await Promise.all([
+          readExcelFile(fSPW),
+          readExcelFile(fMSR),
+          readExcelFile(fSTOCK)
+        ]);
+
+        const res = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: 'uploadData',
+            spw: spwRows,
+            msr: msrRows,
+            stock: stockRows
+          })
         });
+        const result = await res.json();
+        if (result && result.success !== false) {
+          statusEl.style.color = 'var(--accent-green)';
+          statusEl.innerText = '✅ ' + (result.message || 'Sinkronisasi data berhasil!');
+          dashboardData = null;
+          sohList = [];
+        } else {
+          statusEl.style.color = 'var(--accent-red)';
+          statusEl.innerText = '⚠️ ' + ((result && result.message) || 'Gagal menyinkronkan data.');
+        }
+      } catch (err) {
+        statusEl.style.color = 'var(--accent-red)';
+        statusEl.innerText = '⚠️ Terjadi kesalahan saat memproses file.';
+      } finally {
+        btn.disabled = false;
+        btn.innerText = 'Sinkronisasi Data';
+      }
     }
 
-    function renderDailySalesCard(staffName, dateStr, staffMap) {
-      const data = staffMap[staffName] || {
-        total: 0, device: 0, acc: 0, qoala: 0, trx: 0,
-        qty_iphone: 0, qty_ipad: 0, qty_mac: 0, qty_aw: 0, qty_airpods: 0
-      };
-      document.getElementById('valDailyTotal').innerText = formatRp(data.total);
-      document.getElementById('valDailyDevice').innerText = formatRp(data.device);
-      document.getElementById('valDailyAcc').innerText = formatRp(data.acc);
-      document.getElementById('valDailyQoala').innerText = formatRp(data.qoala);
-
-      document.getElementById('dailyQtyIphone').innerText = data.qty_iphone || 0;
-      document.getElementById('dailyQtyIpad').innerText = data.qty_ipad || 0;
-      document.getElementById('dailyQtyMac').innerText = data.qty_mac || 0;
-      document.getElementById('dailyQtyWatch').innerText = data.qty_aw || 0;
-      document.getElementById('dailyQtyAirpods').innerText = data.qty_airpods || 0;
-
-      const parts = dateStr.split('-');
-      const tglIndo = `${parts[2]}/${parts[1]}/${parts[0]}`;
-      document.getElementById('dailyMetaInfo').innerText = data.trx > 0
-        ? `Menampilkan ${data.trx} transaksi pada tanggal ${tglIndo}`
-        : `Belum ada transaksi tercatat pada tanggal ${tglIndo}`;
-    }
-
-    loadLinksData();
-    switchTab('dashboard');
+    // Inisialisasi saat halaman dimuat
+    document.addEventListener('DOMContentLoaded', () => {
+      const dailyInp = document.getElementById('dailyDateInput');
+      if (dailyInp) dailyInp.value = getTodayLocalStr();
+      loadDashboardData();
+    });
   </script>
 </body>
 </html>
