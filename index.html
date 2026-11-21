@@ -134,6 +134,13 @@
     .link-modal-box input, .link-modal-box select { width: 100%; padding: 13px 15px; border: 2px solid #F0EDFF; border-radius: 14px; font-size: 13px; margin-bottom: 12px; outline: none; background: #FAFAFF; }
     .link-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-80px); background: var(--text-main); color: white; padding: 11px 20px; border-radius: 30px; font-size: 12px; font-weight: 600; z-index: 300; transition: 0.3s ease; }
     .link-toast.show { transform: translateX(-50%) translateY(0); }
+    
+    /* Styling Bagian Sales Harian Staff */
+    .daily-header-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 28px 0 12px 2px; flex-wrap: wrap; }
+    .daily-date-nav { display: flex; align-items: center; gap: 6px; background: var(--card-bg); padding: 5px 8px; border-radius: 20px; box-shadow: var(--shadow-soft); }
+    .btn-date-step { background: var(--bg-main); border: none; color: var(--primary); width: 30px; height: 30px; border-radius: 50%; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+    .daily-date-input { border: none; background: transparent; font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600; color: var(--text-main); outline: none; cursor: pointer; }
+    .daily-meta-info { font-size: 11.5px; color: var(--text-muted); margin: 0 0 14px 5px; }
   </style>
 </head>
 <body>
@@ -220,6 +227,38 @@
         <div class="detail-card-header"><div class="detail-icon bg-blue c-blue">🛡️</div><div class="detail-title">Qoala</div></div>
         <div class="stat-row"><div class="stat-label">Sales: <span class="stat-val" id="valQoalaSales">Rp 0</span></div><div class="stat-label">Target: <span class="stat-val" id="valQoalaTarget" style="font-weight:400;">Rp 0</span></div></div>
         <div class="progress-bar-container"><div class="progress-bar bar-blue" id="barQoala" style="width: 0%;"></div></div>
+      </div>
+      <div class="daily-header-row">
+        <div class="section-title" style="margin:0;">📅 Sales Harian</div>
+        <div class="daily-date-nav">
+          <button type="button" class="btn-date-step" onclick="stepDailyDate(-1)" title="Hari Sebelumnya">◀</button>
+          <input type="date" id="dailyDateInput" class="daily-date-input" onchange="loadDailySales()">
+          <button type="button" class="btn-date-step" onclick="stepDailyDate(1)" title="Hari Berikutnya">▶</button>
+        </div>
+      </div>
+      <div id="dailyMetaInfo" class="daily-meta-info">Memuat data harian...</div>
+
+      <div class="kpi-grid" style="margin-bottom: 10px;">
+        <div class="kpi-card">
+          <div class="kpi-bg-icon">💰</div>
+          <div class="kpi-title">Total Harian</div>
+          <div class="kpi-value c-purple" id="valDailyTotal" style="font-size:17px;">Rp 0</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-bg-icon">📱</div>
+          <div class="kpi-title">Device</div>
+          <div class="kpi-value" id="valDailyDevice" style="font-size:17px;">Rp 0</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-bg-icon">🎧</div>
+          <div class="kpi-title">Accessories</div>
+          <div class="kpi-value" id="valDailyAcc" style="font-size:17px;">Rp 0</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-bg-icon">🛡️</div>
+          <div class="kpi-title">Qoala</div>
+          <div class="kpi-value" id="valDailyQoala" style="font-size:17px;">Rp 0</div>
+        </div>
       </div>
     </div>
   </div>
@@ -418,7 +457,11 @@
         document.getElementById('valMyTarget').innerText = formatRp(staff.target);
         document.getElementById('valMyRank').innerText = "#" + staff.rank;
         document.getElementById('valMyPct').innerText = Math.round(staff.achieved) + '%';
-        
+        document.getElementById('valQoalaSales').innerText = formatRp(staff.qoalaSales);
+        document.getElementById('valQoalaTarget').innerText = formatRp(staff.qoalaTarget);
+        document.getElementById('barQoala').style.width = Math.min((staff.qoalaTarget > 0 ? staff.qoalaSales/staff.qoalaTarget*100 : 0), 100) + '%';
+        loadDailySales();
+      }
         const sisaEl = document.getElementById('valMySisa');
         if (staff.sales >= staff.target && staff.target > 0) { sisaEl.innerText = "🎉 TERCAPAI"; sisaEl.style.color = "var(--accent-green)"; } 
         else if (staff.target === 0) { sisaEl.innerText = "Target Kosong"; sisaEl.style.color = "var(--text-muted)"; } 
@@ -504,6 +547,7 @@
         
         dashboardData = [];
         sohDataGlobal = [];
+        dailySalesCache = {};
         loadDashboardData();
       }
 
@@ -780,7 +824,74 @@
       t.classList.add('show');
       setTimeout(() => t.classList.remove('show'), 2200);
     }
+// =========================================================
+    // FITUR SALES HARIAN PER STAFF & PILIH TANGGAL
+    // =========================================================
+    let dailySalesCache = {};
 
+    function getTodayLocalStr() {
+      const now = new Date();
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, '0');
+      const d = String(now.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function stepDailyDate(delta) {
+      const input = document.getElementById('dailyDateInput');
+      const current = input.value || getTodayLocalStr();
+      const parts = current.split('-').map(Number);
+      const dt = new Date(parts[0], parts[1] - 1, parts[2] + delta);
+      const y = dt.getFullYear();
+      const m = String(dt.getMonth() + 1).padStart(2, '0');
+      const d = String(dt.getDate()).padStart(2, '0');
+      input.value = `${y}-${m}-${d}`;
+      loadDailySales();
+    }
+
+    function loadDailySales() {
+      const selectedStaff = document.getElementById('staffSelect').value;
+      if (!selectedStaff) return;
+
+      const input = document.getElementById('dailyDateInput');
+      if (!input.value) input.value = getTodayLocalStr();
+      const dateStr = input.value;
+      const metaEl = document.getElementById('dailyMetaInfo');
+
+      if (dailySalesCache[dateStr]) {
+        renderDailySalesCard(selectedStaff, dateStr, dailySalesCache[dateStr]);
+        return;
+      }
+
+      metaEl.innerText = '⏳ Mengambil data tanggal ' + dateStr + '...';
+      fetch(API_URL + "?action=getDailySales&date=" + encodeURIComponent(dateStr))
+        .then(res => res.json())
+        .then(res => {
+          if (res.success) {
+            dailySalesCache[dateStr] = res.staff || {};
+            renderDailySalesCard(selectedStaff, dateStr, dailySalesCache[dateStr]);
+          } else {
+            metaEl.innerText = '❌ Gagal memuat data harian.';
+          }
+        })
+        .catch(() => {
+          metaEl.innerText = '❌ Gagal terhubung ke server.';
+        });
+    }
+
+    function renderDailySalesCard(staffName, dateStr, staffMap) {
+      const data = staffMap[staffName] || { total: 0, device: 0, acc: 0, qoala: 0, trx: 0 };
+      document.getElementById('valDailyTotal').innerText = formatRp(data.total);
+      document.getElementById('valDailyDevice').innerText = formatRp(data.device);
+      document.getElementById('valDailyAcc').innerText = formatRp(data.acc);
+      document.getElementById('valDailyQoala').innerText = formatRp(data.qoala);
+
+      const parts = dateStr.split('-');
+      const tglIndo = `${parts[2]}/${parts[1]}/${parts[0]}`;
+      document.getElementById('dailyMetaInfo').innerText = data.trx > 0
+        ? `Menampilkan ${data.trx} transaksi pada tanggal ${tglIndo}`
+        : `Belum ada transaksi tercatat pada tanggal ${tglIndo}`;
+    }
     loadLinksData();
     switchTab('dashboard');
   </script>
