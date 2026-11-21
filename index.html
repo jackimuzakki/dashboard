@@ -904,6 +904,129 @@
     // =========================================================
     // 1. DASHBOARD TARGET & KLASEMEN & SALES HARIAN
     // =========================================================
+    const DASHBOARD_CACHE_KEY = 'digimap_dashboard_cache_v1';
+
+    function toNum(val) {
+      if (typeof val === 'number') return isNaN(val) ? 0 : val;
+      if (val == null || val === '') return 0;
+      const cleaned = String(val).replace(/[^0-9.-]/g, '');
+      const n = Number(cleaned);
+      return isNaN(n) ? 0 : n;
+    }
+
+    function normalizeDateYMD(rawDate) {
+      if (!rawDate) return '';
+      const s = String(rawDate).trim();
+      if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
+      const slashMatch = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+      if (slashMatch) {
+        return `${slashMatch[3]}-${slashMatch[2].padStart(2, '0')}-${slashMatch[1].padStart(2, '0')}`;
+      }
+      const dt = new Date(s);
+      if (!isNaN(dt.getTime())) {
+        return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+      }
+      return s;
+    }
+
+    function hasValidDashboardShape(raw) {
+      if (!raw || typeof raw !== 'object') return false;
+      if (raw.success === false && !raw.store && !raw.staff && !raw.ranking && !raw.dashboard && !raw.data) return false;
+      if (Array.isArray(raw) && raw.length > 0) return true;
+      const root = (raw.dashboard && typeof raw.dashboard === 'object' && !Array.isArray(raw.dashboard)) ? raw.dashboard : raw;
+      return Boolean(
+        root.store || root.toko || root.summary ||
+        Array.isArray(root.staff) || Array.isArray(root.ranking) ||
+        Array.isArray(root.dashboard) || Array.isArray(root.data) || Array.isArray(root.sales) ||
+        (root.staff && typeof root.staff === 'object' && Object.keys(root.staff).length > 0)
+      );
+    }
+
+    function normalizeDashboardPayload(raw) {
+      const root = (raw && raw.dashboard && typeof raw.dashboard === 'object' && !Array.isArray(raw.dashboard))
+        ? raw.dashboard
+        : (raw || {});
+
+      let rawStaffArr = [];
+      if (Array.isArray(root)) {
+        rawStaffArr = root;
+      } else if (Array.isArray(root.staff)) {
+        rawStaffArr = root.staff;
+      } else if (Array.isArray(root.ranking)) {
+        rawStaffArr = root.ranking;
+      } else if (Array.isArray(root.dashboard)) {
+        rawStaffArr = root.dashboard;
+      } else if (Array.isArray(root.data)) {
+        rawStaffArr = root.data;
+      } else if (Array.isArray(root.sales)) {
+        rawStaffArr = root.sales;
+      } else if (root.staff && typeof root.staff === 'object') {
+        rawStaffArr = Object.entries(root.staff).map(([k, v]) => Object.assign({ name: k }, v || {}));
+      } else if (root.ranking && typeof root.ranking === 'object') {
+        rawStaffArr = Object.entries(root.ranking).map(([k, v]) => Object.assign({ name: k }, v || {}));
+      }
+
+      const staffMap = {};
+      const staffList = [];
+
+      rawStaffArr.forEach(item => {
+        if (!item || typeof item !== 'object') return;
+        const name = String(
+          item.name ?? item.nama ?? item.Nama ?? item.staff ?? item.Staff ?? item.salesman ?? item.Salesman ?? ''
+        ).trim();
+        if (!name || name.toLowerCase() === 'total' || name.toLowerCase() === 'store') return;
+
+        const norm = {
+          name,
+          totalSales: toNum(item.totalSales ?? item.sales ?? item.Sales ?? item.omzet ?? item.total_sales ?? item.netSales),
+          totalTarget: toNum(item.totalTarget ?? item.target ?? item.Target ?? item.targetSales ?? item.total_target),
+          point: toNum(item.point ?? item.poin ?? item.Point ?? item.Poin ?? item.totalPoint ?? item.totalPoin),
+          qtyIphone: toNum(item.qtyIphone ?? item.iphone ?? item.iPhone ?? item.IPHONE ?? item.qty_iphone),
+          qtyIpad: toNum(item.qtyIpad ?? item.ipad ?? item.iPad ?? item.IPAD ?? item.qty_ipad),
+          qtyMac: toNum(item.qtyMac ?? item.mac ?? item.Mac ?? item.MAC ?? item.qty_mac),
+          qtyWatch: toNum(item.qtyWatch ?? item.watch ?? item.Watch ?? item.appleWatch ?? item.qty_watch),
+          qtyAirpods: toNum(item.qtyAirpods ?? item.airpods ?? item.AirPods ?? item.AIRPODS ?? item.qty_airpods),
+          deviceSales: toNum(item.deviceSales ?? item.device ?? item.Device ?? item.salesDevice),
+          deviceTarget: toNum(item.deviceTarget ?? item.targetDevice ?? item.device_target),
+          accSales: toNum(item.accSales ?? item.acc ?? item.Acc ?? item.accessories ?? item.Accessories ?? item.aksesoris ?? item.salesAcc),
+          accTarget: toNum(item.accTarget ?? item.targetAcc ?? item.acc_target ?? item.accessoriesTarget),
+          qoalaSales: toNum(item.qoalaSales ?? item.qoala ?? item.Qoala ?? item.vasSales ?? item.vas ?? item.VAS ?? item.salesQoala),
+          qoalaTarget: toNum(item.qoalaTarget ?? item.targetQoala ?? item.qoala_target ?? item.vasTarget ?? item.targetVas)
+        };
+
+        staffMap[name] = norm;
+        staffList.push(norm);
+      });
+
+      const ranking = [...staffList].sort((a, b) => b.totalSales - a.totalSales);
+      const sumField = (key) => staffList.reduce((acc, s) => acc + (s[key] || 0), 0);
+
+      const st = root.store || root.toko || root.summary || {};
+      const store = {
+        totalSales: toNum(st.totalSales ?? st.sales ?? st.Sales) || sumField('totalSales'),
+        totalTarget: toNum(st.totalTarget ?? st.target ?? st.Target) || sumField('totalTarget'),
+        totalPoint: toNum(st.totalPoint ?? st.point ?? st.poin ?? st.totalPoin) || sumField('point'),
+        pct: toNum(st.pct ?? st.achievement ?? st.pencapaian),
+        deviceSales: toNum(st.deviceSales ?? st.device ?? st.salesDevice) || sumField('deviceSales'),
+        deviceTarget: toNum(st.deviceTarget ?? st.targetDevice) || sumField('deviceTarget'),
+        accSales: toNum(st.accSales ?? st.acc ?? st.accessories ?? st.aksesoris) || sumField('accSales'),
+        accTarget: toNum(st.accTarget ?? st.targetAcc ?? st.accessoriesTarget) || sumField('accTarget'),
+        vasSales: toNum(st.vasSales ?? st.vas ?? st.qoalaSales ?? st.qoala) || sumField('qoalaSales'),
+        vasTarget: toNum(st.vasTarget ?? st.targetVas ?? st.qoalaTarget ?? st.targetQoala) || sumField('qoalaTarget')
+      };
+
+      const rawDaily = Array.isArray(root.daily) ? root.daily
+        : Array.isArray(root.dailySales) ? root.dailySales
+        : Array.isArray(root.spw) ? root.spw
+        : Array.isArray(root.transactions) ? root.transactions
+        : null;
+
+      if (Array.isArray(root.soh) && root.soh.length > 0) sohList = root.soh;
+      else if (Array.isArray(root.stock) && root.stock.length > 0) sohList = root.stock;
+
+      return { store, staff: staffMap, ranking, rawDaily };
+    }
+
     async function loadDashboardData(force = false) {
       if (isDashboardLoading && !force) return;
       if (dashboardData && !force) {
@@ -912,21 +1035,50 @@
         return;
       }
 
+      try {
+        const cached = localStorage.getItem(DASHBOARD_CACHE_KEY);
+        if (cached && !dashboardData) {
+          dashboardData = JSON.parse(cached);
+          populateStaffDropdowns();
+          showPersonalData();
+        }
+      } catch (e) {}
+
       isDashboardLoading = true;
       const loadingEl = document.getElementById('loadingDash');
-      if (loadingEl) loadingEl.style.display = 'block';
+      if (loadingEl && !dashboardData) loadingEl.style.display = 'block';
 
       try {
-        const res = await fetch(`${API_URL}?action=getDashboard`);
-        const json = await res.json();
-        dashboardData = json;
+        const endpoints = [
+          API_URL,
+          `${API_URL}?action=getDashboard`,
+          `${API_URL}?action=getData`
+        ];
+        let validRaw = null;
+
+        for (let i = 0; i < endpoints.length; i++) {
+          try {
+            const res = await fetch(endpoints[i]);
+            const json = await res.json();
+            if (hasValidDashboardShape(json)) {
+              validRaw = json;
+              break;
+            }
+          } catch (innerErr) {}
+        }
+
+        if (validRaw) {
+          dashboardData = normalizeDashboardPayload(validRaw);
+          try { localStorage.setItem(DASHBOARD_CACHE_KEY, JSON.stringify(dashboardData)); } catch (e) {}
+        }
+
         populateStaffDropdowns();
         showPersonalData();
       } catch (err) {
         console.error('Gagal memuat dashboard:', err);
         const sel = document.getElementById('staffSelect');
         if (sel && sel.options.length <= 1) {
-          sel.innerHTML = '<option value="">Overview Toko (Digimap Jember Roxy)</option>';
+          sel.innerHTML = '<option value="">🏪 Overview Toko (Digimap Jember Roxy)</option>';
         }
         document.getElementById('storeView').style.display = 'block';
         showLinkToast('⚠️ Gagal menyambung ke server data');
@@ -944,9 +1096,9 @@
 
       const staffNames = [];
       if (dashboardData) {
-        if (Array.isArray(dashboardData.ranking)) {
+        if (Array.isArray(dashboardData.ranking) && dashboardData.ranking.length > 0) {
           dashboardData.ranking.forEach(r => { if (r.name) staffNames.push(String(r.name).trim()); });
-        } else if (dashboardData.staff && typeof dashboardData.staff === 'object') {
+        } else if (dashboardData.staff && typeof dashboardData.staff === 'object' && !Array.isArray(dashboardData.staff)) {
           Object.keys(dashboardData.staff).forEach(k => staffNames.push(k));
         }
       }
@@ -982,35 +1134,34 @@
     }
 
     function renderStoreOverview() {
-      if (!dashboardData || !dashboardData.store) return;
-      const st = dashboardData.store;
-      const sales = Number(st.totalSales || st.sales || 0);
-      const target = Number(st.totalTarget || st.target || 0);
-      const point = Number(st.totalPoint || st.point || 0);
-      const pct = target > 0 ? Math.round((sales / target) * 100) : Number(st.pct || 0);
+      const st = (dashboardData && dashboardData.store) ? dashboardData.store : {};
+      const sales = toNum(st.totalSales || st.sales);
+      const target = toNum(st.totalTarget || st.target);
+      const point = toNum(st.totalPoint || st.point);
+      const pct = target > 0 ? Math.round((sales / target) * 100) : toNum(st.pct);
 
       document.getElementById('valStoreSales').innerText = formatRupiah(sales);
       document.getElementById('valStoreTarget').innerText = formatRupiah(target);
       document.getElementById('valStorePoint').innerText = point.toLocaleString('id-ID');
       document.getElementById('valStorePct').innerText = pct + '%';
 
-      const devS = Number(st.deviceSales || 0), devT = Number(st.deviceTarget || 0);
+      const devS = toNum(st.deviceSales), devT = toNum(st.deviceTarget);
       document.getElementById('valStoreDeviceSales').innerText = formatRupiah(devS);
       document.getElementById('valStoreDeviceTarget').innerText = formatRupiah(devT);
       document.getElementById('barStoreDevice').style.width = Math.min(100, devT > 0 ? (devS / devT) * 100 : 0) + '%';
 
-      const accS = Number(st.accSales || 0), accT = Number(st.accTarget || 0);
+      const accS = toNum(st.accSales), accT = toNum(st.accTarget);
       document.getElementById('valStoreAccSales').innerText = formatRupiah(accS);
       document.getElementById('valStoreAccTarget').innerText = formatRupiah(accT);
       document.getElementById('barStoreAcc').style.width = Math.min(100, accT > 0 ? (accS / accT) * 100 : 0) + '%';
 
-      const vasS = Number(st.vasSales || 0), vasT = Number(st.vasTarget || 0);
+      const vasS = toNum(st.vasSales), vasT = toNum(st.vasTarget);
       document.getElementById('valStoreVasSales').innerText = formatRupiah(vasS);
       document.getElementById('valStoreVasTarget').innerText = formatRupiah(vasT);
       document.getElementById('barStoreVas').style.width = Math.min(100, vasT > 0 ? (vasS / vasT) * 100 : 0) + '%';
 
       const tbody = document.getElementById('rankTableBody');
-      const ranking = Array.isArray(dashboardData.ranking) ? dashboardData.ranking : [];
+      const ranking = (dashboardData && Array.isArray(dashboardData.ranking)) ? dashboardData.ranking : [];
       if (ranking.length === 0) {
         tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--text-muted);">Belum ada data klasemen</td></tr>';
       } else {
@@ -1020,7 +1171,7 @@
             <tr style="cursor:pointer;" onclick="document.getElementById('staffSelect').value='${escapeAttr(r.name)}'; showPersonalData();">
               <td style="text-align:center; font-weight:700;">${medal}</td>
               <td style="font-weight:600;">${escapeHtml(r.name)}</td>
-              <td style="text-align:right; font-weight:700; color:var(--primary);">${formatRupiah(r.sales)}</td>
+              <td style="text-align:right; font-weight:700; color:var(--primary);">${formatRupiah(r.totalSales)}</td>
             </tr>
           `;
         }).join('');
@@ -1033,8 +1184,8 @@
       const ranking = (dashboardData && Array.isArray(dashboardData.ranking)) ? dashboardData.ranking : [];
       const rankIdx = ranking.findIndex(r => String(r.name).trim() === staffName);
 
-      const sales = Number(stObj.totalSales || stObj.sales || (rankIdx >= 0 ? ranking[rankIdx].sales : 0));
-      const target = Number(stObj.totalTarget || stObj.target || 0);
+      const sales = toNum(stObj.totalSales || (rankIdx >= 0 ? ranking[rankIdx].totalSales : 0));
+      const target = toNum(stObj.totalTarget);
       const sisa = Math.max(0, target - sales);
       const pct = target > 0 ? Math.round((sales / target) * 100) : 0;
 
@@ -1044,18 +1195,18 @@
       document.getElementById('valMySisa').innerText = sisa === 0 && target > 0 ? '🎉 Target Tercapai!' : formatRupiah(sisa);
       document.getElementById('valMyPct').innerText = pct + '%';
 
-      document.getElementById('qtyIphone').innerText = Number(stObj.qtyIphone || stObj.iphone || 0);
-      document.getElementById('qtyIpad').innerText = Number(stObj.qtyIpad || stObj.ipad || 0);
-      document.getElementById('qtyMac').innerText = Number(stObj.qtyMac || stObj.mac || 0);
-      document.getElementById('qtyWatch').innerText = Number(stObj.qtyWatch || stObj.watch || 0);
-      document.getElementById('qtyAirpods').innerText = Number(stObj.qtyAirpods || stObj.airpods || 0);
+      document.getElementById('qtyIphone').innerText = toNum(stObj.qtyIphone);
+      document.getElementById('qtyIpad').innerText = toNum(stObj.qtyIpad);
+      document.getElementById('qtyMac').innerText = toNum(stObj.qtyMac);
+      document.getElementById('qtyWatch').innerText = toNum(stObj.qtyWatch);
+      document.getElementById('qtyAirpods').innerText = toNum(stObj.qtyAirpods);
 
-      const accS = Number(stObj.accSales || 0), accT = Number(stObj.accTarget || 0);
+      const accS = toNum(stObj.accSales), accT = toNum(stObj.accTarget);
       document.getElementById('valAccSales').innerText = formatRupiah(accS);
       document.getElementById('valAccTarget').innerText = formatRupiah(accT);
       document.getElementById('barAcc').style.width = Math.min(100, accT > 0 ? (accS / accT) * 100 : 0) + '%';
 
-      const qoalaS = Number(stObj.qoalaSales || stObj.vasSales || 0), qoalaT = Number(stObj.qoalaTarget || stObj.vasTarget || 0);
+      const qoalaS = toNum(stObj.qoalaSales), qoalaT = toNum(stObj.qoalaTarget);
       document.getElementById('valQoalaSales').innerText = formatRupiah(qoalaS);
       document.getElementById('valQoalaTarget').innerText = formatRupiah(qoalaT);
       document.getElementById('barQoala').style.width = Math.min(100, qoalaT > 0 ? (qoalaS / qoalaT) * 100 : 0) + '%';
@@ -1076,36 +1227,72 @@
       loadDailySales();
     }
 
+    function applyDailyStatsToUI(stats, staffName, dateStr) {
+      const total = toNum(stats.totalSales ?? stats.total ?? stats.sales);
+      const device = toNum(stats.deviceSales ?? stats.device);
+      const acc = toNum(stats.accSales ?? stats.acc ?? stats.accessories);
+      const qoala = toNum(stats.qoalaSales ?? stats.qoala ?? stats.vas ?? stats.vasSales);
+
+      document.getElementById('valDailyTotal').innerText = formatRupiah(total);
+      document.getElementById('valDailyDevice').innerText = formatRupiah(device);
+      document.getElementById('valDailyAcc').innerText = formatRupiah(acc);
+      document.getElementById('valDailyQoala').innerText = formatRupiah(qoala);
+
+      document.getElementById('dailyQtyIphone').innerText = toNum(stats.qtyIphone ?? stats.iphone);
+      document.getElementById('dailyQtyIpad').innerText = toNum(stats.qtyIpad ?? stats.ipad);
+      document.getElementById('dailyQtyMac').innerText = toNum(stats.qtyMac ?? stats.mac);
+      document.getElementById('dailyQtyWatch').innerText = toNum(stats.qtyWatch ?? stats.watch);
+      document.getElementById('dailyQtyAirpods').innerText = toNum(stats.qtyAirpods ?? stats.airpods);
+
+      const metaEl = document.getElementById('dailyMetaInfo');
+      if (metaEl) {
+        metaEl.innerText = total > 0
+          ? `✅ Menampilkan transaksi ${staffName} (${dateStr})`
+          : `ℹ️ Tidak ada catatan transaksi pada tanggal ${dateStr}`;
+      }
+    }
+
     async function loadDailySales() {
       const staffName = document.getElementById('staffSelect').value;
       const dateStr = document.getElementById('dailyDateInput').value || getTodayLocalStr();
       const metaEl = document.getElementById('dailyMetaInfo');
       if (!staffName) return;
 
+      if (dashboardData && Array.isArray(dashboardData.rawDaily)) {
+        const agg = { total: 0, device: 0, acc: 0, qoala: 0, iphone: 0, ipad: 0, mac: 0, watch: 0, airpods: 0 };
+        dashboardData.rawDaily.forEach(row => {
+          const rStaff = String(row.staff ?? row.nama ?? row.Nama ?? row.salesman ?? '').trim();
+          const rDate = normalizeDateYMD(row.date ?? row.tanggal ?? row.Tanggal ?? row.postingDate ?? '');
+          if (rStaff.toLowerCase() !== staffName.toLowerCase() || rDate !== dateStr) return;
+
+          const amt = toNum(row.totalSales ?? row.sales ?? row.amount ?? row.netSales ?? row.value);
+          const qty = toNum(row.qty ?? row.Qty ?? 1);
+          const lob = String(row.lob ?? row.LOB ?? row.category ?? row.kategori ?? '').toLowerCase();
+          const desc = String(row.desc ?? row.description ?? row.name ?? row.material ?? '').toLowerCase();
+
+          agg.total += amt;
+          if (lob.includes('qoala') || lob.includes('vas') || desc.includes('qoala')) {
+            agg.qoala += amt;
+          } else if (lob.includes('acc') || lob.includes('aksesoris')) {
+            agg.acc += amt;
+          } else {
+            agg.device += amt;
+            if (lob.includes('iphone') || desc.includes('iphone')) agg.iphone += qty;
+            else if (lob.includes('ipad') || desc.includes('ipad')) agg.ipad += qty;
+            else if (lob.includes('mac') || desc.includes('macbook') || desc.includes('imac') || desc.includes('mac ')) agg.mac += qty;
+            else if (lob.includes('watch') || desc.includes('watch')) agg.watch += qty;
+            else if (lob.includes('airpods') || desc.includes('airpods')) agg.airpods += qty;
+          }
+        });
+        applyDailyStatsToUI(agg, staffName, dateStr);
+        return;
+      }
+
       metaEl.innerText = `⏳ Memuat penjualan ${staffName} (${dateStr})...`;
       try {
         const res = await fetch(`${API_URL}?action=getDailySales&staff=${encodeURIComponent(staffName)}&date=${encodeURIComponent(dateStr)}`);
         const data = await res.json();
-
-        const total = Number(data.totalSales || data.total || 0);
-        const device = Number(data.deviceSales || data.device || 0);
-        const acc = Number(data.accSales || data.acc || 0);
-        const qoala = Number(data.qoalaSales || data.qoala || data.vas || 0);
-
-        document.getElementById('valDailyTotal').innerText = formatRupiah(total);
-        document.getElementById('valDailyDevice').innerText = formatRupiah(device);
-        document.getElementById('valDailyAcc').innerText = formatRupiah(acc);
-        document.getElementById('valDailyQoala').innerText = formatRupiah(qoala);
-
-        document.getElementById('dailyQtyIphone').innerText = Number(data.qtyIphone || data.iphone || 0);
-        document.getElementById('dailyQtyIpad').innerText = Number(data.qtyIpad || data.ipad || 0);
-        document.getElementById('dailyQtyMac').innerText = Number(data.qtyMac || data.mac || 0);
-        document.getElementById('dailyQtyWatch').innerText = Number(data.qtyWatch || data.watch || 0);
-        document.getElementById('dailyQtyAirpods').innerText = Number(data.qtyAirpods || data.airpods || 0);
-
-        metaEl.innerText = total > 0
-          ? `✅ Menampilkan transaksi tanggal ${dateStr}`
-          : `ℹ️ Tidak ada catatan transaksi pada tanggal ${dateStr}`;
+        applyDailyStatsToUI(data || {}, staffName, dateStr);
       } catch (err) {
         metaEl.innerText = `⚠️ Data harian belum tersedia untuk ${dateStr}`;
       }
