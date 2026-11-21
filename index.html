@@ -16,10 +16,11 @@
     html, body { width: 100%; overflow-x: hidden; background-color: var(--bg-main); color: var(--text-main); }
     body { display: block; padding: 20px 16px 120px 16px; }
     
-    .nav { background: var(--card-bg); padding: 10px 12px; border-radius: 40px; display: flex; gap: 4px; box-shadow: 0 15px 35px rgba(140,109,253,0.18); position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 999; flex-wrap: nowrap; justify-content: space-between; width: 92%; max-width: 500px; }
-    .nav button { background: transparent; border: none; padding: 10px 6px; flex: 1; font-weight: 600; color: var(--text-muted); cursor: pointer; border-radius: 30px; transition: all 0.3s ease; font-size: 13px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .nav { background: var(--card-bg); padding: 8px 8px; border-radius: 40px; display: flex; gap: 2px; box-shadow: 0 15px 35px rgba(140,109,253,0.18); position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 999; flex-wrap: nowrap; justify-content: space-between; width: 94%; max-width: 500px; }
+    .nav button { background: transparent; border: none; padding: 9px 2px; flex: 1; min-width: 0; font-weight: 600; color: var(--text-muted); cursor: pointer; border-radius: 30px; transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; gap: 3px; }
     .nav button.active { background: var(--primary); color: white; box-shadow: 0 8px 15px rgba(140,109,253,0.3); }
-    .nav-icon { font-size: 18px; }
+    .nav-icon { font-size: 16px; }
+    .nav-text { font-size: 9.5px; white-space: nowrap; }
     
     .tab-content { display: none; width: 100%; max-width: 500px; margin: 0 auto; animation: fadeIn 0.5s ease; padding-bottom: 20px; }
     .tab-content.active { display: block; }
@@ -112,10 +113,11 @@
     .btn-date-step { background: var(--bg-main); border: none; color: var(--primary); width: 30px; height: 30px; border-radius: 50%; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; }
     .daily-date-input { border: none; background: transparent; font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600; color: var(--text-main); outline: none; cursor: pointer; }
     .daily-meta-info { font-size: 11.5px; color: var(--text-muted); margin: 0 0 14px 5px; }
-    /* Ukuran kartu Qty Harian Full Width + Scroll Samping */
-    .qty-row-scroll { grid-column: span 2; width: 100%; display: flex; gap: 12px; margin-top: 6px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 8px; -ms-overflow-style: none; scrollbar-width: none; }
-    .qty-row-scroll::-webkit-scrollbar { display: none; }
-    .qty-row-scroll .qty-card { min-width: 90px; flex-shrink: 0; padding: 15px; }
+    .qty-row-scroll { width: 100%; display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 6px; margin-bottom: 15px; }
+    .qty-row-scroll .qty-card { min-width: 0; padding: 14px 2px; border-radius: 16px; }
+    .qty-row-scroll .qty-emoji { width: 36px; height: 36px; font-size: 18px; margin-bottom: 6px; }
+    .qty-row-scroll .qty-val { font-size: 16px; }
+    .qty-row-scroll .qty-label { font-size: 9.5px; letter-spacing: -0.2px; }
 
     /* Styling Menu Pusat Form & Link */
     .link-hero-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; z-index: 2; position: relative; }
@@ -138,23 +140,43 @@
     .btn-edit-custom { background: #EEF2FF; border: none; color: var(--primary); padding: 0 11px; border-radius: 12px; font-size: 13px; cursor: pointer; }
     .btn-del-custom { background: #FFF1F2; border: none; color: #FB7185; padding: 0 11px; border-radius: 12px; font-size: 13px; cursor: pointer; }
 
-    /* Modal Tambah & Edit Link */
-    .link-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(45,42,74,0.45); backdrop-filter: blur(3px); z-index: 200; align-items: center; justify-content: center; padding: 20px; }
+    /* Styling Menu Biodata Tim */
+    .bio-card { background: var(--card-bg); border-radius: 22px; padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow-soft); }
+    .bio-header { display: flex; gap: 14px; align-items: center; margin-bottom: 14px; }
+    .bio-avatar { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; font-size: 22px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 3px solid #F4EEFF; }
+    .bio-main-info { flex: 1; min-width: 0; }
+    .bio-name { font-size: 16px; font-weight: 700; color: var(--text-main); line-height: 1.3; overflow-wrap: break-word; }
+    .bio-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 5px; }
+    .bio-role-badge { font-size: 10.5px; font-weight: 700; padding: 3px 10px; border-radius: 12px; background: #F4EEFF; color: var(--primary); }
+    .bio-bday-badge { font-size: 10.5px; font-weight: 700; padding: 3px 10px; border-radius: 12px; background: #FEF3C7; color: #D97706; }
+    .bio-details { background: #FAFAFF; border-radius: 16px; padding: 13px 15px; display: flex; flex-direction: column; gap: 8px; border: 1px solid #F0EDFF; }
+    .bio-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; font-size: 12px; }
+    .bio-lbl { color: var(--text-muted); font-weight: 500; white-space: nowrap; }
+    .bio-val { color: var(--text-main); font-weight: 600; text-align: right; overflow-wrap: break-word; word-break: break-word; }
+    .btn-wa-link { flex: 1.3; background: linear-gradient(135deg, #22C55E, #16A34A); border: none; color: white; padding: 10px 10px; border-radius: 12px; font-size: 11.5px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 5px; box-shadow: 0 6px 14px rgba(34,197,94,0.22); white-space: nowrap; }
+
+    /* Modal Umum (Link & Biodata) */
+    .link-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(45,42,74,0.45); backdrop-filter: blur(3px); z-index: 1000; align-items: center; justify-content: center; padding: 16px; overflow-y: auto; }
     .link-modal-overlay.open { display: flex; }
-    .link-modal-box { background: white; width: 100%; max-width: 420px; border-radius: 24px; padding: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
-    .link-modal-box input, .link-modal-box select { width: 100%; padding: 13px 15px; border: 2px solid #F0EDFF; border-radius: 14px; font-size: 13px; margin-bottom: 12px; outline: none; background: #FAFAFF; }
-    .link-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-80px); background: var(--text-main); color: white; padding: 11px 20px; border-radius: 30px; font-size: 12px; font-weight: 600; z-index: 300; transition: 0.3s ease; }
+    .link-modal-box { background: white; width: 100%; max-width: 420px; max-height: 90vh; overflow-y: auto; border-radius: 24px; padding: 22px; box-shadow: 0 20px 40px rgba(0,0,0,0.18); }
+    .link-modal-box input, .link-modal-box select { width: 100%; padding: 12px 14px; border: 2px solid #F0EDFF; border-radius: 14px; font-size: 13px; margin-bottom: 10px; outline: none; background: #FAFAFF; text-align: left; }
+    .modal-field-lbl { font-size: 11.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; display: block; margin-top: 2px; }
+    .photo-picker-wrap { display: flex; align-items: center; gap: 14px; background: #FAFAFF; padding: 12px; border-radius: 16px; border: 2px dashed #E9E4FF; margin-bottom: 12px; }
+    .photo-preview-circle { width: 58px; height: 58px; border-radius: 50%; object-fit: cover; background: var(--bg-main); display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--primary); font-weight: 700; flex-shrink: 0; border: 2px solid var(--primary-light); }
+    .btn-pick-photo { background: #F4EEFF; color: var(--primary); border: none; padding: 8px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .link-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-80px); background: var(--text-main); color: white; padding: 11px 20px; border-radius: 30px; font-size: 12px; font-weight: 600; z-index: 1100; transition: 0.3s ease; }
     .link-toast.show { transform: translateX(-50%) translateY(0); }
   </style>
 </head>
 <body>
 
   <div class="nav">
-    <button id="btnTabDashboard" class="active" onclick="switchTab('dashboard')"><span class="nav-icon">📊</span><span style="font-size: 10px;">Target</span></button>
-    <button id="btnTabSoh" onclick="switchTab('soh')"><span class="nav-icon">📦</span><span style="font-size: 10px;">Stok</span></button>
-    <button id="btnTabLinks" onclick="switchTab('links')"><span class="nav-icon">🔗</span><span style="font-size: 10px;">Link</span></button>
-    <button id="btnTabBonus" onclick="switchTab('bonus')"><span class="nav-icon">💳</span><span style="font-size: 10px;">Slip Gaji</span></button>
-    <button id="btnTabUpload" onclick="switchTab('upload')"><span class="nav-icon">⚙️</span><span style="font-size: 10px;">Admin</span></button>
+    <button id="btnTabDashboard" class="active" onclick="switchTab('dashboard')"><span class="nav-icon">📊</span><span class="nav-text">Target</span></button>
+    <button id="btnTabSoh" onclick="switchTab('soh')"><span class="nav-icon">📦</span><span class="nav-text">Stok</span></button>
+    <button id="btnTabLinks" onclick="switchTab('links')"><span class="nav-icon">🔗</span><span class="nav-text">Link</span></button>
+    <button id="btnTabBiodata" onclick="switchTab('biodata')"><span class="nav-icon">👥</span><span class="nav-text">Tim</span></button>
+    <button id="btnTabBonus" onclick="switchTab('bonus')"><span class="nav-icon">💳</span><span class="nav-text">Slip Gaji</span></button>
+    <button id="btnTabUpload" onclick="switchTab('upload')"><span class="nav-icon">⚙️</span><span class="nav-text">Admin</span></button>
   </div>
 
   <div id="tab-upload" class="tab-content">
@@ -264,13 +286,14 @@
           <div class="kpi-title">Qoala</div>
           <div class="kpi-value" id="valDailyQoala" style="font-size:17px;">Rp 0</div>
         </div>
-        <div class="qty-row-scroll">
+      </div>
+
+      <div class="qty-row-scroll">
         <div class="qty-card"><div class="qty-emoji">📱</div><div class="qty-val" id="dailyQtyIphone">0</div><div class="qty-label">iPhone</div></div>
         <div class="qty-card"><div class="qty-emoji">💻</div><div class="qty-val" id="dailyQtyIpad">0</div><div class="qty-label">iPad</div></div>
         <div class="qty-card"><div class="qty-emoji">🖥️</div><div class="qty-val" id="dailyQtyMac">0</div><div class="qty-label">Mac</div></div>
         <div class="qty-card"><div class="qty-emoji">⌚</div><div class="qty-val" id="dailyQtyWatch">0</div><div class="qty-label">Watch</div></div>
         <div class="qty-card"><div class="qty-emoji">🎧</div><div class="qty-val" id="dailyQtyAirpods">0</div><div class="qty-label">AirPods</div></div>
-      </div>
       </div>
     </div>
   </div>
@@ -290,6 +313,52 @@
     </div>
     <div id="loadingSOH" class="loading-text" style="display:block;">Mengecek ketersediaan di gudang...</div>
     <div class="table-container" id="sohTableContainer" style="display:none;"><table id="sohTable"><thead><tr><th>Detail Produk</th><th style="text-align:center; width: 70px;">Stok</th></tr></thead><tbody id="sohTableBody"></tbody></table></div>
+  </div>
+
+  <div id="tab-links" class="tab-content">
+    <div class="hero-header">
+      <div class="link-hero-top">
+        <div>
+          <div class="hero-title">Pusat Form & Link</div>
+          <div class="hero-name" style="font-size:21px;">Operasional Toko</div>
+          <div style="font-size:12px; opacity:0.9; margin-top:4px;">Akses cepat semua form harian & laporan</div>
+        </div>
+        <button class="btn-add-link" onclick="openAddFormModal()">+ Tambah</button>
+      </div>
+    </div>
+
+    <div class="dropdown-container" style="margin-bottom:14px;">
+      <input type="text" id="linkSearchInput" class="search-box" placeholder="🔍 Cari nama form atau laporan..." onkeyup="renderLinks()">
+    </div>
+
+    <div class="chip-row" id="linkFilterChips">
+      <button class="chip-btn active" onclick="setLinkCat('Semua', this)">Semua</button>
+      <button class="chip-btn" onclick="setLinkCat('Harian', this)">📅 Harian</button>
+      <button class="chip-btn" onclick="setLinkCat('Stok & Display', this)">📦 Stok & Display</button>
+      <button class="chip-btn" onclick="setLinkCat('Promo & VAS', this)">🛡️ Promo & VAS</button>
+      <button class="chip-btn" onclick="setLinkCat('Tim & HR', this)">👥 Tim & HR</button>
+    </div>
+
+    <div id="formListContainer"></div>
+  </div>
+
+  <div id="tab-biodata" class="tab-content">
+    <div class="hero-header">
+      <div class="link-hero-top">
+        <div>
+          <div class="hero-title">Direktori & Biodata</div>
+          <div class="hero-name" style="font-size:21px;">Tim Digimap Roxy</div>
+          <div style="font-size:12px; opacity:0.9; margin-top:4px;">Profil, kontak WA, NIK & masa kerja tim</div>
+        </div>
+        <button class="btn-add-link" onclick="openAddBiodataModal()">+ Tambah</button>
+      </div>
+    </div>
+
+    <div class="dropdown-container" style="margin-bottom:16px;">
+      <input type="text" id="bioSearchInput" class="search-box" placeholder="🔍 Cari nama, jabatan, atau NIK..." onkeyup="renderBiodata()">
+    </div>
+
+    <div id="biodataListContainer"></div>
   </div>
 
   <div id="tab-bonus" class="tab-content">
@@ -326,33 +395,7 @@
     </div>
   </div>
 
-  <div id="tab-links" class="tab-content">
-    <div class="hero-header">
-      <div class="link-hero-top">
-        <div>
-          <div class="hero-title">Pusat Form & Link</div>
-          <div class="hero-name" style="font-size:21px;">Operasional Toko</div>
-          <div style="font-size:12px; opacity:0.9; margin-top:4px;">Akses cepat semua form harian & laporan</div>
-        </div>
-        <button class="btn-add-link" onclick="openAddFormModal()">+ Tambah</button>
-      </div>
-    </div>
-
-    <div class="dropdown-container" style="margin-bottom:14px;">
-      <input type="text" id="linkSearchInput" class="search-box" placeholder="🔍 Cari nama form atau laporan..." onkeyup="renderLinks()">
-    </div>
-
-    <div class="chip-row" id="linkFilterChips">
-      <button class="chip-btn active" onclick="setLinkCat('Semua', this)">Semua</button>
-      <button class="chip-btn" onclick="setLinkCat('Harian', this)">📅 Harian</button>
-      <button class="chip-btn" onclick="setLinkCat('Stok & Display', this)">📦 Stok & Display</button>
-      <button class="chip-btn" onclick="setLinkCat('Promo & VAS', this)">🛡️ Promo & VAS</button>
-      <button class="chip-btn" onclick="setLinkCat('Tim & HR', this)">👥 Tim & HR</button>
-    </div>
-
-    <div id="formListContainer"></div>
-  </div>
-
+  <!-- Modal Tambah / Edit Link -->
   <div class="link-modal-overlay" id="addFormModal" onclick="if(event.target===this) closeAddFormModal()">
     <div class="link-modal-box">
       <h3 id="formModalTitle" style="font-size:17px; font-weight:700; margin-bottom:14px;">➕ Tambah Link Form Baru</h3>
@@ -372,7 +415,64 @@
     </div>
   </div>
 
-  <div class="link-toast" id="linkToast">Link disalin!</div>
+  <!-- Modal Tambah / Edit Biodata -->
+  <div class="link-modal-overlay" id="biodataModal" onclick="if(event.target===this) closeBiodataModal()">
+    <div class="link-modal-box">
+      <h3 id="bioModalTitle" style="font-size:17px; font-weight:700; margin-bottom:14px;">👤 Tambah Biodata Tim</h3>
+
+      <div class="photo-picker-wrap">
+        <div id="bioPhotoPreview" class="photo-preview-circle">📷</div>
+        <div style="flex:1;">
+          <div style="font-size:12px; font-weight:600; color:var(--text-main); margin-bottom:5px;">Foto Profil</div>
+          <input type="file" id="bioPhotoFile" accept="image/*" style="display:none;" onchange="handleBioPhotoSelect(this)">
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button type="button" class="btn-pick-photo" onclick="document.getElementById('bioPhotoFile').click()">Pilih Foto</button>
+            <button type="button" id="btnClearPhoto" class="btn-pick-photo" style="background:#FFF1F2; color:#FB7185; display:none;" onclick="clearBioPhoto()">Hapus</button>
+          </div>
+        </div>
+      </div>
+
+      <span class="modal-field-lbl">Nama Lengkap *</span>
+      <input type="text" id="bioName" placeholder="Contoh: Sigit Ardiyanto">
+
+      <span class="modal-field-lbl">Jabatan</span>
+      <input type="text" id="bioRole" placeholder="Contoh: Store Leader / Champion / Sales">
+
+      <span class="modal-field-lbl">NIK Karyawan</span>
+      <input type="text" id="bioNik" placeholder="Nomor Induk Karyawan">
+
+      <span class="modal-field-lbl">Tanggal Masuk Kerja</span>
+      <input type="date" id="bioJoinDate">
+
+      <span class="modal-field-lbl">No. WhatsApp</span>
+      <input type="tel" id="bioWa" placeholder="Contoh: 081234567890">
+
+      <span class="modal-field-lbl">Tanggal Lahir</span>
+      <input type="date" id="bioDob">
+
+      <span class="modal-field-lbl">Ukuran Baju / Seragam</span>
+      <select id="bioShirt">
+        <option value="">-- Pilih Ukuran Baju --</option>
+        <option value="XS">XS</option>
+        <option value="S">S</option>
+        <option value="M">M</option>
+        <option value="L">L</option>
+        <option value="XL">XL</option>
+        <option value="XXL">XXL</option>
+        <option value="XXXL">XXXL</option>
+      </select>
+
+      <span class="modal-field-lbl">Alamat Domisili</span>
+      <input type="text" id="bioAddress" placeholder="Alamat tempat tinggal saat ini">
+
+      <div style="display:flex; gap:10px; margin-top:8px;">
+        <button class="btn-outline" style="margin-top:0;" onclick="closeBiodataModal()">Batal</button>
+        <button id="btnSaveBio" class="btn-primary" style="margin-top:0;" onclick="saveBiodata()">Simpan Biodata</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="link-toast" id="linkToast">Berhasil!</div>
 
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbwQafvOo2JU_75b2wF6h40oqotR101fh9bqml7UGnEsxBE4JHuO-C5EfrKAAmHiVJ4w/exec";
@@ -388,6 +488,7 @@
       if(tabName === 'dashboard') loadDashboardData(); 
       if(tabName === 'soh') loadSOHData();
       if(tabName === 'links') loadLinksData();
+      if(tabName === 'biodata') loadBiodataData();
       if(tabName === 'bonus') loadDashboardData();
     }
 
@@ -833,6 +934,267 @@
       t.innerText = msg;
       t.classList.add('show');
       setTimeout(() => t.classList.remove('show'), 2200);
+    }
+
+    // =========================================================
+    // FITUR BIODATA & DIREKTORI TIM (DENGAN FOTO PROFIL)
+    // =========================================================
+    let allBiodataList = [];
+    let isBiodataLoading = false;
+    let editingBioId = null;
+    let currentBioPhotoBase64 = '';
+
+    function loadBiodataData() {
+      isBiodataLoading = true;
+      renderBiodata();
+      fetch(API_URL + "?action=getBiodata")
+        .then(res => res.json())
+        .then(data => {
+          allBiodataList = data.biodata || [];
+          isBiodataLoading = false;
+          renderBiodata();
+        })
+        .catch(() => {
+          isBiodataLoading = false;
+          renderBiodata();
+        });
+    }
+
+    function formatIndoDate(yyyyMmDd) {
+      if (!yyyyMmDd || yyyyMmDd.indexOf('-') === -1) return yyyyMmDd || '-';
+      const p = yyyyMmDd.split('-');
+      const bulan = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+      const mIdx = parseInt(p[1], 10) - 1;
+      return `${parseInt(p[2], 10)} ${bulan[mIdx] || p[1]} ${p[0]}`;
+    }
+
+    function isBirthdayThisMonth(yyyyMmDd) {
+      if (!yyyyMmDd || yyyyMmDd.indexOf('-') === -1) return false;
+      const m = parseInt(yyyyMmDd.split('-')[1], 10);
+      return m === (new Date().getMonth() + 1);
+    }
+
+    function formatWaHref(wa) {
+      let clean = String(wa || '').replace(/[^0-9]/g, '');
+      if (!clean) return '';
+      if (clean.startsWith('0')) clean = '62' + clean.slice(1);
+      return 'https://wa.me/' + clean;
+    }
+
+    function getInitials(name) {
+      const parts = String(name || '').trim().split(/\s+/);
+      if (parts.length === 0 || !parts[0]) return '👤';
+      return (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
+    }
+
+    function renderBiodata() {
+      const container = document.getElementById('biodataListContainer');
+      if (!container) return;
+
+      if (isBiodataLoading && allBiodataList.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">⏳ Memuat biodata tim...</div>';
+        return;
+      }
+
+      const q = (document.getElementById('bioSearchInput').value || '').toLowerCase().trim();
+      const filtered = allBiodataList.filter(b => {
+        return !q ||
+          (b.name && b.name.toLowerCase().includes(q)) ||
+          (b.role && b.role.toLowerCase().includes(q)) ||
+          (b.nik && b.nik.toLowerCase().includes(q));
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">Belum ada data biodata. Klik <b>+ Tambah</b> di pojok kanan atas untuk mengisi profil pertama.</div>';
+        return;
+      }
+
+      container.innerHTML = filtered.map(b => {
+        const avatarHtml = b.photo
+          ? `<img src="${b.photo}" class="bio-avatar" alt="${b.name}">`
+          : `<div class="bio-avatar">${getInitials(b.name)}</div>`;
+        const bdayBadge = isBirthdayThisMonth(b.dob)
+          ? `<span class="bio-bday-badge">🎂 Ultah Bulan Ini</span>`
+          : '';
+        const waUrl = formatWaHref(b.wa);
+
+        return `
+          <div class="bio-card">
+            <div class="bio-header">
+              ${avatarHtml}
+              <div class="bio-main-info">
+                <div class="bio-name">${b.name}</div>
+                <div class="bio-badges">
+                  <span class="bio-role-badge">${b.role || 'Staff Toko'}</span>
+                  ${bdayBadge}
+                </div>
+              </div>
+            </div>
+
+            <div class="bio-details">
+              <div class="bio-row"><span class="bio-lbl">🪪 NIK Karyawan</span><span class="bio-val">${b.nik || '-'}</span></div>
+              <div class="bio-row"><span class="bio-lbl">📅 Masuk Kerja</span><span class="bio-val">${formatIndoDate(b.joinDate)}</span></div>
+              <div class="bio-row"><span class="bio-lbl">📱 No. WhatsApp</span><span class="bio-val">${b.wa || '-'}</span></div>
+              <div class="bio-row"><span class="bio-lbl">🎂 Tanggal Lahir</span><span class="bio-val">${formatIndoDate(b.dob)}</span></div>
+              <div class="bio-row"><span class="bio-lbl">👕 Ukuran Baju</span><span class="bio-val">${b.shirt || '-'}</span></div>
+              <div class="bio-row"><span class="bio-lbl">📍 Alamat</span><span class="bio-val">${b.address || '-'}</span></div>
+            </div>
+
+            <div class="form-actions">
+              ${waUrl ? `<a class="btn-wa-link" href="${waUrl}" target="_blank" rel="noopener">💬 Chat WA ↗</a>` : `<button class="btn-copy-link" disabled style="opacity:0.5;">Belum ada WA</button>`}
+              <button class="btn-edit-custom" style="padding:10px 14px; font-size:12px; font-weight:600;" onclick="openEditBiodataModal('${b.id}')">✏️ Edit</button>
+              <button class="btn-del-custom" onclick="deleteBiodata('${b.id}')" title="Hapus Biodata">🗑️</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function updateBioPhotoPreview() {
+      const box = document.getElementById('bioPhotoPreview');
+      const btnClear = document.getElementById('btnClearPhoto');
+      if (currentBioPhotoBase64) {
+        box.innerHTML = `<img src="${currentBioPhotoBase64}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+        btnClear.style.display = 'inline-block';
+      } else {
+        box.innerHTML = '📷';
+        btnClear.style.display = 'none';
+      }
+    }
+
+    function clearBioPhoto() {
+      currentBioPhotoBase64 = '';
+      document.getElementById('bioPhotoFile').value = '';
+      updateBioPhotoPreview();
+    }
+
+    function handleBioPhotoSelect(input) {
+      const file = input.files && input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          const size = 160;
+          canvas.width = size;
+          canvas.height = size;
+          const ctx = canvas.getContext('2d');
+          const minSide = Math.min(img.width, img.height);
+          const sx = (img.width - minSide) / 2;
+          const sy = (img.height - minSide) / 2;
+          ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, size, size);
+
+          let compressed = canvas.toDataURL('image/jpeg', 0.72);
+          if (compressed.length > 45000) {
+            compressed = canvas.toDataURL('image/jpeg', 0.45);
+          }
+          currentBioPhotoBase64 = compressed;
+          updateBioPhotoPreview();
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function openAddBiodataModal() {
+      editingBioId = null;
+      document.getElementById('bioModalTitle').innerText = '👤 Tambah Biodata Tim';
+      document.getElementById('bioName').value = '';
+      document.getElementById('bioRole').value = '';
+      document.getElementById('bioNik').value = '';
+      document.getElementById('bioJoinDate').value = '';
+      document.getElementById('bioWa').value = '';
+      document.getElementById('bioDob').value = '';
+      document.getElementById('bioShirt').value = '';
+      document.getElementById('bioAddress').value = '';
+      clearBioPhoto();
+      document.getElementById('biodataModal').classList.add('open');
+    }
+
+    function openEditBiodataModal(id) {
+      const item = allBiodataList.find(b => b.id === id);
+      if (!item) return;
+      editingBioId = id;
+      document.getElementById('bioModalTitle').innerText = '✏️ Edit Biodata';
+      document.getElementById('bioName').value = item.name || '';
+      document.getElementById('bioRole').value = item.role || '';
+      document.getElementById('bioNik').value = item.nik || '';
+      document.getElementById('bioJoinDate').value = item.joinDate || '';
+      document.getElementById('bioWa').value = item.wa || '';
+      document.getElementById('bioDob').value = item.dob || '';
+      document.getElementById('bioShirt').value = item.shirt || '';
+      document.getElementById('bioAddress').value = item.address || '';
+      currentBioPhotoBase64 = item.photo || '';
+      document.getElementById('bioPhotoFile').value = '';
+      updateBioPhotoPreview();
+      document.getElementById('biodataModal').classList.add('open');
+    }
+
+    function closeBiodataModal() {
+      editingBioId = null;
+      document.getElementById('biodataModal').classList.remove('open');
+    }
+
+    function saveBiodata() {
+      const name = document.getElementById('bioName').value.trim();
+      const role = document.getElementById('bioRole').value.trim();
+      const nik = document.getElementById('bioNik').value.trim();
+      const joinDate = document.getElementById('bioJoinDate').value;
+      const wa = document.getElementById('bioWa').value.trim();
+      const dob = document.getElementById('bioDob').value;
+      const shirt = document.getElementById('bioShirt').value;
+      const address = document.getElementById('bioAddress').value.trim();
+
+      if (!name) { alert('Nama Lengkap wajib diisi!'); return; }
+
+      const btn = document.getElementById('btnSaveBio');
+      const isEdit = editingBioId !== null;
+      const targetId = editingBioId;
+
+      btn.disabled = true;
+      btn.innerText = '⏳ Menyimpan...';
+
+      function selesaiSimpanBio() {
+        btn.disabled = false;
+        btn.innerText = 'Simpan Biodata';
+        closeBiodataModal();
+        loadBiodataData();
+        showLinkToast(isEdit ? '✅ Biodata berhasil diperbarui!' : '✅ Biodata tim ditambahkan!');
+      }
+
+      fetch(API_URL, {
+        method: 'POST',
+        redirect: 'follow',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          action: isEdit ? 'editBiodata' : 'addBiodata',
+          id: targetId,
+          name, role, nik, joinDate, wa, dob, shirt, address,
+          photo: currentBioPhotoBase64
+        })
+      })
+      .then(() => selesaiSimpanBio())
+      .catch(() => selesaiSimpanBio());
+    }
+
+    function deleteBiodata(id) {
+      if (!confirm('Hapus biodata ini dari daftar tim?')) return;
+      showLinkToast('⏳ Menghapus biodata...');
+      fetch(API_URL, {
+        method: 'POST',
+        redirect: 'follow',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'deleteBiodata', id })
+      })
+      .then(() => {
+        loadBiodataData();
+        showLinkToast('🗑️ Biodata dihapus');
+      })
+      .catch(() => {
+        loadBiodataData();
+        showLinkToast('🗑️ Biodata dihapus');
+      });
     }
 
     // =========================================================
