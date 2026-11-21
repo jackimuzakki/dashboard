@@ -112,11 +112,10 @@
     .btn-date-step { background: var(--bg-main); border: none; color: var(--primary); width: 30px; height: 30px; border-radius: 50%; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; }
     .daily-date-input { border: none; background: transparent; font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600; color: var(--text-main); outline: none; cursor: pointer; }
     .daily-meta-info { font-size: 11.5px; color: var(--text-muted); margin: 0 0 14px 5px; }
-    .qty-row-scroll { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 12px; margin-bottom: 20px; }
-    .qty-row-scroll .qty-card { min-width: 0; padding: 12px 4px; }
-    .qty-row-scroll .qty-emoji { width: 38px; height: 38px; font-size: 20px; margin-bottom: 6px; }
-    .qty-row-scroll .qty-val { font-size: 16px; }
-    .qty-row-scroll .qty-label { font-size: 10px; }
+    /* Ukuran kartu Qty Harian sama dengan kartu LOB bulanan */
+    .qty-row-scroll { display: flex; gap: 12px; margin-top: 12px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 8px; -ms-overflow-style: none; scrollbar-width: none; }
+    .qty-row-scroll::-webkit-scrollbar { display: none; }
+    .qty-row-scroll .qty-card { min-width: 88px; flex-shrink: 0; padding: 15px 10px; }
 
     /* Styling Menu Pusat Form & Link */
     .link-hero-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; z-index: 2; position: relative; }
