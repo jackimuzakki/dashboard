@@ -453,7 +453,6 @@
 
   <!-- TAB GABUNGAN STAF (SLIP GAJI, BIODATA TIM, & JADWAL SHIFT) -->
   <div id="tab-staf" class="tab-content">
-    <!-- Layar Pilihan Awal saat Menu Staf Diklik -->
     <div id="staffHubChoice">
       <div class="hero-header">
         <div class="hero-title">Portal Personal</div>
@@ -489,7 +488,6 @@
       </div>
     </div>
 
-    <!-- Bar Switcher Cepat saat Sudah Masuk ke Salah Satu Sub-Menu -->
     <div id="staffSubSwitcher" class="sub-switcher-bar" style="display:none;">
       <button type="button" class="btn-back-hub" onclick="showStaffHubChoice()">‹ Staf</button>
       <button type="button" id="btnSubBonus" class="sub-switch-btn" onclick="openStaffSubMenu('bonus')">💳 Gaji</button>
@@ -762,7 +760,7 @@
     let isSohLoading = false;
 
     // =========================================================
-    // HELPER UMUM & FORMATTER
+    // HELPER UMUM, PARSING ANGKA & EKSTRAKSI KEY FLEKSIBEL
     // =========================================================
     function parseNum(val) {
       if (typeof val === 'number') return isFinite(val) ? val : 0;
@@ -779,6 +777,41 @@
       }
       const n = parseFloat(s);
       return isFinite(n) ? n : 0;
+    }
+
+    // Membaca angka dari berbagai variasi nama field (case-insensitive & nested object seperti lob.iPhone / iphone.qty)
+    function pickNum(obj, keys) {
+      if (!obj || typeof obj !== 'object') return 0;
+      const flat = {};
+      const genericContainers = ['lob', 'qty', 'unit', 'units', 'count', 'sales', 'target', 'metrics', 'summary', 'breakdown', 'others'];
+
+      Object.keys(obj).forEach(k => {
+        const lk = k.toLowerCase().replace(/[^a-z0-9]/g, '');
+        const v = obj[k];
+        if (v !== null && typeof v === 'object' && !Array.isArray(v)) {
+          Object.keys(v).forEach(subK => {
+            const lsub = subK.toLowerCase().replace(/[^a-z0-9]/g, '');
+            const subVal = v[subK];
+            if (subVal !== null && typeof subVal !== 'object') {
+              if (flat[lk + lsub] === undefined) flat[lk + lsub] = subVal;
+              if (genericContainers.includes(lk) && flat[lsub] === undefined) {
+                flat[lsub] = subVal;
+              }
+            }
+          });
+        } else if (v !== null && typeof v !== 'object') {
+          flat[lk] = v;
+        }
+      });
+
+      for (let i = 0; i < keys.length; i++) {
+        const normKey = keys[i].toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (flat[normKey] !== undefined && flat[normKey] !== null && flat[normKey] !== '') {
+          const num = parseNum(flat[normKey]);
+          if (num !== 0) return num;
+        }
+      }
+      return 0;
     }
 
     function formatRupiah(num) {
@@ -890,47 +923,55 @@
         const cleanName = String(name || '').trim();
         if (!cleanName || /^(store|toko|total|grand total)$/i.test(cleanName)) return;
         const prev = staffMap[cleanName] || {};
-        const merged = {
+        staffMap[cleanName] = {
           name: cleanName,
-          totalSales: parseNum(obj.totalSales ?? obj.sales ?? obj.total ?? obj.penjualan ?? prev.totalSales),
-          totalTarget: parseNum(obj.totalTarget ?? obj.target ?? prev.totalTarget),
-          qtyIphone: parseNum(obj.qtyIphone ?? obj.iphone ?? prev.qtyIphone),
-          qtyIpad: parseNum(obj.qtyIpad ?? obj.ipad ?? prev.qtyIpad),
-          qtyMac: parseNum(obj.qtyMac ?? obj.mac ?? prev.qtyMac),
-          qtyWatch: parseNum(obj.qtyWatch ?? obj.watch ?? prev.qtyWatch),
-          qtyAirpods: parseNum(obj.qtyAirpods ?? obj.airpods ?? prev.qtyAirpods),
-          accSales: parseNum(obj.accSales ?? obj.acc ?? obj.accessoriesSales ?? prev.accSales),
-          accTarget: parseNum(obj.accTarget ?? obj.accessoriesTarget ?? prev.accTarget),
-          qoalaSales: parseNum(obj.qoalaSales ?? obj.qoala ?? obj.vasSales ?? obj.vas ?? prev.qoalaSales),
-          qoalaTarget: parseNum(obj.qoalaTarget ?? obj.vasTarget ?? prev.qoalaTarget)
+          totalSales: pickNum(obj, ['totalSales', 'sales', 'total', 'penjualan', 'omzet']) || prev.totalSales || 0,
+          totalTarget: pickNum(obj, ['totalTarget', 'target', 'targetTotal']) || prev.totalTarget || 0,
+          totalPoint: pickNum(obj, ['totalPoint', 'totalPoints', 'point', 'points', 'poin', 'totalPoin', 'pts']) || prev.totalPoint || 0,
+          qtyIphone: pickNum(obj, ['qtyIphone', 'iphoneQty', 'iPhone', 'iphone', 'unitIphone', 'unitsIphone', 'qIphone', 'lobIphone']) || prev.qtyIphone || 0,
+          qtyIpad: pickNum(obj, ['qtyIpad', 'ipadQty', 'iPad', 'ipad', 'unitIpad', 'unitsIpad', 'qIpad', 'lobIpad']) || prev.qtyIpad || 0,
+          qtyMac: pickNum(obj, ['qtyMac', 'macQty', 'Mac', 'mac', 'macbook', 'qtyMacbook', 'unitMac', 'qMac', 'lobMac']) || prev.qtyMac || 0,
+          qtyWatch: pickNum(obj, ['qtyWatch', 'watchQty', 'Watch', 'watch', 'appleWatch', 'qtyAppleWatch', 'unitWatch', 'qWatch', 'lobWatch']) || prev.qtyWatch || 0,
+          qtyAirpods: pickNum(obj, ['qtyAirpods', 'airpodsQty', 'AirPods', 'airpods', 'airpod', 'unitAirpods', 'qAirpods', 'lobAirpods']) || prev.qtyAirpods || 0,
+          accSales: pickNum(obj, ['accSales', 'accessoriesSales', 'salesAcc', 'salesAccessories', 'acc', 'accessories', 'totalAcc']) || prev.accSales || 0,
+          accTarget: pickNum(obj, ['accTarget', 'accessoriesTarget', 'targetAcc', 'targetAccessories']) || prev.accTarget || 0,
+          qoalaSales: pickNum(obj, ['qoalaSales', 'vasSales', 'salesQoala', 'salesVas', 'qoala', 'vas', 'totalQoala', 'totalVas']) || prev.qoalaSales || 0,
+          qoalaTarget: pickNum(obj, ['qoalaTarget', 'vasTarget', 'targetQoala', 'targetVas']) || prev.qoalaTarget || 0
         };
-        staffMap[cleanName] = merged;
       }
 
       if (Array.isArray(root)) {
         root.forEach(item => {
           if (item && typeof item === 'object') {
-            upsertStaff(item.name || item.nama || item.staff, item);
+            upsertStaff(item.name || item.nama || item.staff || item.staffName, item);
           }
         });
       } else if (root && typeof root === 'object') {
         if (Array.isArray(root.staff)) {
-          root.staff.forEach(item => upsertStaff(item.name || item.nama || item.staff, item));
+          root.staff.forEach(item => upsertStaff(item.name || item.nama || item.staff || item.staffName, item));
         } else if (root.staff && typeof root.staff === 'object') {
           Object.keys(root.staff).forEach(k => {
             const val = root.staff[k];
             if (val && typeof val === 'object') upsertStaff(val.name || val.nama || k, val);
           });
         }
+        if (Array.isArray(root.staffData)) {
+          root.staffData.forEach(item => upsertStaff(item.name || item.nama || item.staff || item.staffName, item));
+        } else if (root.staffData && typeof root.staffData === 'object') {
+          Object.keys(root.staffData).forEach(k => {
+            const val = root.staffData[k];
+            if (val && typeof val === 'object') upsertStaff(val.name || val.nama || k, val);
+          });
+        }
         if (Array.isArray(root.staffList)) {
-          root.staffList.forEach(item => upsertStaff(item.name || item.nama || item.staff, item));
+          root.staffList.forEach(item => upsertStaff(item.name || item.nama || item.staff || item.staffName, item));
         }
         if (Array.isArray(root.ranking)) {
           root.ranking.forEach(item => {
             if (typeof item === 'string') {
               upsertStaff(item, {});
             } else if (item && typeof item === 'object') {
-              upsertStaff(item.name || item.nama || item.staff, item);
+              upsertStaff(item.name || item.nama || item.staff || item.staffName, item);
             }
           });
         }
@@ -942,27 +983,42 @@
       ranking.sort((a, b) => b.sales - a.sales);
 
       const stRaw = (root && root.store && typeof root.store === 'object') ? root.store : (root || {});
+      const staffValues = Object.values(staffMap);
       const sumStaffSales = ranking.reduce((acc, r) => acc + r.sales, 0);
-      const sumStaffTarget = Object.values(staffMap).reduce((acc, s) => acc + s.totalTarget, 0);
+      const sumStaffTarget = staffValues.reduce((acc, s) => acc + s.totalTarget, 0);
+      const sumStaffPoint = staffValues.reduce((acc, s) => acc + s.totalPoint, 0);
+      const sumStaffAcc = staffValues.reduce((acc, s) => acc + s.accSales, 0);
+      const sumStaffVas = staffValues.reduce((acc, s) => acc + s.qoalaSales, 0);
+
+      const totalSales = pickNum(stRaw, ['totalSales', 'sales', 'penjualan', 'omzet', 'storeSales']) || sumStaffSales;
+      const totalTarget = pickNum(stRaw, ['totalTarget', 'target', 'storeTarget']) || sumStaffTarget;
+      const totalPoint = pickNum(stRaw, ['totalPoint', 'totalPoints', 'storePoint', 'storePoints', 'point', 'points', 'poin', 'totalPoin', 'pts']) || sumStaffPoint;
+      const accSales = pickNum(stRaw, ['accSales', 'accessoriesSales', 'salesAcc', 'acc', 'accessories']) || sumStaffAcc;
+      const accTarget = pickNum(stRaw, ['accTarget', 'accessoriesTarget', 'targetAcc', 'targetAccessories']);
+      const vasSales = pickNum(stRaw, ['vasSales', 'qoalaSales', 'salesVas', 'salesQoala', 'vas', 'qoala']) || sumStaffVas;
+      const vasTarget = pickNum(stRaw, ['vasTarget', 'qoalaTarget', 'targetVas', 'targetQoala']);
+      const deviceSales = pickNum(stRaw, ['deviceSales', 'salesDevice', 'device']) || Math.max(0, totalSales - accSales - vasSales);
+      const deviceTarget = pickNum(stRaw, ['deviceTarget', 'targetDevice']);
 
       const store = {
-        totalSales: parseNum(stRaw.totalSales ?? stRaw.sales ?? stRaw.penjualan) || sumStaffSales,
-        totalTarget: parseNum(stRaw.totalTarget ?? stRaw.target) || sumStaffTarget,
-        totalPoint: parseNum(stRaw.totalPoint ?? stRaw.point ?? stRaw.points ?? stRaw.poin),
-        pct: parseNum(stRaw.pct ?? stRaw.achievement ?? stRaw.pencapaian),
-        deviceSales: parseNum(stRaw.deviceSales ?? (stRaw.device && stRaw.device.sales)),
-        deviceTarget: parseNum(stRaw.deviceTarget ?? (stRaw.device && stRaw.device.target)),
-        accSales: parseNum(stRaw.accSales ?? stRaw.accessoriesSales ?? (stRaw.acc && stRaw.acc.sales)),
-        accTarget: parseNum(stRaw.accTarget ?? stRaw.accessoriesTarget ?? (stRaw.acc && stRaw.acc.target)),
-        vasSales: parseNum(stRaw.vasSales ?? stRaw.qoalaSales ?? (stRaw.vas && stRaw.vas.sales)),
-        vasTarget: parseNum(stRaw.vasTarget ?? stRaw.qoalaTarget ?? (stRaw.vas && stRaw.vas.target))
+        totalSales,
+        totalTarget,
+        totalPoint,
+        pct: pickNum(stRaw, ['pct', 'achievement', 'pencapaian', 'persen']),
+        deviceSales,
+        deviceTarget,
+        accSales,
+        accTarget,
+        vasSales,
+        vasTarget
       };
 
       if (root && Array.isArray(root.soh) && sohList.length === 0) {
         sohList = root.soh;
       }
 
-      return { store, staff: staffMap, ranking };
+      const preloadedDaily = (root && (root.dailySales || root.daily || root.harian)) || null;
+      return { store, staff: staffMap, ranking, preloadedDaily };
     }
 
     async function loadDashboardData(force = false) {
@@ -978,19 +1034,31 @@
       if (loadingEl) loadingEl.style.display = 'block';
 
       try {
-        let json = null;
+        let norm1 = null;
+        let norm2 = null;
+
         try {
           const resDefault = await fetch(API_URL, { redirect: 'follow' });
-          json = await resDefault.json();
+          const json1 = await resDefault.json();
+          norm1 = normalizeDashboardData(json1);
         } catch (e) {}
 
-        const checkNorm = json ? normalizeDashboardData(json) : null;
-        if (!checkNorm || (checkNorm.ranking.length === 0 && checkNorm.store.totalSales === 0)) {
-          const resAction = await fetch(`${API_URL}?action=getDashboard`, { redirect: 'follow' });
-          json = await resAction.json();
+        if (!norm1 || norm1.ranking.length === 0 || norm1.store.totalSales === 0 || norm1.store.totalPoint === 0) {
+          try {
+            const resAction = await fetch(`${API_URL}?action=getDashboard`, { redirect: 'follow' });
+            const json2 = await resAction.json();
+            norm2 = normalizeDashboardData(json2);
+          } catch (e) {}
         }
 
-        dashboardData = normalizeDashboardData(json);
+        if (norm1 && norm2) {
+          const score1 = (norm1.store.totalSales > 0 ? 2 : 0) + (norm1.store.totalPoint > 0 ? 2 : 0) + norm1.ranking.length;
+          const score2 = (norm2.store.totalSales > 0 ? 2 : 0) + (norm2.store.totalPoint > 0 ? 2 : 0) + norm2.ranking.length;
+          dashboardData = score2 > score1 ? norm2 : norm1;
+        } else {
+          dashboardData = norm1 || norm2 || normalizeDashboardData({});
+        }
+
         populateStaffDropdowns();
         showPersonalData();
       } catch (err) {
@@ -1147,6 +1215,50 @@
       loadDailySales();
     }
 
+    function applyDailyMetricsToUI(obj, dateStr) {
+      const total = pickNum(obj, ['totalSales', 'total', 'sales', 'penjualan', 'omzet', 'totalHarian']);
+      const device = pickNum(obj, ['deviceSales', 'device', 'salesDevice']);
+      const acc = pickNum(obj, ['accSales', 'acc', 'accessories', 'accessoriesSales', 'salesAcc']);
+      const qoala = pickNum(obj, ['qoalaSales', 'qoala', 'vas', 'vasSales', 'salesQoala']);
+
+      const iphone = pickNum(obj, ['qtyIphone', 'iphoneQty', 'iPhone', 'iphone', 'unitIphone', 'qIphone', 'lobIphone']);
+      const ipad = pickNum(obj, ['qtyIpad', 'ipadQty', 'iPad', 'ipad', 'unitIpad', 'qIpad', 'lobIpad']);
+      const mac = pickNum(obj, ['qtyMac', 'macQty', 'Mac', 'mac', 'macbook', 'unitMac', 'qMac', 'lobMac']);
+      const watch = pickNum(obj, ['qtyWatch', 'watchQty', 'Watch', 'watch', 'appleWatch', 'unitWatch', 'qWatch', 'lobWatch']);
+      const airpods = pickNum(obj, ['qtyAirpods', 'airpodsQty', 'AirPods', 'airpods', 'airpod', 'unitAirpods', 'qAirpods', 'lobAirpods']);
+
+      const computedTotal = total || (device + acc + qoala);
+
+      document.getElementById('valDailyTotal').innerText = formatRupiah(computedTotal);
+      document.getElementById('valDailyDevice').innerText = formatRupiah(device);
+      document.getElementById('valDailyAcc').innerText = formatRupiah(acc);
+      document.getElementById('valDailyQoala').innerText = formatRupiah(qoala);
+
+      document.getElementById('dailyQtyIphone').innerText = iphone;
+      document.getElementById('dailyQtyIpad').innerText = ipad;
+      document.getElementById('dailyQtyMac').innerText = mac;
+      document.getElementById('dailyQtyWatch').innerText = watch;
+      document.getElementById('dailyQtyAirpods').innerText = airpods;
+
+      const metaEl = document.getElementById('dailyMetaInfo');
+      if (metaEl) {
+        metaEl.innerText = (computedTotal > 0 || (iphone + ipad + mac + watch + airpods) > 0)
+          ? `✅ Menampilkan transaksi tanggal ${dateStr}`
+          : `ℹ️ Tidak ada catatan transaksi pada tanggal ${dateStr}`;
+      }
+    }
+
+    function normalizeDateMatch(rawDate) {
+      if (!rawDate) return '';
+      const s = String(rawDate).trim();
+      if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
+      const d = new Date(s);
+      if (!isNaN(d.getTime())) {
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      }
+      return s;
+    }
+
     async function loadDailySales() {
       const staffName = document.getElementById('staffSelect').value;
       const dateStr = document.getElementById('dailyDateInput').value || getTodayLocalStr();
@@ -1155,29 +1267,43 @@
 
       metaEl.innerText = `⏳ Memuat penjualan ${staffName} (${dateStr})...`;
       try {
-        const res = await fetch(`${API_URL}?action=getDailySales&staff=${encodeURIComponent(staffName)}&date=${encodeURIComponent(dateStr)}`, { redirect: 'follow' });
+        const url = `${API_URL}?action=getDailySales&staff=${encodeURIComponent(staffName)}&name=${encodeURIComponent(staffName)}&date=${encodeURIComponent(dateStr)}`;
+        const res = await fetch(url, { redirect: 'follow' });
         const raw = await res.json();
-        const data = (raw && raw.data && typeof raw.data === 'object') ? raw.data : raw;
+        let data = (raw && raw.data !== undefined && typeof raw.data === 'object') ? raw.data : raw;
 
-        const total = parseNum(data.totalSales ?? data.total ?? data.sales);
-        const device = parseNum(data.deviceSales ?? data.device);
-        const acc = parseNum(data.accSales ?? data.acc ?? data.accessories);
-        const qoala = parseNum(data.qoalaSales ?? data.qoala ?? data.vas);
-
-        document.getElementById('valDailyTotal').innerText = formatRupiah(total);
-        document.getElementById('valDailyDevice').innerText = formatRupiah(device);
-        document.getElementById('valDailyAcc').innerText = formatRupiah(acc);
-        document.getElementById('valDailyQoala').innerText = formatRupiah(qoala);
-
-        document.getElementById('dailyQtyIphone').innerText = parseNum(data.qtyIphone ?? data.iphone);
-        document.getElementById('dailyQtyIpad').innerText = parseNum(data.qtyIpad ?? data.ipad);
-        document.getElementById('dailyQtyMac').innerText = parseNum(data.qtyMac ?? data.mac);
-        document.getElementById('dailyQtyWatch').innerText = parseNum(data.qtyWatch ?? data.watch);
-        document.getElementById('dailyQtyAirpods').innerText = parseNum(data.qtyAirpods ?? data.airpods);
-
-        metaEl.innerText = total > 0
-          ? `✅ Menampilkan transaksi tanggal ${dateStr}`
-          : `ℹ️ Tidak ada catatan transaksi pada tanggal ${dateStr}`;
+        if (Array.isArray(data)) {
+          const matchedRows = data.filter(row => {
+            if (!row || typeof row !== 'object') return false;
+            const rStaff = String(row.staff || row.name || row.nama || row.staffName || '').trim().toLowerCase();
+            const rDate = normalizeDateMatch(row.date || row.tanggal || row.tgl);
+            const staffOk = !rStaff || rStaff === staffName.toLowerCase();
+            const dateOk = !rDate || rDate === dateStr;
+            return staffOk && dateOk;
+          });
+          const summed = { totalSales: 0, deviceSales: 0, accSales: 0, qoalaSales: 0, qtyIphone: 0, qtyIpad: 0, qtyMac: 0, qtyWatch: 0, qtyAirpods: 0 };
+          matchedRows.forEach(r => {
+            summed.totalSales += pickNum(r, ['totalSales', 'total', 'sales', 'penjualan', 'omzet']);
+            summed.deviceSales += pickNum(r, ['deviceSales', 'device', 'salesDevice']);
+            summed.accSales += pickNum(r, ['accSales', 'acc', 'accessories', 'accessoriesSales']);
+            summed.qoalaSales += pickNum(r, ['qoalaSales', 'qoala', 'vas', 'vasSales']);
+            summed.qtyIphone += pickNum(r, ['qtyIphone', 'iphoneQty', 'iPhone', 'iphone']);
+            summed.qtyIpad += pickNum(r, ['qtyIpad', 'ipadQty', 'iPad', 'ipad']);
+            summed.qtyMac += pickNum(r, ['qtyMac', 'macQty', 'Mac', 'mac']);
+            summed.qtyWatch += pickNum(r, ['qtyWatch', 'watchQty', 'Watch', 'watch']);
+            summed.qtyAirpods += pickNum(r, ['qtyAirpods', 'airpodsQty', 'AirPods', 'airpods']);
+          });
+          applyDailyMetricsToUI(summed, dateStr);
+        } else if (data && typeof data === 'object') {
+          if (data[dateStr] && typeof data[dateStr] === 'object') {
+            data = data[dateStr][staffName] || data[dateStr];
+          } else if (data[staffName] && typeof data[staffName] === 'object') {
+            data = data[staffName][dateStr] || data[staffName];
+          }
+          applyDailyMetricsToUI(data, dateStr);
+        } else {
+          applyDailyMetricsToUI({}, dateStr);
+        }
       } catch (err) {
         metaEl.innerText = `⚠️ Data harian belum tersedia untuk ${dateStr}`;
       }
@@ -1493,10 +1619,10 @@
         }
 
         unlockedStaffName = staffName;
-        const pokok = parseNum(data.gajiPokok ?? data.pokok) || GAJI_POKOK;
-        const insentif = parseNum(data.insentif ?? data.bonus);
-        const tunjangan = parseNum(data.tunjangan);
-        const total = parseNum(data.total) || (pokok + insentif + tunjangan);
+        const pokok = pickNum(data, ['gajiPokok', 'pokok']) || GAJI_POKOK;
+        const insentif = pickNum(data, ['insentif', 'bonus']);
+        const tunjangan = pickNum(data, ['tunjangan']);
+        const total = pickNum(data, ['total']) || (pokok + insentif + tunjangan);
 
         document.getElementById('slipNamaHeader').innerText = staffName;
         document.getElementById('slipPokok').innerText = formatRupiah(pokok);
