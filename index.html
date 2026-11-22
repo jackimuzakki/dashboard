@@ -170,7 +170,7 @@
     .btn-wa-link { flex: 1.3; background: linear-gradient(135deg, #22C55E, #16A34A); border: none; color: white; padding: 10px 10px; border-radius: 12px; font-size: 11.5px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 5px; box-shadow: 0 6px 14px rgba(34,197,94,0.22); white-space: nowrap; }
 
     /* =========================================================
-       STYLING MENU JADWAL SHIFT & CATATAN PER STAF
+       STYLING MENU JADWAL SHIFT & CATATAN PER STAF (2 STACKED)
        ========================================================= */
     .week-nav-bar { background: var(--card-bg); border-radius: 18px; padding: 8px 10px; margin-bottom: 13px; box-shadow: var(--shadow-soft); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
     .btn-week-step { width: 34px; height: 34px; border-radius: 12px; border: none; background: #F4EEFF; color: var(--primary); font-size: 13px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; }
@@ -194,7 +194,7 @@
     .dsb-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
     .dsb-chip { padding: 5px 2px; border-radius: 10px; font-size: 10px; font-weight: 700; text-align: center; }
 
-    .daily-staff-row { background: var(--card-bg); border-radius: 20px; padding: 13px 14px; margin-bottom: 10px; box-shadow: var(--shadow-soft); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .daily-staff-row { background: var(--card-bg); border-radius: 20px; padding: 12px 14px; margin-bottom: 10px; box-shadow: var(--shadow-soft); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
     .daily-staff-row.is-off { opacity: 0.78; background: #FCFBFF; }
     .dsr-left { display: flex; align-items: center; gap: 11px; flex: 1; min-width: 0; text-align: left; }
     .sch-avatar { width: 42px; height: 42px; border-radius: 50%; font-size: 13.5px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -207,9 +207,10 @@
     .dsr-name { font-size: 14px; font-weight: 700; color: var(--text-main); line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
     .dsr-shift-line { display: inline-flex; align-items: center; gap: 4px; margin-top: 4px; padding: 3px 9px; border-radius: 9px; font-size: 11px; font-weight: 700; cursor: default; white-space: nowrap; }
 
-    .dsr-right { display: flex; align-items: center; justify-content: flex-end; flex-shrink: 0; max-width: 44%; }
+    /* Wadah Kanan Bersusun Atas-Bawah untuk Maksimal 2 Catatan */
+    .dsr-right { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 4px; flex-shrink: 0; max-width: 45%; }
     .btn-add-note-right { background: #F8F7FF; border: 1.5px dashed #D8CEFF; color: var(--primary); border-radius: 12px; padding: 7px 10px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; }
-    .btn-active-note-right { background: #FFFBEB; border: 1.5px solid #FDE68A; color: #92400E; border-radius: 12px; padding: 5px 8px; font-size: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; max-width: 100%; text-align: left; line-height: 1.25; }
+    .btn-active-note-right { background: #FFFBEB; border: 1.5px solid #FDE68A; color: #92400E; border-radius: 10px; padding: 4px 8px; font-size: 8.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; max-width: 100%; text-align: left; line-height: 1.2; }
     .btn-active-note-right span.note-label-clamp { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
     .sh-P { background: #EFF6FF; color: #2563EB; border: 1px solid #BFDBFE; }
@@ -697,9 +698,10 @@
           <button type="button" style="background:none; border:none; color:#92400E; font-weight:800; cursor:pointer;" onclick="closeMatrixCellNotePrompt()">✕</button>
         </div>
         <div class="preset-chips-wrap" style="margin:0 0 8px 0;" id="matrixNotePresets"></div>
-        <input type="text" id="matrixCellNoteInput" style="padding:9px 12px; font-size:12px; background:#FFF; margin-bottom:8px;" placeholder="Tulis kegiatan staf ini...">
+        <input type="text" id="matrixCellNoteInput1" style="padding:9px 12px; font-size:12px; background:#FFF; margin-bottom:6px;" placeholder="Catatan 1 (Atas) - Contoh: Meeting 15:30">
+        <input type="text" id="matrixCellNoteInput2" style="padding:9px 12px; font-size:12px; background:#FFF; margin-bottom:8px;" placeholder="Catatan 2 (Bawah - opsional)">
         <div style="display:flex; gap:6px;">
-          <button type="button" id="btnMcnpDelete" class="btn-danger-modal" style="padding:8px; font-size:11px;" onclick="deleteMatrixCellNote()">Hapus</button>
+          <button type="button" id="btnMcnpDelete" class="btn-danger-modal" style="padding:8px; font-size:11px;" onclick="deleteMatrixCellNote()">Hapus Semua</button>
           <button type="button" class="btn-primary" style="margin-top:0; padding:8px; font-size:11px;" onclick="applyMatrixCellNote()">Terapkan</button>
         </div>
       </div>
@@ -718,7 +720,7 @@
     </div>
   </div>
 
-  <!-- MODAL C JADWAL: CATATAN KEGIATAN PER STAF -->
+  <!-- MODAL C JADWAL: CATATAN KEGIATAN PER STAF (2 SLOT BERSUSUN) -->
   <div class="link-modal-overlay" id="staffNoteModal" onclick="if(event.target===this) closeStaffNoteModal()">
     <div class="link-modal-box">
       <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:12px;">
@@ -732,15 +734,18 @@
         <button type="button" style="background:#F4EEFF; color:var(--text-muted); border:none; width:32px; height:32px; border-radius:50%; font-weight:700; cursor:pointer;" onclick="closeStaffNoteModal()">✕</button>
       </div>
 
-      <div style="font-size:11.5px; font-weight:700; color:var(--text-muted);">Pilih Cepat:</div>
+      <div style="font-size:11.5px; font-weight:700; color:var(--text-muted);">Pilih Cepat (isi otomatis Catatan 1 / 2):</div>
       <div class="preset-chips-wrap" id="snmPresetChips"></div>
 
-      <span class="modal-field-lbl">Detail Kegiatan Khusus</span>
-      <input type="text" id="snmTextInput" placeholder="Contoh: Stock Opname, Meeting Area...">
+      <span class="modal-field-lbl">Catatan 1 (Atas)</span>
+      <input type="text" id="snmTextInput1" oninput="renderSnmPresets()" placeholder="Contoh: Meeting 15:30">
+
+      <span class="modal-field-lbl">Catatan 2 (Bawah - Opsional)</span>
+      <input type="text" id="snmTextInput2" oninput="renderSnmPresets()" placeholder="Contoh: Stock Opname">
 
       <div style="display:flex; gap:8px; margin-top:10px;">
         <button type="button" class="btn-outline" style="margin-top:0; padding:13px;" onclick="closeStaffNoteModal()">Batal</button>
-        <button type="button" id="btnSnmDelete" class="btn-danger-modal" style="display:none;" onclick="deleteStaffNoteFromModal()">Hapus</button>
+        <button type="button" id="btnSnmDelete" class="btn-danger-modal" style="display:none;" onclick="deleteStaffNoteFromModal()">Hapus Semua</button>
         <button type="button" id="btnSnmSave" class="btn-primary" style="margin-top:0; padding:13px;" onclick="saveStaffNoteFromModal()">Simpan</button>
       </div>
     </div>
@@ -1935,7 +1940,7 @@
     }
 
     // =========================================================
-    // 4C. SUB-MENU STAF: JADWAL SHIFT & CATATAN PER STAF
+    // 4C. SUB-MENU STAF: JADWAL SHIFT & CATATAN PER STAF (MAX 2)
     // =========================================================
     const SHIFTS = {
       P:   { code: 'P',   shortLabel: 'P',   label: 'Pagi',   icon: '🌅', hours: '09:00–17:00', badgeClass: 'sh-P',   avClass: 'av-P' },
@@ -1958,6 +1963,22 @@
     let selectedPerStaffName = '';
     let scheduleDatabase = {};
     let isScheduleLoading = false;
+
+    function parseNotes(rawNote) {
+      return String(rawNote || '')
+        .split(/\s*\|\s*|\r?\n/)
+        .map(s => s.trim())
+        .filter(Boolean)
+        .slice(0, 2);
+    }
+
+    function joinNotes(note1, note2) {
+      return [note1, note2]
+        .map(s => String(s || '').replace(/\|/g, ' ').trim())
+        .filter(Boolean)
+        .slice(0, 2)
+        .join(' | ');
+    }
 
     function getScheduleStaffList() {
       const seen = {};
@@ -2096,7 +2117,7 @@
       const staffList = getScheduleStaffList();
 
       stripEl.innerHTML = weekDays.map((d, idx) => {
-        const hasAnyNote = staffList.some(m => (getScheduleCell(d.key, m.name).note || '').trim() !== '');
+        const hasAnyNote = staffList.some(m => parseNotes(getScheduleCell(d.key, m.name).note).length > 0);
         return `
           <button type="button" class="day-pill ${idx === selectedScheduleDayIdx ? 'active' : ''}" onclick="selectedScheduleDayIdx=${idx}; renderPerDayView();">
             ${hasAnyNote ? '<span class="note-dot-indicator"></span>' : ''}
@@ -2146,13 +2167,15 @@
         const sh = SHIFTS[code];
         const isOff = code === 'OFF';
         const shiftText = isOff ? `${sh.icon} Off / Libur` : `${sh.icon} ${sh.label} • ${sh.hours}`;
+        const notesArr = parseNotes(note);
 
-        const rightNoteHtml = note
-          ? `<button type="button" class="btn-active-note-right" onclick="openStaffNoteModal('${escapeAttr(member.name)}', '${activeDay.key}')" title="${escapeAttr(note)}">
-               <span>📌</span>
-               <span class="note-label-clamp">${escapeHtml(note)}</span>
-               <span></span>
-             </button>`
+        const rightNoteHtml = notesArr.length > 0
+          ? notesArr.map(nText => `
+              <button type="button" class="btn-active-note-right" onclick="openStaffNoteModal('${escapeAttr(member.name)}', '${activeDay.key}')" title="${escapeAttr(nText)}">
+                <span>📌</span>
+                <span class="note-label-clamp">${escapeHtml(nText)}</span>
+              </button>
+            `).join('')
           : `<button type="button" class="btn-add-note-right" onclick="openStaffNoteModal('${escapeAttr(member.name)}', '${activeDay.key}')">+ Catatan</button>`;
 
         return `
@@ -2211,15 +2234,16 @@
         const code = SHIFTS[cell.shift] ? cell.shift : 'P';
         const sh = SHIFTS[code];
         const isOff = code === 'OFF';
-        const noteText = (cell.note || '').trim();
+        const notesArr = parseNotes(cell.note);
 
         const shiftDisplay = isOff ? `${sh.icon} Off / Libur` : `${sh.icon} ${sh.label} • ${sh.hours}`;
-        const rightActionHtml = noteText
-          ? `<button type="button" class="btn-active-note-right" onclick="openStaffNoteModal('${escapeAttr(member.name)}', '${d.key}')" title="${escapeAttr(noteText)}">
-               <span>📌</span>
-               <span class="note-label-clamp">${escapeHtml(noteText)}</span>
-               <span>✏️</span>
-             </button>`
+        const rightActionHtml = notesArr.length > 0
+          ? notesArr.map(nText => `
+              <button type="button" class="btn-active-note-right" onclick="openStaffNoteModal('${escapeAttr(member.name)}', '${d.key}')" title="${escapeAttr(nText)}">
+                <span>📌</span>
+                <span class="note-label-clamp">${escapeHtml(nText)}</span>
+              </button>
+            `).join('')
           : `<button type="button" class="btn-add-note-right" onclick="openStaffNoteModal('${escapeAttr(member.name)}', '${d.key}')">+ Catatan</button>`;
 
         return `
@@ -2292,6 +2316,26 @@
       document.getElementById('bulkMatrixModal').classList.remove('open');
     }
 
+    function applyMatrixPreset(presetText) {
+      const inp1 = document.getElementById('matrixCellNoteInput1');
+      const inp2 = document.getElementById('matrixCellNoteInput2');
+      const v1 = inp1.value.trim();
+      const v2 = inp2.value.trim();
+      if (v1 === presetText) inp1.value = '';
+      else if (v2 === presetText) inp2.value = '';
+      else if (!v1) inp1.value = presetText;
+      else inp2.value = presetText;
+      renderMatrixNotePresets();
+    }
+
+    function renderMatrixNotePresets() {
+      const v1 = (document.getElementById('matrixCellNoteInput1').value || '').trim();
+      const v2 = (document.getElementById('matrixCellNoteInput2').value || '').trim();
+      document.getElementById('matrixNotePresets').innerHTML = NOTE_PRESETS.map(p => `
+        <button type="button" class="note-preset-chip ${(v1 === p || v2 === p) ? 'active-chip' : ''}" onclick="applyMatrixPreset('${escapeAttr(p)}')">${escapeHtml(p)}</button>
+      `).join('');
+    }
+
     function handleMatrixCellTap(staffIdx, dayIdx) {
       const staffList = getScheduleStaffList();
       const member = staffList[staffIdx];
@@ -2301,12 +2345,12 @@
         editingMatrixCell = { staffName: member.name, dayIdx };
         const day = getWeekList(currentScheduleWeekStart)[dayIdx];
         const currNote = draftBulkData[member.name][dayIdx].note || '';
+        const notesArr = parseNotes(currNote);
         document.getElementById('mcnpTitle').innerText = `📌 Catatan: ${member.shortName} • ${day.dayShort} ${day.dateNum}`;
-        document.getElementById('matrixCellNoteInput').value = currNote;
+        document.getElementById('matrixCellNoteInput1').value = notesArr[0] || '';
+        document.getElementById('matrixCellNoteInput2').value = notesArr[1] || '';
         document.getElementById('btnMcnpDelete').style.display = currNote ? 'block' : 'none';
-        document.getElementById('matrixNotePresets').innerHTML = NOTE_PRESETS.map(p => `
-          <button type="button" class="note-preset-chip ${currNote === p ? 'active-chip' : ''}" onclick="document.getElementById('matrixCellNoteInput').value='${escapeAttr(p)}'">${escapeHtml(p)}</button>
-        `).join('');
+        renderMatrixNotePresets();
         document.getElementById('matrixCellNotePrompt').style.display = 'block';
         return;
       }
@@ -2322,7 +2366,9 @@
 
     function applyMatrixCellNote() {
       if (!editingMatrixCell) return;
-      draftBulkData[editingMatrixCell.staffName][editingMatrixCell.dayIdx].note = document.getElementById('matrixCellNoteInput').value.trim();
+      const n1 = document.getElementById('matrixCellNoteInput1').value;
+      const n2 = document.getElementById('matrixCellNoteInput2').value;
+      draftBulkData[editingMatrixCell.staffName][editingMatrixCell.dayIdx].note = joinNotes(n1, n2);
       closeMatrixCellNotePrompt();
       renderBulkMatrix();
     }
@@ -2350,10 +2396,11 @@
           ${weekDays.map((d, dIdx) => {
             const c = draftBulkData[m.name][dIdx];
             const sh = SHIFTS[c.shift] || SHIFTS.P;
+            const noteCount = parseNotes(c.note).length;
             return `
               <td>
                 <button type="button" class="m-cell-btn ${sh.badgeClass}" onclick="handleMatrixCellTap(${sIdx}, ${dIdx})">
-                  ${c.note ? '<span class="m-cell-pin">📌</span>' : ''}
+                  ${noteCount > 0 ? `<span class="m-cell-pin">${noteCount > 1 ? '2' : '📌'}</span>` : ''}
                   ${sh.shortLabel}
                 </button>
               </td>
@@ -2393,7 +2440,7 @@
     }
 
     // =========================================================
-    // MODAL C JADWAL: CATATAN KEGIATAN PER STAF
+    // MODAL C JADWAL: CATATAN KEGIATAN PER STAF (MAX 2)
     // =========================================================
     let noteModalContext = null;
 
@@ -2401,20 +2448,41 @@
       noteModalContext = { staffName, dateKey };
       const dt = parseScheduleKey(dateKey);
       const currNote = getScheduleCell(dateKey, staffName).note || '';
+      const notesArr = parseNotes(currNote);
 
       document.getElementById('snmAvatar').innerText = getInitials(staffName);
-      document.getElementById('snmTitle').innerText = currNote ? '✏️ Edit Catatan Staf' : '📌 Tambah Catatan Staf';
+      document.getElementById('snmTitle').innerText = notesArr.length > 0 ? '✏️ Edit Catatan Staf' : '📌 Tambah Catatan Staf';
       document.getElementById('snmSub').innerText = `${staffName} • ${DAY_NAMES_FULL[dt.getDay()]}, ${dt.getDate()} ${MONTH_NAMES_ID[dt.getMonth()]} ${dt.getFullYear()}`;
-      document.getElementById('snmTextInput').value = currNote;
-      document.getElementById('btnSnmDelete').style.display = currNote ? 'block' : 'none';
+      document.getElementById('snmTextInput1').value = notesArr[0] || '';
+      document.getElementById('snmTextInput2').value = notesArr[1] || '';
+      document.getElementById('btnSnmDelete').style.display = notesArr.length > 0 ? 'block' : 'none';
 
-      renderSnmPresets(currNote);
+      renderSnmPresets();
       document.getElementById('staffNoteModal').classList.add('open');
     }
 
-    function renderSnmPresets(activeText) {
+    function applySnmPreset(presetText) {
+      const inp1 = document.getElementById('snmTextInput1');
+      const inp2 = document.getElementById('snmTextInput2');
+      const v1 = inp1.value.trim();
+      const v2 = inp2.value.trim();
+      if (v1 === presetText) {
+        inp1.value = '';
+      } else if (v2 === presetText) {
+        inp2.value = '';
+      } else if (!v1) {
+        inp1.value = presetText;
+      } else {
+        inp2.value = presetText;
+      }
+      renderSnmPresets();
+    }
+
+    function renderSnmPresets() {
+      const v1 = (document.getElementById('snmTextInput1').value || '').trim();
+      const v2 = (document.getElementById('snmTextInput2').value || '').trim();
       document.getElementById('snmPresetChips').innerHTML = NOTE_PRESETS.map(p => `
-        <button type="button" class="note-preset-chip ${activeText === p ? 'active-chip' : ''}" onclick="document.getElementById('snmTextInput').value='${escapeAttr(p)}'; renderSnmPresets('${escapeAttr(p)}')">${escapeHtml(p)}</button>
+        <button type="button" class="note-preset-chip ${(v1 === p || v2 === p) ? 'active-chip' : ''}" onclick="applySnmPreset('${escapeAttr(p)}')">${escapeHtml(p)}</button>
       `).join('');
     }
 
@@ -2426,13 +2494,15 @@
     async function saveStaffNoteFromModal() {
       if (!noteModalContext) return;
       const { staffName, dateKey } = noteModalContext;
-      const val = document.getElementById('snmTextInput').value.trim();
+      const n1 = document.getElementById('snmTextInput1').value;
+      const n2 = document.getElementById('snmTextInput2').value;
+      const combined = joinNotes(n1, n2);
       const cell = getScheduleCell(dateKey, staffName);
-      cell.note = val;
+      cell.note = combined;
       closeStaffNoteModal();
       renderAllScheduleViews();
-      showLinkToast(val ? `📌 Catatan ${staffName} disimpan!` : `Catatan ${staffName} dikosongkan`);
-      await syncScheduleItemsToServer([{ date: dateKey, staff: staffName, shift: cell.shift || 'P', note: val }]);
+      showLinkToast(combined ? `📌 Catatan ${staffName} disimpan!` : `Catatan ${staffName} dikosongkan`);
+      await syncScheduleItemsToServer([{ date: dateKey, staff: staffName, shift: cell.shift || 'P', note: combined }]);
     }
 
     async function deleteStaffNoteFromModal() {
