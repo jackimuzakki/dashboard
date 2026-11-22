@@ -205,8 +205,7 @@
 
     .dsr-text-col { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; min-width: 0; flex: 1; }
     .dsr-name { font-size: 14px; font-weight: 700; color: var(--text-main); line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
-    .dsr-shift-line { display: inline-flex; align-items: center; gap: 4px; margin-top: 4px; padding: 3px 9px; border-radius: 9px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; }
-    .dsr-shift-line:active { transform: scale(0.95); }
+    .dsr-shift-line { display: inline-flex; align-items: center; gap: 4px; margin-top: 4px; padding: 3px 9px; border-radius: 9px; font-size: 11px; font-weight: 700; cursor: default; white-space: nowrap; }
 
     .dsr-right { display: flex; align-items: center; justify-content: flex-end; flex-shrink: 0; max-width: 44%; }
     .btn-add-note-right { background: #F8F7FF; border: 1.5px dashed #D8CEFF; color: var(--primary); border-radius: 12px; padding: 7px 10px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; }
@@ -908,7 +907,6 @@
 
     // =========================================================
     // 1. DASHBOARD TARGET & KLASEMEN & SALES HARIAN
-    //    (Sesuai Code.gs: getDashboardData() -> { staffList, storeData })
     // =========================================================
     function normalizeDashboardData(raw) {
       let root = raw;
@@ -979,7 +977,6 @@
       });
       ranking.sort((a, b) => (a.rank && b.rank) ? (a.rank - b.rank) : (b.sales - a.sales));
 
-      // Code.gs mengirim object utama toko bernama "storeData"
       const stRaw = (root && root.storeData && typeof root.storeData === 'object')
         ? root.storeData
         : ((root && root.store && typeof root.store === 'object') ? root.store : {});
@@ -1293,7 +1290,6 @@
 
     // =========================================================
     // 2. CEK STOK (SOH)
-    //    (Sesuai Code.gs: getSOHData() -> [{ category, article, description, qty }])
     // =========================================================
     async function loadSOHData() {
       if (isSohLoading) return;
@@ -1360,7 +1356,7 @@
     }
 
     // =========================================================
-    // 3. PUSAT FORM & LINK (getLinks, addLink, editLink, deleteLink)
+    // 3. PUSAT FORM & LINK
     // =========================================================
     const LINKS_LOCAL_KEY = 'digimap_links_cache_v2';
     let allLinksList = [];
@@ -1570,7 +1566,7 @@
     }
 
     // =========================================================
-    // 4A. SUB-MENU STAF: SLIP GAJI & PIN (getBonus & updatePin)
+    // 4A. SUB-MENU STAF: SLIP GAJI & PIN
     // =========================================================
     let unlockedStaffName = '';
 
@@ -1680,7 +1676,7 @@
     }
 
     // =========================================================
-    // 4B. SUB-MENU STAF: BIODATA TIM (getBiodata, addBiodata, editBiodata, deleteBiodata)
+    // 4B. SUB-MENU STAF: BIODATA TIM
     // =========================================================
     let allBiodataList = [];
     let isBiodataLoading = false;
@@ -1944,7 +1940,6 @@
     };
 
     const NOTE_PRESETS = ['Stock Opname', 'Meeting Area', 'Training Produk', 'Cek Display', 'Admin & Laporan'];
-    const SHIFT_ORDER = ['P', 'M', 'S', 'OFF'];
     const DAY_NAMES_SHORT = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
     const DAY_NAMES_FULL  = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
     const MONTH_NAMES_ID  = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
@@ -2086,15 +2081,6 @@
       renderPerStaffView();
     }
 
-    function quickToggleStaffDay(staffName, dateKey) {
-      const cell = getScheduleCell(dateKey, staffName);
-      const next = SHIFT_ORDER[(SHIFT_ORDER.indexOf(cell.shift || 'P') + 1) % SHIFT_ORDER.length];
-      cell.shift = next;
-      renderAllScheduleViews();
-      showLinkToast(`${SHIFTS[next].icon} ${staffName}: ${SHIFTS[next].label} (${SHIFTS[next].hours})`);
-      syncScheduleItemsToServer([{ date: dateKey, staff: staffName, shift: next, note: cell.note || '' }]);
-    }
-
     function renderPerDayView() {
       const stripEl = document.getElementById('daySelectorStrip');
       const sumEl = document.getElementById('dailySummaryBar');
@@ -2170,7 +2156,7 @@
               <div class="sch-avatar ${sh.avClass}">${escapeHtml(getInitials(member.name))}</div>
               <div class="dsr-text-col">
                 <div class="dsr-name">${escapeHtml(member.name)}</div>
-                <div class="dsr-shift-line ${sh.badgeClass}" onclick="quickToggleStaffDay('${escapeAttr(member.name)}', '${activeDay.key}')" title="Ketuk untuk ubah shift">
+                <div class="dsr-shift-line ${sh.badgeClass}">
                   ${shiftText}
                 </div>
               </div>
@@ -2240,7 +2226,7 @@
               </div>
               <div class="sdr-text-col">
                 <div class="sdr-date-title">${d.dayFull}, ${d.dateNum} ${d.monthShort}</div>
-                <div class="dsr-shift-line ${sh.badgeClass}" onclick="quickToggleStaffDay('${escapeAttr(member.name)}', '${d.key}')" title="Ketuk untuk ubah shift">
+                <div class="dsr-shift-line ${sh.badgeClass}">
                   ${shiftDisplay}
                 </div>
               </div>
@@ -2456,7 +2442,7 @@
     }
 
     // =========================================================
-    // 5. ADMIN PANEL UPLOAD EXCEL/CSV (Sesuai prosesUploadDariWeb)
+    // 5. ADMIN PANEL UPLOAD EXCEL/CSV
     // =========================================================
     function readExcelAsCsv(file) {
       return new Promise((resolve, reject) => {
