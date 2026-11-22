@@ -62,12 +62,17 @@
     .kpi-rank-badge { position: absolute; top: 15px; right: 15px; background: #FEF3C7; color: #D97706; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
 
     .section-title { font-size: 16px; font-weight: 700; color: var(--text-main); margin: 25px 0 15px 5px; }
-    #qtyKPI { display: flex; gap: 12px; margin-bottom: 25px; overflow-x: auto; padding-bottom: 10px; -ms-overflow-style: none; scrollbar-width: none; }
-    #qtyKPI::-webkit-scrollbar { display: none; }
     .qty-card { background: var(--card-bg); padding: 15px; border-radius: var(--radius-medium); box-shadow: var(--shadow-soft); text-align: center; min-width: 90px; flex-shrink: 0; }
     .qty-emoji { font-size: 24px; margin-bottom: 8px; background: var(--bg-main); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px auto; }
     .qty-label { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-bottom: 2px; }
-    .qty-val { font-size: 18px; font-weight: 700; color: var(--primary); } 
+    .qty-val { font-size: 18px; font-weight: 700; color: var(--primary); }
+
+    /* Grid 5 Kolom Kompak untuk LOB Bulanan (#qtyKPI) - Samakan dengan LOB Harian */
+    #qtyKPI { width: 100%; display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 25px; }
+    #qtyKPI .qty-card { min-width: 0; padding: 14px 2px; border-radius: 16px; }
+    #qtyKPI .qty-emoji { width: 36px; height: 36px; font-size: 18px; margin-bottom: 6px; }
+    #qtyKPI .qty-val { font-size: 16px; }
+    #qtyKPI .qty-label { font-size: 9.5px; letter-spacing: -0.2px; }
 
     .detail-card { background: var(--card-bg); padding: 22px; border-radius: var(--radius-large); box-shadow: var(--shadow-soft); margin-bottom: 15px; }
     .detail-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
