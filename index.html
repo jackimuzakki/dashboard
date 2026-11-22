@@ -255,21 +255,6 @@
     .duty-ok { background: #ECFDF5; color: #059669; }
     .duty-warn { background: #FFFBEB; color: #D97706; border: 1px solid #FDE68A; }
 
-    .preset-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; }
-    .btn-preset { background: #F8F6FF; border: 1.5px solid #E2D9FF; color: var(--primary); border-radius: 12px; padding: 8px 4px; font-size: 10.5px; font-weight: 700; cursor: pointer; text-align: center; }
-    .single-day-item { display: flex; flex-direction: column; gap: 7px; padding: 10px 11px; background: #FAFAFF; border: 1px solid #EFEAFF; border-radius: 15px; margin-bottom: 8px; }
-    .sdi-top-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-    .sdi-left { min-width: 80px; }
-    .sdi-day { font-size: 12px; font-weight: 700; color: var(--text-main); }
-    .sdi-date { font-size: 10.5px; color: var(--text-muted); }
-    .sdi-choices { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; flex: 1; }
-    .sdi-choice-btn { background: #FFFFFF; border: 1.5px solid #E9E4FF; color: var(--text-muted); border-radius: 10px; padding: 7px 2px; font-size: 10.5px; font-weight: 700; cursor: pointer; text-align: center; }
-    .sdi-choice-btn.sel-P { background: #2563EB; border-color: #2563EB; color: #FFF; }
-    .sdi-choice-btn.sel-M { background: #D97706; border-color: #D97706; color: #FFF; }
-    .sdi-choice-btn.sel-S { background: #7C3AED; border-color: #7C3AED; color: #FFF; }
-    .sdi-choice-btn.sel-OFF { background: #E11D48; border-color: #E11D48; color: #FFF; }
-    .sdi-note-input { width: 100%; border: 1.5px solid #EFEAFF; background: #FFFFFF; border-radius: 10px; padding: 7px 10px; font-size: 11.5px; font-weight: 600; color: var(--text-main); outline: none; margin-bottom: 0 !important; }
-
     .preset-chips-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 12px 0; }
     .note-preset-chip { background: #FFFBEB; border: 1.5px solid #FDE68A; color: #92400E; border-radius: 20px; padding: 6px 12px; font-size: 11.5px; font-weight: 700; cursor: pointer; }
     .note-preset-chip.active-chip { background: #F59E0B; border-color: #F59E0B; color: #FFFFFF; }
@@ -737,35 +722,6 @@
     </div>
   </div>
 
-  <!-- MODAL B JADWAL: ATUR JADWAL 7 HARI PER STAF -->
-  <div class="link-modal-overlay" id="singleStaffModal" onclick="if(event.target===this) closeSingleModal()">
-    <div class="link-modal-box">
-      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:12px;">
-        <div style="display:flex; align-items:center; gap:11px;">
-          <div class="sch-avatar av-P" id="singleModalAvatar">SA</div>
-          <div>
-            <div style="font-size:15.5px; font-weight:800; color:var(--text-main);" id="singleModalTitle">✏️ Atur 7 Hari</div>
-            <div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;" id="singleModalSub">Minggu Ini</div>
-          </div>
-        </div>
-        <button type="button" style="background:#F4EEFF; color:var(--text-muted); border:none; width:32px; height:32px; border-radius:50%; font-weight:700; cursor:pointer;" onclick="closeSingleModal()">✕</button>
-      </div>
-
-      <div class="preset-row">
-        <button type="button" class="btn-preset" onclick="applySinglePreset('P')">🌅 Semua Pagi</button>
-        <button type="button" class="btn-preset" onclick="applySinglePreset('M')">☀️ Semua Middle</button>
-        <button type="button" class="btn-preset" onclick="applySinglePreset('S')">🌙 Semua Siang</button>
-      </div>
-
-      <div id="singleDaysContainer"></div>
-
-      <div style="display:flex; gap:10px; margin-top:10px;">
-        <button type="button" class="btn-outline" style="margin-top:0; padding:13px;" onclick="closeSingleModal()">Batal</button>
-        <button type="button" id="btnSaveSingleStaff" class="btn-primary" style="margin-top:0; padding:13px;" onclick="saveSingleStaffSchedule()">Simpan Jadwal</button>
-      </div>
-    </div>
-  </div>
-
   <!-- MODAL C JADWAL: CATATAN KEGIATAN PER STAF -->
   <div class="link-modal-overlay" id="staffNoteModal" onclick="if(event.target===this) closeStaffNoteModal()">
     <div class="link-modal-box">
@@ -808,8 +764,25 @@
     // =========================================================
     // HELPER UMUM & FORMATTER
     // =========================================================
+    function parseNum(val) {
+      if (typeof val === 'number') return isFinite(val) ? val : 0;
+      if (val == null || val === '') return 0;
+      let s = String(val).trim();
+      s = s.replace(/rp\.?/gi, '').replace(/%/g, '').trim();
+      if (!s) return 0;
+      if (/^-?\d{1,3}(\.\d{3})+(,\d+)?$/.test(s)) {
+        s = s.replace(/\./g, '').replace(',', '.');
+      } else if (/^-?\d{1,3}(,\d{3})+(\.\d+)?$/.test(s)) {
+        s = s.replace(/,/g, '');
+      } else {
+        s = s.replace(/[^\d.-]/g, '');
+      }
+      const n = parseFloat(s);
+      return isFinite(n) ? n : 0;
+    }
+
     function formatRupiah(num) {
-      const n = Number(num) || 0;
+      const n = parseNum(num);
       return 'Rp ' + Math.round(n).toLocaleString('id-ID');
     }
 
@@ -904,127 +877,92 @@
     // =========================================================
     // 1. DASHBOARD TARGET & KLASEMEN & SALES HARIAN
     // =========================================================
-    const DASHBOARD_CACHE_KEY = 'digimap_dashboard_cache_v1';
-
-    function toNum(val) {
-      if (typeof val === 'number') return isNaN(val) ? 0 : val;
-      if (val == null || val === '') return 0;
-      const cleaned = String(val).replace(/[^0-9.-]/g, '');
-      const n = Number(cleaned);
-      return isNaN(n) ? 0 : n;
-    }
-
-    function normalizeDateYMD(rawDate) {
-      if (!rawDate) return '';
-      const s = String(rawDate).trim();
-      if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
-      const slashMatch = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
-      if (slashMatch) {
-        return `${slashMatch[3]}-${slashMatch[2].padStart(2, '0')}-${slashMatch[1].padStart(2, '0')}`;
-      }
-      const dt = new Date(s);
-      if (!isNaN(dt.getTime())) {
-        return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
-      }
-      return s;
-    }
-
-    function hasValidDashboardShape(raw) {
-      if (!raw || typeof raw !== 'object') return false;
-      if (raw.success === false && !raw.store && !raw.staff && !raw.ranking && !raw.dashboard && !raw.data) return false;
-      if (Array.isArray(raw) && raw.length > 0) return true;
-      const root = (raw.dashboard && typeof raw.dashboard === 'object' && !Array.isArray(raw.dashboard)) ? raw.dashboard : raw;
-      return Boolean(
-        root.store || root.toko || root.summary ||
-        Array.isArray(root.staff) || Array.isArray(root.ranking) ||
-        Array.isArray(root.dashboard) || Array.isArray(root.data) || Array.isArray(root.sales) ||
-        (root.staff && typeof root.staff === 'object' && Object.keys(root.staff).length > 0)
-      );
-    }
-
-    function normalizeDashboardPayload(raw) {
-      const root = (raw && raw.dashboard && typeof raw.dashboard === 'object' && !Array.isArray(raw.dashboard))
-        ? raw.dashboard
-        : (raw || {});
-
-      let rawStaffArr = [];
-      if (Array.isArray(root)) {
-        rawStaffArr = root;
-      } else if (Array.isArray(root.staff)) {
-        rawStaffArr = root.staff;
-      } else if (Array.isArray(root.ranking)) {
-        rawStaffArr = root.ranking;
-      } else if (Array.isArray(root.dashboard)) {
-        rawStaffArr = root.dashboard;
-      } else if (Array.isArray(root.data)) {
-        rawStaffArr = root.data;
-      } else if (Array.isArray(root.sales)) {
-        rawStaffArr = root.sales;
-      } else if (root.staff && typeof root.staff === 'object') {
-        rawStaffArr = Object.entries(root.staff).map(([k, v]) => Object.assign({ name: k }, v || {}));
-      } else if (root.ranking && typeof root.ranking === 'object') {
-        rawStaffArr = Object.entries(root.ranking).map(([k, v]) => Object.assign({ name: k }, v || {}));
+    function normalizeDashboardData(raw) {
+      let root = raw;
+      if (root && root.data && typeof root.data === 'object' && !Array.isArray(root.data) && (root.data.store || root.data.staff || root.data.ranking)) {
+        root = root.data;
       }
 
       const staffMap = {};
-      const staffList = [];
+      const ranking = [];
 
-      rawStaffArr.forEach(item => {
-        if (!item || typeof item !== 'object') return;
-        const name = String(
-          item.name ?? item.nama ?? item.Nama ?? item.staff ?? item.Staff ?? item.salesman ?? item.Salesman ?? ''
-        ).trim();
-        if (!name || name.toLowerCase() === 'total' || name.toLowerCase() === 'store') return;
-
-        const norm = {
-          name,
-          totalSales: toNum(item.totalSales ?? item.sales ?? item.Sales ?? item.omzet ?? item.total_sales ?? item.netSales),
-          totalTarget: toNum(item.totalTarget ?? item.target ?? item.Target ?? item.targetSales ?? item.total_target),
-          point: toNum(item.point ?? item.poin ?? item.Point ?? item.Poin ?? item.totalPoint ?? item.totalPoin),
-          qtyIphone: toNum(item.qtyIphone ?? item.iphone ?? item.iPhone ?? item.IPHONE ?? item.qty_iphone),
-          qtyIpad: toNum(item.qtyIpad ?? item.ipad ?? item.iPad ?? item.IPAD ?? item.qty_ipad),
-          qtyMac: toNum(item.qtyMac ?? item.mac ?? item.Mac ?? item.MAC ?? item.qty_mac),
-          qtyWatch: toNum(item.qtyWatch ?? item.watch ?? item.Watch ?? item.appleWatch ?? item.qty_watch),
-          qtyAirpods: toNum(item.qtyAirpods ?? item.airpods ?? item.AirPods ?? item.AIRPODS ?? item.qty_airpods),
-          deviceSales: toNum(item.deviceSales ?? item.device ?? item.Device ?? item.salesDevice),
-          deviceTarget: toNum(item.deviceTarget ?? item.targetDevice ?? item.device_target),
-          accSales: toNum(item.accSales ?? item.acc ?? item.Acc ?? item.accessories ?? item.Accessories ?? item.aksesoris ?? item.salesAcc),
-          accTarget: toNum(item.accTarget ?? item.targetAcc ?? item.acc_target ?? item.accessoriesTarget),
-          qoalaSales: toNum(item.qoalaSales ?? item.qoala ?? item.Qoala ?? item.vasSales ?? item.vas ?? item.VAS ?? item.salesQoala),
-          qoalaTarget: toNum(item.qoalaTarget ?? item.targetQoala ?? item.qoala_target ?? item.vasTarget ?? item.targetVas)
+      function upsertStaff(name, obj) {
+        const cleanName = String(name || '').trim();
+        if (!cleanName || /^(store|toko|total|grand total)$/i.test(cleanName)) return;
+        const prev = staffMap[cleanName] || {};
+        const merged = {
+          name: cleanName,
+          totalSales: parseNum(obj.totalSales ?? obj.sales ?? obj.total ?? obj.penjualan ?? prev.totalSales),
+          totalTarget: parseNum(obj.totalTarget ?? obj.target ?? prev.totalTarget),
+          qtyIphone: parseNum(obj.qtyIphone ?? obj.iphone ?? prev.qtyIphone),
+          qtyIpad: parseNum(obj.qtyIpad ?? obj.ipad ?? prev.qtyIpad),
+          qtyMac: parseNum(obj.qtyMac ?? obj.mac ?? prev.qtyMac),
+          qtyWatch: parseNum(obj.qtyWatch ?? obj.watch ?? prev.qtyWatch),
+          qtyAirpods: parseNum(obj.qtyAirpods ?? obj.airpods ?? prev.qtyAirpods),
+          accSales: parseNum(obj.accSales ?? obj.acc ?? obj.accessoriesSales ?? prev.accSales),
+          accTarget: parseNum(obj.accTarget ?? obj.accessoriesTarget ?? prev.accTarget),
+          qoalaSales: parseNum(obj.qoalaSales ?? obj.qoala ?? obj.vasSales ?? obj.vas ?? prev.qoalaSales),
+          qoalaTarget: parseNum(obj.qoalaTarget ?? obj.vasTarget ?? prev.qoalaTarget)
         };
+        staffMap[cleanName] = merged;
+      }
 
-        staffMap[name] = norm;
-        staffList.push(norm);
+      if (Array.isArray(root)) {
+        root.forEach(item => {
+          if (item && typeof item === 'object') {
+            upsertStaff(item.name || item.nama || item.staff, item);
+          }
+        });
+      } else if (root && typeof root === 'object') {
+        if (Array.isArray(root.staff)) {
+          root.staff.forEach(item => upsertStaff(item.name || item.nama || item.staff, item));
+        } else if (root.staff && typeof root.staff === 'object') {
+          Object.keys(root.staff).forEach(k => {
+            const val = root.staff[k];
+            if (val && typeof val === 'object') upsertStaff(val.name || val.nama || k, val);
+          });
+        }
+        if (Array.isArray(root.staffList)) {
+          root.staffList.forEach(item => upsertStaff(item.name || item.nama || item.staff, item));
+        }
+        if (Array.isArray(root.ranking)) {
+          root.ranking.forEach(item => {
+            if (typeof item === 'string') {
+              upsertStaff(item, {});
+            } else if (item && typeof item === 'object') {
+              upsertStaff(item.name || item.nama || item.staff, item);
+            }
+          });
+        }
+      }
+
+      Object.keys(staffMap).forEach(k => {
+        ranking.push({ name: k, sales: staffMap[k].totalSales });
       });
+      ranking.sort((a, b) => b.sales - a.sales);
 
-      const ranking = [...staffList].sort((a, b) => b.totalSales - a.totalSales);
-      const sumField = (key) => staffList.reduce((acc, s) => acc + (s[key] || 0), 0);
+      const stRaw = (root && root.store && typeof root.store === 'object') ? root.store : (root || {});
+      const sumStaffSales = ranking.reduce((acc, r) => acc + r.sales, 0);
+      const sumStaffTarget = Object.values(staffMap).reduce((acc, s) => acc + s.totalTarget, 0);
 
-      const st = root.store || root.toko || root.summary || {};
       const store = {
-        totalSales: toNum(st.totalSales ?? st.sales ?? st.Sales) || sumField('totalSales'),
-        totalTarget: toNum(st.totalTarget ?? st.target ?? st.Target) || sumField('totalTarget'),
-        totalPoint: toNum(st.totalPoint ?? st.point ?? st.poin ?? st.totalPoin) || sumField('point'),
-        pct: toNum(st.pct ?? st.achievement ?? st.pencapaian),
-        deviceSales: toNum(st.deviceSales ?? st.device ?? st.salesDevice) || sumField('deviceSales'),
-        deviceTarget: toNum(st.deviceTarget ?? st.targetDevice) || sumField('deviceTarget'),
-        accSales: toNum(st.accSales ?? st.acc ?? st.accessories ?? st.aksesoris) || sumField('accSales'),
-        accTarget: toNum(st.accTarget ?? st.targetAcc ?? st.accessoriesTarget) || sumField('accTarget'),
-        vasSales: toNum(st.vasSales ?? st.vas ?? st.qoalaSales ?? st.qoala) || sumField('qoalaSales'),
-        vasTarget: toNum(st.vasTarget ?? st.targetVas ?? st.qoalaTarget ?? st.targetQoala) || sumField('qoalaTarget')
+        totalSales: parseNum(stRaw.totalSales ?? stRaw.sales ?? stRaw.penjualan) || sumStaffSales,
+        totalTarget: parseNum(stRaw.totalTarget ?? stRaw.target) || sumStaffTarget,
+        totalPoint: parseNum(stRaw.totalPoint ?? stRaw.point ?? stRaw.points ?? stRaw.poin),
+        pct: parseNum(stRaw.pct ?? stRaw.achievement ?? stRaw.pencapaian),
+        deviceSales: parseNum(stRaw.deviceSales ?? (stRaw.device && stRaw.device.sales)),
+        deviceTarget: parseNum(stRaw.deviceTarget ?? (stRaw.device && stRaw.device.target)),
+        accSales: parseNum(stRaw.accSales ?? stRaw.accessoriesSales ?? (stRaw.acc && stRaw.acc.sales)),
+        accTarget: parseNum(stRaw.accTarget ?? stRaw.accessoriesTarget ?? (stRaw.acc && stRaw.acc.target)),
+        vasSales: parseNum(stRaw.vasSales ?? stRaw.qoalaSales ?? (stRaw.vas && stRaw.vas.sales)),
+        vasTarget: parseNum(stRaw.vasTarget ?? stRaw.qoalaTarget ?? (stRaw.vas && stRaw.vas.target))
       };
 
-      const rawDaily = Array.isArray(root.daily) ? root.daily
-        : Array.isArray(root.dailySales) ? root.dailySales
-        : Array.isArray(root.spw) ? root.spw
-        : Array.isArray(root.transactions) ? root.transactions
-        : null;
+      if (root && Array.isArray(root.soh) && sohList.length === 0) {
+        sohList = root.soh;
+      }
 
-      if (Array.isArray(root.soh) && root.soh.length > 0) sohList = root.soh;
-      else if (Array.isArray(root.stock) && root.stock.length > 0) sohList = root.stock;
-
-      return { store, staff: staffMap, ranking, rawDaily };
+      return { store, staff: staffMap, ranking };
     }
 
     async function loadDashboardData(force = false) {
@@ -1035,43 +973,24 @@
         return;
       }
 
-      try {
-        const cached = localStorage.getItem(DASHBOARD_CACHE_KEY);
-        if (cached && !dashboardData) {
-          dashboardData = JSON.parse(cached);
-          populateStaffDropdowns();
-          showPersonalData();
-        }
-      } catch (e) {}
-
       isDashboardLoading = true;
       const loadingEl = document.getElementById('loadingDash');
-      if (loadingEl && !dashboardData) loadingEl.style.display = 'block';
+      if (loadingEl) loadingEl.style.display = 'block';
 
       try {
-        const endpoints = [
-          API_URL,
-          `${API_URL}?action=getDashboard`,
-          `${API_URL}?action=getData`
-        ];
-        let validRaw = null;
+        let json = null;
+        try {
+          const resDefault = await fetch(API_URL, { redirect: 'follow' });
+          json = await resDefault.json();
+        } catch (e) {}
 
-        for (let i = 0; i < endpoints.length; i++) {
-          try {
-            const res = await fetch(endpoints[i]);
-            const json = await res.json();
-            if (hasValidDashboardShape(json)) {
-              validRaw = json;
-              break;
-            }
-          } catch (innerErr) {}
+        const checkNorm = json ? normalizeDashboardData(json) : null;
+        if (!checkNorm || (checkNorm.ranking.length === 0 && checkNorm.store.totalSales === 0)) {
+          const resAction = await fetch(`${API_URL}?action=getDashboard`, { redirect: 'follow' });
+          json = await resAction.json();
         }
 
-        if (validRaw) {
-          dashboardData = normalizeDashboardPayload(validRaw);
-          try { localStorage.setItem(DASHBOARD_CACHE_KEY, JSON.stringify(dashboardData)); } catch (e) {}
-        }
-
+        dashboardData = normalizeDashboardData(json);
         populateStaffDropdowns();
         showPersonalData();
       } catch (err) {
@@ -1098,7 +1017,7 @@
       if (dashboardData) {
         if (Array.isArray(dashboardData.ranking) && dashboardData.ranking.length > 0) {
           dashboardData.ranking.forEach(r => { if (r.name) staffNames.push(String(r.name).trim()); });
-        } else if (dashboardData.staff && typeof dashboardData.staff === 'object' && !Array.isArray(dashboardData.staff)) {
+        } else if (dashboardData.staff && typeof dashboardData.staff === 'object') {
           Object.keys(dashboardData.staff).forEach(k => staffNames.push(k));
         }
       }
@@ -1134,34 +1053,35 @@
     }
 
     function renderStoreOverview() {
-      const st = (dashboardData && dashboardData.store) ? dashboardData.store : {};
-      const sales = toNum(st.totalSales || st.sales);
-      const target = toNum(st.totalTarget || st.target);
-      const point = toNum(st.totalPoint || st.point);
-      const pct = target > 0 ? Math.round((sales / target) * 100) : toNum(st.pct);
+      if (!dashboardData || !dashboardData.store) return;
+      const st = dashboardData.store;
+      const sales = parseNum(st.totalSales);
+      const target = parseNum(st.totalTarget);
+      const point = parseNum(st.totalPoint);
+      const pct = target > 0 ? Math.round((sales / target) * 100) : Math.round(parseNum(st.pct));
 
       document.getElementById('valStoreSales').innerText = formatRupiah(sales);
       document.getElementById('valStoreTarget').innerText = formatRupiah(target);
       document.getElementById('valStorePoint').innerText = point.toLocaleString('id-ID');
       document.getElementById('valStorePct').innerText = pct + '%';
 
-      const devS = toNum(st.deviceSales), devT = toNum(st.deviceTarget);
+      const devS = parseNum(st.deviceSales), devT = parseNum(st.deviceTarget);
       document.getElementById('valStoreDeviceSales').innerText = formatRupiah(devS);
       document.getElementById('valStoreDeviceTarget').innerText = formatRupiah(devT);
       document.getElementById('barStoreDevice').style.width = Math.min(100, devT > 0 ? (devS / devT) * 100 : 0) + '%';
 
-      const accS = toNum(st.accSales), accT = toNum(st.accTarget);
+      const accS = parseNum(st.accSales), accT = parseNum(st.accTarget);
       document.getElementById('valStoreAccSales').innerText = formatRupiah(accS);
       document.getElementById('valStoreAccTarget').innerText = formatRupiah(accT);
       document.getElementById('barStoreAcc').style.width = Math.min(100, accT > 0 ? (accS / accT) * 100 : 0) + '%';
 
-      const vasS = toNum(st.vasSales), vasT = toNum(st.vasTarget);
+      const vasS = parseNum(st.vasSales), vasT = parseNum(st.vasTarget);
       document.getElementById('valStoreVasSales').innerText = formatRupiah(vasS);
       document.getElementById('valStoreVasTarget').innerText = formatRupiah(vasT);
       document.getElementById('barStoreVas').style.width = Math.min(100, vasT > 0 ? (vasS / vasT) * 100 : 0) + '%';
 
       const tbody = document.getElementById('rankTableBody');
-      const ranking = (dashboardData && Array.isArray(dashboardData.ranking)) ? dashboardData.ranking : [];
+      const ranking = Array.isArray(dashboardData.ranking) ? dashboardData.ranking : [];
       if (ranking.length === 0) {
         tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--text-muted);">Belum ada data klasemen</td></tr>';
       } else {
@@ -1171,7 +1091,7 @@
             <tr style="cursor:pointer;" onclick="document.getElementById('staffSelect').value='${escapeAttr(r.name)}'; showPersonalData();">
               <td style="text-align:center; font-weight:700;">${medal}</td>
               <td style="font-weight:600;">${escapeHtml(r.name)}</td>
-              <td style="text-align:right; font-weight:700; color:var(--primary);">${formatRupiah(r.totalSales)}</td>
+              <td style="text-align:right; font-weight:700; color:var(--primary);">${formatRupiah(r.sales)}</td>
             </tr>
           `;
         }).join('');
@@ -1184,8 +1104,8 @@
       const ranking = (dashboardData && Array.isArray(dashboardData.ranking)) ? dashboardData.ranking : [];
       const rankIdx = ranking.findIndex(r => String(r.name).trim() === staffName);
 
-      const sales = toNum(stObj.totalSales || (rankIdx >= 0 ? ranking[rankIdx].totalSales : 0));
-      const target = toNum(stObj.totalTarget);
+      const sales = parseNum(stObj.totalSales ?? (rankIdx >= 0 ? ranking[rankIdx].sales : 0));
+      const target = parseNum(stObj.totalTarget);
       const sisa = Math.max(0, target - sales);
       const pct = target > 0 ? Math.round((sales / target) * 100) : 0;
 
@@ -1195,18 +1115,18 @@
       document.getElementById('valMySisa').innerText = sisa === 0 && target > 0 ? '🎉 Target Tercapai!' : formatRupiah(sisa);
       document.getElementById('valMyPct').innerText = pct + '%';
 
-      document.getElementById('qtyIphone').innerText = toNum(stObj.qtyIphone);
-      document.getElementById('qtyIpad').innerText = toNum(stObj.qtyIpad);
-      document.getElementById('qtyMac').innerText = toNum(stObj.qtyMac);
-      document.getElementById('qtyWatch').innerText = toNum(stObj.qtyWatch);
-      document.getElementById('qtyAirpods').innerText = toNum(stObj.qtyAirpods);
+      document.getElementById('qtyIphone').innerText = parseNum(stObj.qtyIphone);
+      document.getElementById('qtyIpad').innerText = parseNum(stObj.qtyIpad);
+      document.getElementById('qtyMac').innerText = parseNum(stObj.qtyMac);
+      document.getElementById('qtyWatch').innerText = parseNum(stObj.qtyWatch);
+      document.getElementById('qtyAirpods').innerText = parseNum(stObj.qtyAirpods);
 
-      const accS = toNum(stObj.accSales), accT = toNum(stObj.accTarget);
+      const accS = parseNum(stObj.accSales), accT = parseNum(stObj.accTarget);
       document.getElementById('valAccSales').innerText = formatRupiah(accS);
       document.getElementById('valAccTarget').innerText = formatRupiah(accT);
       document.getElementById('barAcc').style.width = Math.min(100, accT > 0 ? (accS / accT) * 100 : 0) + '%';
 
-      const qoalaS = toNum(stObj.qoalaSales), qoalaT = toNum(stObj.qoalaTarget);
+      const qoalaS = parseNum(stObj.qoalaSales), qoalaT = parseNum(stObj.qoalaTarget);
       document.getElementById('valQoalaSales').innerText = formatRupiah(qoalaS);
       document.getElementById('valQoalaTarget').innerText = formatRupiah(qoalaT);
       document.getElementById('barQoala').style.width = Math.min(100, qoalaT > 0 ? (qoalaS / qoalaT) * 100 : 0) + '%';
@@ -1227,72 +1147,37 @@
       loadDailySales();
     }
 
-    function applyDailyStatsToUI(stats, staffName, dateStr) {
-      const total = toNum(stats.totalSales ?? stats.total ?? stats.sales);
-      const device = toNum(stats.deviceSales ?? stats.device);
-      const acc = toNum(stats.accSales ?? stats.acc ?? stats.accessories);
-      const qoala = toNum(stats.qoalaSales ?? stats.qoala ?? stats.vas ?? stats.vasSales);
-
-      document.getElementById('valDailyTotal').innerText = formatRupiah(total);
-      document.getElementById('valDailyDevice').innerText = formatRupiah(device);
-      document.getElementById('valDailyAcc').innerText = formatRupiah(acc);
-      document.getElementById('valDailyQoala').innerText = formatRupiah(qoala);
-
-      document.getElementById('dailyQtyIphone').innerText = toNum(stats.qtyIphone ?? stats.iphone);
-      document.getElementById('dailyQtyIpad').innerText = toNum(stats.qtyIpad ?? stats.ipad);
-      document.getElementById('dailyQtyMac').innerText = toNum(stats.qtyMac ?? stats.mac);
-      document.getElementById('dailyQtyWatch').innerText = toNum(stats.qtyWatch ?? stats.watch);
-      document.getElementById('dailyQtyAirpods').innerText = toNum(stats.qtyAirpods ?? stats.airpods);
-
-      const metaEl = document.getElementById('dailyMetaInfo');
-      if (metaEl) {
-        metaEl.innerText = total > 0
-          ? `✅ Menampilkan transaksi ${staffName} (${dateStr})`
-          : `ℹ️ Tidak ada catatan transaksi pada tanggal ${dateStr}`;
-      }
-    }
-
     async function loadDailySales() {
       const staffName = document.getElementById('staffSelect').value;
       const dateStr = document.getElementById('dailyDateInput').value || getTodayLocalStr();
       const metaEl = document.getElementById('dailyMetaInfo');
       if (!staffName) return;
 
-      if (dashboardData && Array.isArray(dashboardData.rawDaily)) {
-        const agg = { total: 0, device: 0, acc: 0, qoala: 0, iphone: 0, ipad: 0, mac: 0, watch: 0, airpods: 0 };
-        dashboardData.rawDaily.forEach(row => {
-          const rStaff = String(row.staff ?? row.nama ?? row.Nama ?? row.salesman ?? '').trim();
-          const rDate = normalizeDateYMD(row.date ?? row.tanggal ?? row.Tanggal ?? row.postingDate ?? '');
-          if (rStaff.toLowerCase() !== staffName.toLowerCase() || rDate !== dateStr) return;
-
-          const amt = toNum(row.totalSales ?? row.sales ?? row.amount ?? row.netSales ?? row.value);
-          const qty = toNum(row.qty ?? row.Qty ?? 1);
-          const lob = String(row.lob ?? row.LOB ?? row.category ?? row.kategori ?? '').toLowerCase();
-          const desc = String(row.desc ?? row.description ?? row.name ?? row.material ?? '').toLowerCase();
-
-          agg.total += amt;
-          if (lob.includes('qoala') || lob.includes('vas') || desc.includes('qoala')) {
-            agg.qoala += amt;
-          } else if (lob.includes('acc') || lob.includes('aksesoris')) {
-            agg.acc += amt;
-          } else {
-            agg.device += amt;
-            if (lob.includes('iphone') || desc.includes('iphone')) agg.iphone += qty;
-            else if (lob.includes('ipad') || desc.includes('ipad')) agg.ipad += qty;
-            else if (lob.includes('mac') || desc.includes('macbook') || desc.includes('imac') || desc.includes('mac ')) agg.mac += qty;
-            else if (lob.includes('watch') || desc.includes('watch')) agg.watch += qty;
-            else if (lob.includes('airpods') || desc.includes('airpods')) agg.airpods += qty;
-          }
-        });
-        applyDailyStatsToUI(agg, staffName, dateStr);
-        return;
-      }
-
       metaEl.innerText = `⏳ Memuat penjualan ${staffName} (${dateStr})...`;
       try {
-        const res = await fetch(`${API_URL}?action=getDailySales&staff=${encodeURIComponent(staffName)}&date=${encodeURIComponent(dateStr)}`);
-        const data = await res.json();
-        applyDailyStatsToUI(data || {}, staffName, dateStr);
+        const res = await fetch(`${API_URL}?action=getDailySales&staff=${encodeURIComponent(staffName)}&date=${encodeURIComponent(dateStr)}`, { redirect: 'follow' });
+        const raw = await res.json();
+        const data = (raw && raw.data && typeof raw.data === 'object') ? raw.data : raw;
+
+        const total = parseNum(data.totalSales ?? data.total ?? data.sales);
+        const device = parseNum(data.deviceSales ?? data.device);
+        const acc = parseNum(data.accSales ?? data.acc ?? data.accessories);
+        const qoala = parseNum(data.qoalaSales ?? data.qoala ?? data.vas);
+
+        document.getElementById('valDailyTotal').innerText = formatRupiah(total);
+        document.getElementById('valDailyDevice').innerText = formatRupiah(device);
+        document.getElementById('valDailyAcc').innerText = formatRupiah(acc);
+        document.getElementById('valDailyQoala').innerText = formatRupiah(qoala);
+
+        document.getElementById('dailyQtyIphone').innerText = parseNum(data.qtyIphone ?? data.iphone);
+        document.getElementById('dailyQtyIpad').innerText = parseNum(data.qtyIpad ?? data.ipad);
+        document.getElementById('dailyQtyMac').innerText = parseNum(data.qtyMac ?? data.mac);
+        document.getElementById('dailyQtyWatch').innerText = parseNum(data.qtyWatch ?? data.watch);
+        document.getElementById('dailyQtyAirpods').innerText = parseNum(data.qtyAirpods ?? data.airpods);
+
+        metaEl.innerText = total > 0
+          ? `✅ Menampilkan transaksi tanggal ${dateStr}`
+          : `ℹ️ Tidak ada catatan transaksi pada tanggal ${dateStr}`;
       } catch (err) {
         metaEl.innerText = `⚠️ Data harian belum tersedia untuk ${dateStr}`;
       }
@@ -1313,7 +1198,7 @@
       document.getElementById('sohTableContainer').style.display = 'none';
 
       try {
-        const res = await fetch(`${API_URL}?action=getSOH`);
+        const res = await fetch(`${API_URL}?action=getSOH`, { redirect: 'follow' });
         const json = await res.json();
         sohList = Array.isArray(json) ? json : (Array.isArray(json.items) ? json.items : (Array.isArray(json.soh) ? json.soh : []));
         renderSOH();
@@ -1352,7 +1237,7 @@
       tbody.innerHTML = filtered.slice(0, 150).map(item => {
         const name = item.name || item.desc || item.description || 'Produk';
         const sku = item.sku || item.code || '';
-        const qty = Number(item.qty || item.stock || item.soh || 0);
+        const qty = parseNum(item.qty ?? item.stock ?? item.soh);
         return `
           <tr>
             <td>
@@ -1383,7 +1268,7 @@
       } catch (e) {}
 
       try {
-        const res = await fetch(`${API_URL}?action=getLinks`);
+        const res = await fetch(`${API_URL}?action=getLinks`, { redirect: 'follow' });
         const json = await res.json();
         const list = Array.isArray(json) ? json : (Array.isArray(json.links) ? json.links : null);
         if (list) {
@@ -1530,6 +1415,7 @@
       try {
         await fetch(API_URL, {
           method: 'POST',
+          redirect: 'follow',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({ action: 'saveLink', link: payloadItem })
         });
@@ -1543,18 +1429,26 @@
     }
 
     async function deleteFormLink(id) {
+      if (!confirm('Hapus link ini? Perubahan akan berlaku untuk semua staf.')) return;
+      showLinkToast('🗑️ Menghapus link...');
       allLinksList = allLinksList.filter((x, i) => String(x.id || ('link-' + i)) !== String(id));
       try { localStorage.setItem(LINKS_LOCAL_KEY, JSON.stringify(allLinksList)); } catch (e) {}
       renderLinks();
-      showLinkToast('🗑️ Link dihapus');
 
-      try {
-        await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: 'deleteLink', id })
-        });
-      } catch (e) {}
+      fetch(API_URL, {
+        method: 'POST',
+        redirect: 'follow',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'deleteLink', id })
+      })
+      .then(() => {
+        loadLinksData();
+        showLinkToast('🗑️ Link dihapus untuk semua staf!');
+      })
+      .catch(() => {
+        loadLinksData();
+        showLinkToast('🗑️ Link dihapus!');
+      });
     }
 
     // =========================================================
@@ -1586,6 +1480,7 @@
       try {
         const res = await fetch(API_URL, {
           method: 'POST',
+          redirect: 'follow',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({ action: 'verifyPin', staff: staffName, pin })
         });
@@ -1598,10 +1493,10 @@
         }
 
         unlockedStaffName = staffName;
-        const pokok = Number(data.gajiPokok || data.pokok || GAJI_POKOK);
-        const insentif = Number(data.insentif || data.bonus || 0);
-        const tunjangan = Number(data.tunjangan || 0);
-        const total = Number(data.total || (pokok + insentif + tunjangan));
+        const pokok = parseNum(data.gajiPokok ?? data.pokok) || GAJI_POKOK;
+        const insentif = parseNum(data.insentif ?? data.bonus);
+        const tunjangan = parseNum(data.tunjangan);
+        const total = parseNum(data.total) || (pokok + insentif + tunjangan);
 
         document.getElementById('slipNamaHeader').innerText = staffName;
         document.getElementById('slipPokok').innerText = formatRupiah(pokok);
@@ -1643,6 +1538,7 @@
       try {
         const res = await fetch(API_URL, {
           method: 'POST',
+          redirect: 'follow',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({ action: 'changePin', staff: unlockedStaffName, oldPin, newPin })
         });
@@ -1691,7 +1587,7 @@
       }
 
       try {
-        const res = await fetch(`${API_URL}?action=getBiodata`);
+        const res = await fetch(`${API_URL}?action=getBiodata`, { redirect: 'follow' });
         const json = await res.json();
         allBiodataList = Array.isArray(json) ? json : (Array.isArray(json.biodata) ? json.biodata : []);
       } catch (err) {
@@ -1890,6 +1786,7 @@
       try {
         await fetch(API_URL, {
           method: 'POST',
+          redirect: 'follow',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({ action: 'saveBiodata', biodata: bioObj })
         });
@@ -1911,6 +1808,7 @@
       try {
         await fetch(API_URL, {
           method: 'POST',
+          redirect: 'follow',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({ action: 'deleteBiodata', id })
         });
@@ -2014,7 +1912,7 @@
       const endDate = weekDays[6].key;
 
       try {
-        const res = await fetch(`${API_URL}?action=getSchedule&startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`);
+        const res = await fetch(`${API_URL}?action=getSchedule&startDate=${encodeURIComponent(startDate)}&endDate=${encodeURIComponent(endDate)}`, { redirect: 'follow' });
         const json = await res.json();
         if (json && json.schedule && typeof json.schedule === 'object') {
           Object.keys(json.schedule).forEach(dKey => {
@@ -2035,6 +1933,7 @@
       try {
         await fetch(API_URL, {
           method: 'POST',
+          redirect: 'follow',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({ action: 'saveScheduleBatch', items })
         });
@@ -2198,7 +2097,7 @@
       const member = staffList.find(m => m.name === selectedPerStaffName) || staffList[0];
       const weekDays = getWeekList(currentScheduleWeekStart);
 
-      const dayRowsHtml = weekDays.map(d => {
+      container.innerHTML = weekDays.map(d => {
         const cell = getScheduleCell(d.key, member.name);
         const code = SHIFTS[cell.shift] ? cell.shift : 'P';
         const sh = SHIFTS[code];
@@ -2234,8 +2133,6 @@
           </div>
         `;
       }).join('');
-
-      container.innerHTML = dayRowsHtml;
     }
 
     // =========================================================
@@ -2387,81 +2284,6 @@
     }
 
     // =========================================================
-    // MODAL B JADWAL: ATUR JADWAL 7 HARI PER STAF
-    // =========================================================
-    let editingSingleStaffName = '';
-    let draftSingleDays = [];
-
-    function openSingleStaffModal(staffName) {
-      editingSingleStaffName = staffName;
-      const weekDays = getWeekList(currentScheduleWeekStart);
-      document.getElementById('singleModalAvatar').innerText = getInitials(staffName);
-      document.getElementById('singleModalTitle').innerText = `✏️ Atur 7 Hari - ${staffName}`;
-      document.getElementById('singleModalSub').innerText = getWeekRangeText(currentScheduleWeekStart);
-
-      draftSingleDays = weekDays.map(d => {
-        const c = getScheduleCell(d.key, staffName);
-        return { shift: SHIFTS[c.shift] ? c.shift : 'P', note: c.note || '' };
-      });
-      renderSingleStaffDays();
-      document.getElementById('singleStaffModal').classList.add('open');
-    }
-
-    function closeSingleModal() {
-      editingSingleStaffName = '';
-      document.getElementById('singleStaffModal').classList.remove('open');
-    }
-
-    function applySinglePreset(code) {
-      draftSingleDays.forEach(d => d.shift = code);
-      renderSingleStaffDays();
-    }
-
-    function renderSingleStaffDays() {
-      const weekDays = getWeekList(currentScheduleWeekStart);
-      document.getElementById('singleDaysContainer').innerHTML = weekDays.map((d, idx) => {
-        const row = draftSingleDays[idx];
-        return `
-          <div class="single-day-item">
-            <div class="sdi-top-row">
-              <div class="sdi-left">
-                <div class="sdi-day">${d.dayFull}</div>
-                <div class="sdi-date">${d.dateNum} ${d.monthShort}</div>
-              </div>
-              <div class="sdi-choices">
-                ${SHIFT_ORDER.map(code => `
-                  <button type="button" class="sdi-choice-btn ${row.shift === code ? 'sel-' + code : ''}" onclick="draftSingleDays[${idx}].shift='${code}'; renderSingleStaffDays();">
-                    ${SHIFTS[code].label}
-                  </button>
-                `).join('')}
-              </div>
-            </div>
-            <input type="text" class="sdi-note-input" value="${escapeHtml(row.note)}" placeholder="📌 Catatan kegiatan ${d.dayShort} (opsional)..." oninput="draftSingleDays[${idx}].note=this.value">
-          </div>
-        `;
-      }).join('');
-    }
-
-    async function saveSingleStaffSchedule() {
-      if (!editingSingleStaffName) return;
-      const targetName = editingSingleStaffName;
-      const weekDays = getWeekList(currentScheduleWeekStart);
-      const batchItems = [];
-
-      weekDays.forEach((d, idx) => {
-        if (!scheduleDatabase[d.key]) scheduleDatabase[d.key] = {};
-        const cleanNote = draftSingleDays[idx].note.trim();
-        scheduleDatabase[d.key][targetName] = { shift: draftSingleDays[idx].shift, note: cleanNote };
-        batchItems.push({ date: d.key, staff: targetName, shift: draftSingleDays[idx].shift, note: cleanNote });
-      });
-
-      closeSingleModal();
-      renderAllScheduleViews();
-      showLinkToast(`✅ Jadwal 7 hari ${targetName} disimpan!`);
-      await syncScheduleItemsToServer(batchItems);
-    }
-
-    // =========================================================
     // MODAL C JADWAL: CATATAN KEGIATAN PER STAF
     // =========================================================
     let noteModalContext = null;
@@ -2564,6 +2386,7 @@
 
         const res = await fetch(API_URL, {
           method: 'POST',
+          redirect: 'follow',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({
             action: 'uploadData',
@@ -2578,6 +2401,7 @@
           statusEl.innerText = '✅ ' + (result.message || 'Sinkronisasi data berhasil!');
           dashboardData = null;
           sohList = [];
+          loadDashboardData(true);
         } else {
           statusEl.style.color = 'var(--accent-red)';
           statusEl.innerText = '⚠️ ' + ((result && result.message) || 'Gagal menyinkronkan data.');
