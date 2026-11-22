@@ -194,7 +194,6 @@
     .dsb-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
     .dsb-chip { padding: 5px 2px; border-radius: 10px; font-size: 10px; font-weight: 700; text-align: center; }
 
-    /* Kartu Per Hari: Nama & Jam Rata Kiri, Catatan Rata Kanan */
     .daily-staff-row { background: var(--card-bg); border-radius: 20px; padding: 13px 14px; margin-bottom: 10px; box-shadow: var(--shadow-soft); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
     .daily-staff-row.is-off { opacity: 0.78; background: #FCFBFF; }
     .dsr-left { display: flex; align-items: center; gap: 11px; flex: 1; min-width: 0; text-align: left; }
@@ -779,30 +778,30 @@
       return isFinite(n) ? n : 0;
     }
 
-    // Membaca angka dari berbagai variasi nama field (case-insensitive & nested object seperti lob.iPhone / iphone.qty)
     function pickNum(obj, keys) {
       if (!obj || typeof obj !== 'object') return 0;
       const flat = {};
-      const genericContainers = ['lob', 'qty', 'unit', 'units', 'count', 'sales', 'target', 'metrics', 'summary', 'breakdown', 'others'];
+      const genericContainers = ['lob', 'qty', 'unit', 'units', 'device', 'count', 'sales', 'target', 'metrics', 'summary', 'breakdown', 'others', 'vas', 'acc'];
 
-      Object.keys(obj).forEach(k => {
-        const lk = k.toLowerCase().replace(/[^a-z0-9]/g, '');
-        const v = obj[k];
-        if (v !== null && typeof v === 'object' && !Array.isArray(v)) {
-          Object.keys(v).forEach(subK => {
-            const lsub = subK.toLowerCase().replace(/[^a-z0-9]/g, '');
-            const subVal = v[subK];
-            if (subVal !== null && typeof subVal !== 'object') {
-              if (flat[lk + lsub] === undefined) flat[lk + lsub] = subVal;
-              if (genericContainers.includes(lk) && flat[lsub] === undefined) {
-                flat[lsub] = subVal;
+      function flattenObj(curr, prefix) {
+        Object.keys(curr).forEach(k => {
+          const lk = k.toLowerCase().replace(/[^a-z0-9]/g, '');
+          const v = curr[k];
+          if (v !== null && typeof v === 'object' && !Array.isArray(v)) {
+            flattenObj(v, lk);
+          } else if (v !== null && typeof v !== 'object') {
+            if (prefix) {
+              if (flat[prefix + lk] === undefined) flat[prefix + lk] = v;
+              if (genericContainers.includes(prefix) && flat[lk] === undefined) {
+                flat[lk] = v;
               }
+            } else {
+              if (flat[lk] === undefined) flat[lk] = v;
             }
-          });
-        } else if (v !== null && typeof v !== 'object') {
-          flat[lk] = v;
-        }
-      });
+          }
+        });
+      }
+      flattenObj(obj, '');
 
       for (let i = 0; i < keys.length; i++) {
         const normKey = keys[i].toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -916,23 +915,26 @@
         root = root.data;
       }
 
-      const staffMap = {};
+      const staffByKey = {};
       const ranking = [];
 
       function upsertStaff(name, obj) {
         const cleanName = String(name || '').trim();
         if (!cleanName || /^(store|toko|total|grand total)$/i.test(cleanName)) return;
-        const prev = staffMap[cleanName] || {};
-        staffMap[cleanName] = {
-          name: cleanName,
+        const normKey = cleanName.toLowerCase();
+        const prev = staffByKey[normKey] || { name: cleanName };
+        const bestName = (/[a-z]/.test(cleanName) && /[A-Z]/.test(cleanName)) ? cleanName : prev.name;
+
+        staffByKey[normKey] = {
+          name: bestName,
           totalSales: pickNum(obj, ['totalSales', 'sales', 'total', 'penjualan', 'omzet']) || prev.totalSales || 0,
           totalTarget: pickNum(obj, ['totalTarget', 'target', 'targetTotal']) || prev.totalTarget || 0,
           totalPoint: pickNum(obj, ['totalPoint', 'totalPoints', 'point', 'points', 'poin', 'totalPoin', 'pts']) || prev.totalPoint || 0,
-          qtyIphone: pickNum(obj, ['qtyIphone', 'iphoneQty', 'iPhone', 'iphone', 'unitIphone', 'unitsIphone', 'qIphone', 'lobIphone']) || prev.qtyIphone || 0,
-          qtyIpad: pickNum(obj, ['qtyIpad', 'ipadQty', 'iPad', 'ipad', 'unitIpad', 'unitsIpad', 'qIpad', 'lobIpad']) || prev.qtyIpad || 0,
-          qtyMac: pickNum(obj, ['qtyMac', 'macQty', 'Mac', 'mac', 'macbook', 'qtyMacbook', 'unitMac', 'qMac', 'lobMac']) || prev.qtyMac || 0,
-          qtyWatch: pickNum(obj, ['qtyWatch', 'watchQty', 'Watch', 'watch', 'appleWatch', 'qtyAppleWatch', 'unitWatch', 'qWatch', 'lobWatch']) || prev.qtyWatch || 0,
-          qtyAirpods: pickNum(obj, ['qtyAirpods', 'airpodsQty', 'AirPods', 'airpods', 'airpod', 'unitAirpods', 'qAirpods', 'lobAirpods']) || prev.qtyAirpods || 0,
+          qtyIphone: pickNum(obj, ['qtyIphone', 'iphoneQty', 'iPhone', 'iphone', 'unitIphone', 'unitsIphone', 'qIphone', 'lobIphone', 'deviceIphone']) || prev.qtyIphone || 0,
+          qtyIpad: pickNum(obj, ['qtyIpad', 'ipadQty', 'iPad', 'ipad', 'unitIpad', 'unitsIpad', 'qIpad', 'lobIpad', 'deviceIpad']) || prev.qtyIpad || 0,
+          qtyMac: pickNum(obj, ['qtyMac', 'macQty', 'Mac', 'mac', 'macbook', 'qtyMacbook', 'unitMac', 'qMac', 'lobMac', 'deviceMac']) || prev.qtyMac || 0,
+          qtyWatch: pickNum(obj, ['qtyWatch', 'watchQty', 'Watch', 'watch', 'appleWatch', 'qtyAppleWatch', 'unitWatch', 'qWatch', 'lobWatch', 'deviceWatch']) || prev.qtyWatch || 0,
+          qtyAirpods: pickNum(obj, ['qtyAirpods', 'airpodsQty', 'AirPods', 'airpods', 'airpod', 'unitAirpods', 'qAirpods', 'lobAirpods', 'deviceAirpods']) || prev.qtyAirpods || 0,
           accSales: pickNum(obj, ['accSales', 'accessoriesSales', 'salesAcc', 'salesAccessories', 'acc', 'accessories', 'totalAcc']) || prev.accSales || 0,
           accTarget: pickNum(obj, ['accTarget', 'accessoriesTarget', 'targetAcc', 'targetAccessories']) || prev.accTarget || 0,
           qoalaSales: pickNum(obj, ['qoalaSales', 'vasSales', 'salesQoala', 'salesVas', 'qoala', 'vas', 'totalQoala', 'totalVas']) || prev.qoalaSales || 0,
@@ -947,25 +949,19 @@
           }
         });
       } else if (root && typeof root === 'object') {
-        if (Array.isArray(root.staff)) {
-          root.staff.forEach(item => upsertStaff(item.name || item.nama || item.staff || item.staffName, item));
-        } else if (root.staff && typeof root.staff === 'object') {
-          Object.keys(root.staff).forEach(k => {
-            const val = root.staff[k];
-            if (val && typeof val === 'object') upsertStaff(val.name || val.nama || k, val);
-          });
-        }
-        if (Array.isArray(root.staffData)) {
-          root.staffData.forEach(item => upsertStaff(item.name || item.nama || item.staff || item.staffName, item));
-        } else if (root.staffData && typeof root.staffData === 'object') {
-          Object.keys(root.staffData).forEach(k => {
-            const val = root.staffData[k];
-            if (val && typeof val === 'object') upsertStaff(val.name || val.nama || k, val);
-          });
-        }
-        if (Array.isArray(root.staffList)) {
-          root.staffList.forEach(item => upsertStaff(item.name || item.nama || item.staff || item.staffName, item));
-        }
+        ['staff', 'staffData', 'staffList', 'details', 'members'].forEach(prop => {
+          const block = root[prop];
+          if (Array.isArray(block)) {
+            block.forEach(item => {
+              if (item && typeof item === 'object') upsertStaff(item.name || item.nama || item.staff || item.staffName, item);
+            });
+          } else if (block && typeof block === 'object') {
+            Object.keys(block).forEach(k => {
+              const val = block[k];
+              if (val && typeof val === 'object') upsertStaff(val.name || val.nama || k, val);
+            });
+          }
+        });
         if (Array.isArray(root.ranking)) {
           root.ranking.forEach(item => {
             if (typeof item === 'string') {
@@ -977,12 +973,14 @@
         }
       }
 
-      Object.keys(staffMap).forEach(k => {
-        ranking.push({ name: k, sales: staffMap[k].totalSales });
+      const staffMap = {};
+      Object.values(staffByKey).forEach(st => {
+        staffMap[st.name] = st;
+        ranking.push({ name: st.name, sales: st.totalSales });
       });
       ranking.sort((a, b) => b.sales - a.sales);
 
-      const stRaw = (root && root.store && typeof root.store === 'object') ? root.store : (root || {});
+      const stRaw = (root && root.store && typeof root.store === 'object') ? root.store : {};
       const staffValues = Object.values(staffMap);
       const sumStaffSales = ranking.reduce((acc, r) => acc + r.sales, 0);
       const sumStaffTarget = staffValues.reduce((acc, s) => acc + s.totalTarget, 0);
@@ -990,21 +988,33 @@
       const sumStaffAcc = staffValues.reduce((acc, s) => acc + s.accSales, 0);
       const sumStaffVas = staffValues.reduce((acc, s) => acc + s.qoalaSales, 0);
 
-      const totalSales = pickNum(stRaw, ['totalSales', 'sales', 'penjualan', 'omzet', 'storeSales']) || sumStaffSales;
-      const totalTarget = pickNum(stRaw, ['totalTarget', 'target', 'storeTarget']) || sumStaffTarget;
-      const totalPoint = pickNum(stRaw, ['totalPoint', 'totalPoints', 'storePoint', 'storePoints', 'point', 'points', 'poin', 'totalPoin', 'pts']) || sumStaffPoint;
-      const accSales = pickNum(stRaw, ['accSales', 'accessoriesSales', 'salesAcc', 'acc', 'accessories']) || sumStaffAcc;
-      const accTarget = pickNum(stRaw, ['accTarget', 'accessoriesTarget', 'targetAcc', 'targetAccessories']);
-      const vasSales = pickNum(stRaw, ['vasSales', 'qoalaSales', 'salesVas', 'salesQoala', 'vas', 'qoala']) || sumStaffVas;
-      const vasTarget = pickNum(stRaw, ['vasTarget', 'qoalaTarget', 'targetVas', 'targetQoala']);
-      const deviceSales = pickNum(stRaw, ['deviceSales', 'salesDevice', 'device']) || Math.max(0, totalSales - accSales - vasSales);
-      const deviceTarget = pickNum(stRaw, ['deviceTarget', 'targetDevice']);
+      const totalSales = pickNum(stRaw, ['totalSales', 'sales', 'penjualan', 'omzet', 'storeSales'])
+        || pickNum(root, ['totalSales', 'storeSales']) || sumStaffSales;
+      const totalTarget = pickNum(stRaw, ['totalTarget', 'target', 'storeTarget'])
+        || pickNum(root, ['totalTarget', 'storeTarget']) || sumStaffTarget;
+      const totalPoint = pickNum(stRaw, ['totalPoint', 'totalPoints', 'storePoint', 'storePoints', 'point', 'points', 'poin', 'totalPoin', 'pts'])
+        || pickNum(root, ['totalPoint', 'totalPoints', 'storePoint', 'storePoints', 'point', 'points', 'poin', 'totalPoin']) || sumStaffPoint;
+
+      const accSales = pickNum(stRaw, ['accSales', 'accessoriesSales', 'salesAcc', 'acc', 'accessories'])
+        || pickNum(root, ['accSales', 'storeAccSales']) || sumStaffAcc;
+      const accTarget = pickNum(stRaw, ['accTarget', 'accessoriesTarget', 'targetAcc', 'targetAccessories'])
+        || pickNum(root, ['accTarget', 'storeAccTarget']);
+
+      const vasSales = pickNum(stRaw, ['vasSales', 'qoalaSales', 'salesVas', 'salesQoala', 'vas', 'qoala'])
+        || pickNum(root, ['vasSales', 'qoalaSales', 'storeVasSales']) || sumStaffVas;
+      const vasTarget = pickNum(stRaw, ['vasTarget', 'qoalaTarget', 'targetVas', 'targetQoala'])
+        || pickNum(root, ['vasTarget', 'qoalaTarget', 'storeVasTarget']);
+
+      const deviceSales = pickNum(stRaw, ['deviceSales', 'salesDevice', 'device'])
+        || pickNum(root, ['deviceSales', 'storeDeviceSales']) || Math.max(0, totalSales - accSales - vasSales);
+      const deviceTarget = pickNum(stRaw, ['deviceTarget', 'targetDevice'])
+        || pickNum(root, ['deviceTarget', 'storeDeviceTarget']);
 
       const store = {
         totalSales,
         totalTarget,
         totalPoint,
-        pct: pickNum(stRaw, ['pct', 'achievement', 'pencapaian', 'persen']),
+        pct: pickNum(stRaw, ['pct', 'achievement', 'pencapaian', 'persen']) || pickNum(root, ['pct', 'achievement']),
         deviceSales,
         deviceTarget,
         accSales,
@@ -1017,8 +1027,7 @@
         sohList = root.soh;
       }
 
-      const preloadedDaily = (root && (root.dailySales || root.daily || root.harian)) || null;
-      return { store, staff: staffMap, ranking, preloadedDaily };
+      return { store, staff: staffMap, ranking };
     }
 
     async function loadDashboardData(force = false) {
@@ -1034,31 +1043,9 @@
       if (loadingEl) loadingEl.style.display = 'block';
 
       try {
-        let norm1 = null;
-        let norm2 = null;
-
-        try {
-          const resDefault = await fetch(API_URL, { redirect: 'follow' });
-          const json1 = await resDefault.json();
-          norm1 = normalizeDashboardData(json1);
-        } catch (e) {}
-
-        if (!norm1 || norm1.ranking.length === 0 || norm1.store.totalSales === 0 || norm1.store.totalPoint === 0) {
-          try {
-            const resAction = await fetch(`${API_URL}?action=getDashboard`, { redirect: 'follow' });
-            const json2 = await resAction.json();
-            norm2 = normalizeDashboardData(json2);
-          } catch (e) {}
-        }
-
-        if (norm1 && norm2) {
-          const score1 = (norm1.store.totalSales > 0 ? 2 : 0) + (norm1.store.totalPoint > 0 ? 2 : 0) + norm1.ranking.length;
-          const score2 = (norm2.store.totalSales > 0 ? 2 : 0) + (norm2.store.totalPoint > 0 ? 2 : 0) + norm2.ranking.length;
-          dashboardData = score2 > score1 ? norm2 : norm1;
-        } else {
-          dashboardData = norm1 || norm2 || normalizeDashboardData({});
-        }
-
+        const res = await fetch(`${API_URL}?action=getDashboard`, { redirect: 'follow' });
+        const json = await res.json();
+        dashboardData = normalizeDashboardData(json);
         populateStaffDropdowns();
         showPersonalData();
       } catch (err) {
@@ -1170,7 +1157,7 @@
       document.getElementById('heroStaffName').innerText = staffName;
       const stObj = (dashboardData && dashboardData.staff && dashboardData.staff[staffName]) ? dashboardData.staff[staffName] : {};
       const ranking = (dashboardData && Array.isArray(dashboardData.ranking)) ? dashboardData.ranking : [];
-      const rankIdx = ranking.findIndex(r => String(r.name).trim() === staffName);
+      const rankIdx = ranking.findIndex(r => String(r.name).trim().toLowerCase() === staffName.toLowerCase());
 
       const sales = parseNum(stObj.totalSales ?? (rankIdx >= 0 ? ranking[rankIdx].sales : 0));
       const target = parseNum(stObj.totalTarget);
@@ -1215,95 +1202,100 @@
       loadDailySales();
     }
 
-    function applyDailyMetricsToUI(obj, dateStr) {
-      const total = pickNum(obj, ['totalSales', 'total', 'sales', 'penjualan', 'omzet', 'totalHarian']);
-      const device = pickNum(obj, ['deviceSales', 'device', 'salesDevice']);
-      const acc = pickNum(obj, ['accSales', 'acc', 'accessories', 'accessoriesSales', 'salesAcc']);
-      const qoala = pickNum(obj, ['qoalaSales', 'qoala', 'vas', 'vasSales', 'salesQoala']);
+    function findStaffDailyRecord(payload, staffName) {
+      if (!payload || typeof payload !== 'object') return null;
+      const targetLower = staffName.trim().toLowerCase();
 
-      const iphone = pickNum(obj, ['qtyIphone', 'iphoneQty', 'iPhone', 'iphone', 'unitIphone', 'qIphone', 'lobIphone']);
-      const ipad = pickNum(obj, ['qtyIpad', 'ipadQty', 'iPad', 'ipad', 'unitIpad', 'qIpad', 'lobIpad']);
-      const mac = pickNum(obj, ['qtyMac', 'macQty', 'Mac', 'mac', 'macbook', 'unitMac', 'qMac', 'lobMac']);
-      const watch = pickNum(obj, ['qtyWatch', 'watchQty', 'Watch', 'watch', 'appleWatch', 'unitWatch', 'qWatch', 'lobWatch']);
-      const airpods = pickNum(obj, ['qtyAirpods', 'airpodsQty', 'AirPods', 'airpods', 'airpod', 'unitAirpods', 'qAirpods', 'lobAirpods']);
-
-      const computedTotal = total || (device + acc + qoala);
-
-      document.getElementById('valDailyTotal').innerText = formatRupiah(computedTotal);
-      document.getElementById('valDailyDevice').innerText = formatRupiah(device);
-      document.getElementById('valDailyAcc').innerText = formatRupiah(acc);
-      document.getElementById('valDailyQoala').innerText = formatRupiah(qoala);
-
-      document.getElementById('dailyQtyIphone').innerText = iphone;
-      document.getElementById('dailyQtyIpad').innerText = ipad;
-      document.getElementById('dailyQtyMac').innerText = mac;
-      document.getElementById('dailyQtyWatch').innerText = watch;
-      document.getElementById('dailyQtyAirpods').innerText = airpods;
-
-      const metaEl = document.getElementById('dailyMetaInfo');
-      if (metaEl) {
-        metaEl.innerText = (computedTotal > 0 || (iphone + ipad + mac + watch + airpods) > 0)
-          ? `✅ Menampilkan transaksi tanggal ${dateStr}`
-          : `ℹ️ Tidak ada catatan transaksi pada tanggal ${dateStr}`;
+      function matchObjKeys(mapObj) {
+        if (!mapObj || typeof mapObj !== 'object' || Array.isArray(mapObj)) return null;
+        const foundKey = Object.keys(mapObj).find(k => k.trim().toLowerCase() === targetLower);
+        if (foundKey && mapObj[foundKey] && typeof mapObj[foundKey] === 'object') {
+          return mapObj[foundKey];
+        }
+        return null;
       }
-    }
 
-    function normalizeDateMatch(rawDate) {
-      if (!rawDate) return '';
-      const s = String(rawDate).trim();
-      if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
-      const d = new Date(s);
-      if (!isNaN(d.getTime())) {
-        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      // 1. Cek langsung di root (misal { "Zakki": { ... } })
+      const directHit = matchObjKeys(payload);
+      if (directHit) return directHit;
+
+      // 2. Cek di container umum yang dikembalikan getDailySalesData(date)
+      const containers = ['staff', 'staffData', 'sales', 'daily', 'dailySales', 'data', 'records', 'items', 'list', 'result'];
+      for (let i = 0; i < containers.length; i++) {
+        const sub = payload[containers[i]];
+        if (!sub) continue;
+        if (Array.isArray(sub)) {
+          const foundArr = sub.find(row => {
+            if (!row || typeof row !== 'object') return false;
+            const n = String(row.name || row.nama || row.staff || row.staffName || '').trim().toLowerCase();
+            return n === targetLower;
+          });
+          if (foundArr) return foundArr;
+        } else if (typeof sub === 'object') {
+          const hit = matchObjKeys(sub);
+          if (hit) return hit;
+        }
       }
-      return s;
+
+      // 3. Jika payload berbentuk array langsung
+      if (Array.isArray(payload)) {
+        const foundArr = payload.find(row => {
+          if (!row || typeof row !== 'object') return false;
+          const n = String(row.name || row.nama || row.staff || row.staffName || '').trim().toLowerCase();
+          return n === targetLower;
+        });
+        if (foundArr) return foundArr;
+      }
+
+      return null;
     }
 
     async function loadDailySales() {
       const staffName = document.getElementById('staffSelect').value;
-      const dateStr = document.getElementById('dailyDateInput').value || getTodayLocalStr();
+      const dateInp = document.getElementById('dailyDateInput');
+      const dateStr = (dateInp && dateInp.value) ? dateInp.value : getTodayLocalStr();
       const metaEl = document.getElementById('dailyMetaInfo');
       if (!staffName) return;
 
       metaEl.innerText = `⏳ Memuat penjualan ${staffName} (${dateStr})...`;
       try {
-        const url = `${API_URL}?action=getDailySales&staff=${encodeURIComponent(staffName)}&name=${encodeURIComponent(staffName)}&date=${encodeURIComponent(dateStr)}`;
-        const res = await fetch(url, { redirect: 'follow' });
+        // Sesuai Code.gs: getDailySalesData(e.parameter.date)
+        const res = await fetch(`${API_URL}?action=getDailySales&date=${encodeURIComponent(dateStr)}`, { redirect: 'follow' });
         const raw = await res.json();
-        let data = (raw && raw.data !== undefined && typeof raw.data === 'object') ? raw.data : raw;
 
-        if (Array.isArray(data)) {
-          const matchedRows = data.filter(row => {
-            if (!row || typeof row !== 'object') return false;
-            const rStaff = String(row.staff || row.name || row.nama || row.staffName || '').trim().toLowerCase();
-            const rDate = normalizeDateMatch(row.date || row.tanggal || row.tgl);
-            const staffOk = !rStaff || rStaff === staffName.toLowerCase();
-            const dateOk = !rDate || rDate === dateStr;
-            return staffOk && dateOk;
-          });
-          const summed = { totalSales: 0, deviceSales: 0, accSales: 0, qoalaSales: 0, qtyIphone: 0, qtyIpad: 0, qtyMac: 0, qtyWatch: 0, qtyAirpods: 0 };
-          matchedRows.forEach(r => {
-            summed.totalSales += pickNum(r, ['totalSales', 'total', 'sales', 'penjualan', 'omzet']);
-            summed.deviceSales += pickNum(r, ['deviceSales', 'device', 'salesDevice']);
-            summed.accSales += pickNum(r, ['accSales', 'acc', 'accessories', 'accessoriesSales']);
-            summed.qoalaSales += pickNum(r, ['qoalaSales', 'qoala', 'vas', 'vasSales']);
-            summed.qtyIphone += pickNum(r, ['qtyIphone', 'iphoneQty', 'iPhone', 'iphone']);
-            summed.qtyIpad += pickNum(r, ['qtyIpad', 'ipadQty', 'iPad', 'ipad']);
-            summed.qtyMac += pickNum(r, ['qtyMac', 'macQty', 'Mac', 'mac']);
-            summed.qtyWatch += pickNum(r, ['qtyWatch', 'watchQty', 'Watch', 'watch']);
-            summed.qtyAirpods += pickNum(r, ['qtyAirpods', 'airpodsQty', 'AirPods', 'airpods']);
-          });
-          applyDailyMetricsToUI(summed, dateStr);
-        } else if (data && typeof data === 'object') {
-          if (data[dateStr] && typeof data[dateStr] === 'object') {
-            data = data[dateStr][staffName] || data[dateStr];
-          } else if (data[staffName] && typeof data[staffName] === 'object') {
-            data = data[staffName][dateStr] || data[staffName];
-          }
-          applyDailyMetricsToUI(data, dateStr);
-        } else {
-          applyDailyMetricsToUI({}, dateStr);
+        const serverDate = (raw && (raw.date || raw.activeDate || raw.latestDate)) ? String(raw.date || raw.activeDate || raw.latestDate).slice(0, 10) : dateStr;
+        if (serverDate && /^\d{4}-\d{2}-\d{2}$/.test(serverDate) && dateInp && dateInp.value !== serverDate && raw && raw.autoFallback) {
+          dateInp.value = serverDate;
         }
+
+        const rec = findStaffDailyRecord(raw, staffName) || {};
+
+        const device = pickNum(rec, ['deviceSales', 'device', 'deviceAmount', 'salesDevice']);
+        const acc = pickNum(rec, ['accSales', 'acc', 'accessories', 'accessoriesSales', 'accAmount', 'salesAcc']);
+        const qoala = pickNum(rec, ['qoalaSales', 'qoala', 'vas', 'vasSales', 'qoalaAmount', 'salesQoala']);
+        const total = pickNum(rec, ['totalSales', 'total', 'sales', 'amount', 'totalAmount', 'penjualan', 'omzet', 'totalHarian']) || (device + acc + qoala);
+
+        const iphone = pickNum(rec, ['qtyIphone', 'iphoneQty', 'iPhone', 'iphone', 'unitIphone', 'qIphone', 'lobIphone', 'deviceIphone']);
+        const ipad = pickNum(rec, ['qtyIpad', 'ipadQty', 'iPad', 'ipad', 'unitIpad', 'qIpad', 'lobIpad', 'deviceIpad']);
+        const mac = pickNum(rec, ['qtyMac', 'macQty', 'Mac', 'mac', 'macbook', 'unitMac', 'qMac', 'lobMac', 'deviceMac']);
+        const watch = pickNum(rec, ['qtyWatch', 'watchQty', 'Watch', 'watch', 'appleWatch', 'unitWatch', 'qWatch', 'lobWatch', 'deviceWatch']);
+        const airpods = pickNum(rec, ['qtyAirpods', 'airpodsQty', 'AirPods', 'airpods', 'airpod', 'unitAirpods', 'qAirpods', 'lobAirpods', 'deviceAirpods']);
+
+        document.getElementById('valDailyTotal').innerText = formatRupiah(total);
+        document.getElementById('valDailyDevice').innerText = formatRupiah(device);
+        document.getElementById('valDailyAcc').innerText = formatRupiah(acc);
+        document.getElementById('valDailyQoala').innerText = formatRupiah(qoala);
+
+        document.getElementById('dailyQtyIphone').innerText = iphone;
+        document.getElementById('dailyQtyIpad').innerText = ipad;
+        document.getElementById('dailyQtyMac').innerText = mac;
+        document.getElementById('dailyQtyWatch').innerText = watch;
+        document.getElementById('dailyQtyAirpods').innerText = airpods;
+
+        const hasSales = total > 0 || (iphone + ipad + mac + watch + airpods) > 0;
+        metaEl.innerText = hasSales
+          ? `✅ Menampilkan transaksi tanggal ${serverDate}`
+          : `ℹ️ Tidak ada catatan transaksi pada tanggal ${serverDate}`;
       } catch (err) {
         metaEl.innerText = `⚠️ Data harian belum tersedia untuk ${dateStr}`;
       }
@@ -1377,7 +1369,7 @@
     }
 
     // =========================================================
-    // 3. PUSAT FORM & LINK (KATEGORI: PROJECT, TRAINER, SPV, LAINNYA)
+    // 3. PUSAT FORM & LINK (SESUAI Code.gs: getLinks, addLink, editLink, deleteLink)
     // =========================================================
     const LINKS_LOCAL_KEY = 'digimap_links_cache_v2';
     let allLinksList = [];
@@ -1525,7 +1517,7 @@
       btn.innerText = 'Menyimpan...';
 
       const id = editingLinkId || ('link-' + Date.now());
-      const payloadItem = { id, title, desc, category, url };
+      const payloadItem = { id, title, desc, cat: category, category, url };
 
       if (editingLinkId) {
         const idx = allLinksList.findIndex((x, i) => String(x.id || ('link-' + i)) === String(editingLinkId));
@@ -1543,8 +1535,17 @@
           method: 'POST',
           redirect: 'follow',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: 'saveLink', link: payloadItem })
+          body: JSON.stringify({
+            action: editingLinkId ? 'editLink' : 'addLink',
+            id,
+            title,
+            desc,
+            cat: category,
+            category,
+            url
+          })
         });
+        loadLinksData();
         showLinkToast('✅ Link berhasil disimpan!');
       } catch (err) {
         showLinkToast('✅ Link tersimpan di perangkat');
@@ -1578,7 +1579,7 @@
     }
 
     // =========================================================
-    // 4A. SUB-MENU STAF: SLIP GAJI & PIN
+    // 4A. SUB-MENU STAF: SLIP GAJI & PIN (SESUAI Code.gs: getBonus & updatePin)
     // =========================================================
     let unlockedStaffName = '';
 
@@ -1604,25 +1605,22 @@
       document.getElementById('btnUnlock').disabled = true;
 
       try {
-        const res = await fetch(API_URL, {
-          method: 'POST',
-          redirect: 'follow',
-          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: 'verifyPin', staff: staffName, pin })
-        });
-        const data = await res.json();
+        // Sesuai Code.gs: action === 'getBonus' -> verifyAndGetBonus(e.parameter.name, e.parameter.pin)
+        const res = await fetch(`${API_URL}?action=getBonus&name=${encodeURIComponent(staffName)}&pin=${encodeURIComponent(pin)}`, { redirect: 'follow' });
+        const raw = await res.json();
+        const data = (raw && raw.data && typeof raw.data === 'object') ? raw.data : raw;
 
-        if (data && data.success === false) {
-          errEl.innerText = data.message || 'PIN salah! Silakan coba lagi.';
+        if (!raw || raw.success === false) {
+          errEl.innerText = (raw && raw.message) || 'PIN salah! Silakan coba lagi.';
           errEl.style.display = 'block';
           return;
         }
 
         unlockedStaffName = staffName;
-        const pokok = pickNum(data, ['gajiPokok', 'pokok']) || GAJI_POKOK;
-        const insentif = pickNum(data, ['insentif', 'bonus']);
-        const tunjangan = pickNum(data, ['tunjangan']);
-        const total = pickNum(data, ['total']) || (pokok + insentif + tunjangan);
+        const pokok = pickNum(data, ['gajiPokok', 'pokok', 'baseSalary']) || GAJI_POKOK;
+        const insentif = pickNum(data, ['insentif', 'bonus', 'estimasiBonus', 'incentive']);
+        const tunjangan = pickNum(data, ['tunjangan', 'allowance']);
+        const total = pickNum(data, ['total', 'totalGaji', 'takeHomePay', 'netPay']) || (pokok + insentif + tunjangan);
 
         document.getElementById('slipNamaHeader').innerText = staffName;
         document.getElementById('slipPokok').innerText = formatRupiah(pokok);
@@ -1662,16 +1660,17 @@
       stEl.innerText = 'Menyimpan PIN baru...';
 
       try {
+        // Sesuai Code.gs: payload.action === 'updatePin' -> updateStaffPin(payload.name, payload.oldPin, payload.newPin)
         const res = await fetch(API_URL, {
           method: 'POST',
           redirect: 'follow',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: 'changePin', staff: unlockedStaffName, oldPin, newPin })
+          body: JSON.stringify({ action: 'updatePin', name: unlockedStaffName, oldPin, newPin })
         });
         const data = await res.json();
         if (data && data.success) {
           stEl.style.color = 'var(--accent-green)';
-          stEl.innerText = '✅ PIN berhasil diperbarui!';
+          stEl.innerText = '✅ ' + (data.message || 'PIN berhasil diperbarui!');
           document.getElementById('oldPin').value = '';
           document.getElementById('newPin').value = '';
         } else {
@@ -1692,7 +1691,7 @@
     }
 
     // =========================================================
-    // 4B. SUB-MENU STAF: BIODATA TIM
+    // 4B. SUB-MENU STAF: BIODATA TIM (SESUAI Code.gs: getBiodata, addBiodata, editBiodata, deleteBiodata)
     // =========================================================
     let allBiodataList = [];
     let isBiodataLoading = false;
@@ -1910,12 +1909,17 @@
       renderAllScheduleViews();
 
       try {
+        // Sesuai Code.gs: addBiodataToSheet(payload) / editBiodataInSheet(payload)
         await fetch(API_URL, {
           method: 'POST',
           redirect: 'follow',
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-          body: JSON.stringify({ action: 'saveBiodata', biodata: bioObj })
+          body: JSON.stringify({
+            action: editingBioId ? 'editBiodata' : 'addBiodata',
+            ...bioObj
+          })
         });
+        loadBiodataData(true);
         showLinkToast('✅ Biodata berhasil disimpan!');
       } catch (err) {
         showLinkToast('⚠️ Gagal menyinkronkan ke server');
@@ -2464,7 +2468,7 @@
     }
 
     // =========================================================
-    // 5. ADMIN PANEL UPLOAD EXCEL/CSV
+    // 5. ADMIN PANEL UPLOAD EXCEL/CSV (SESUAI Code.gs: uploadData)
     // =========================================================
     function readExcelFile(file) {
       return new Promise((resolve, reject) => {
