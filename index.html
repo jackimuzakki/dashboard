@@ -58,7 +58,7 @@
     .kpi-card { background: var(--card-bg); padding: 20px 15px; border-radius: var(--radius-large); box-shadow: var(--shadow-soft); display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
     .kpi-bg-icon { position: absolute; right: -10px; bottom: -10px; font-size: 60px; opacity: 0.03; z-index: 0; }
     .kpi-title { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-bottom: 8px; z-index: 1; }
-    .kpi-value { font-size: 16px; font-weight: 700; color: var(--text-main); z-index: 1; }
+    .kpi-value { font-size: 20px; font-weight: 700; color: var(--text-main); z-index: 1; }
     .kpi-rank-badge { position: absolute; top: 15px; right: 15px; background: #FEF3C7; color: #D97706; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
 
     .section-title { font-size: 16px; font-weight: 700; color: var(--text-main); margin: 25px 0 15px 5px; }
@@ -308,25 +308,25 @@
         <div class="hero-name">Digimap Jember Roxy</div>
       </div>
       <div class="kpi-grid">
-        <div class="kpi-card"><div class="kpi-bg-icon">💰</div><div class="kpi-title">Total Sales</div><div class="kpi-value" id="valStoreSales">Rp 0</div></div>
-        <div class="kpi-card"><div class="kpi-bg-icon">🎯</div><div class="kpi-title">Target Toko</div><div class="kpi-value" id="valStoreTarget" style="color: var(--text-muted); font-size: 16px;">Rp 0</div></div>
+        <div class="kpi-card"><div class="kpi-bg-icon">💰</div><div class="kpi-title">Total Sales</div><div class="kpi-value" id="valStoreSales">0</div></div>
+        <div class="kpi-card"><div class="kpi-bg-icon">🎯</div><div class="kpi-title">Target Toko</div><div class="kpi-value" id="valStoreTarget" style="color: var(--text-muted); font-size: 16px;">0</div></div>
         <div class="kpi-card"><div class="kpi-bg-icon">⭐</div><div class="kpi-title">Total Poin</div><div class="kpi-value c-purple" id="valStorePoint">0</div></div>
         <div class="kpi-card"><div class="kpi-bg-icon">🚀</div><div class="kpi-title">Pencapaian</div><div class="kpi-value c-green" id="valStorePct">0%</div></div>
       </div>
       <div class="section-title">Breakdown LOB</div>
       <div class="detail-card">
         <div class="detail-card-header"><div class="detail-icon bg-blue c-blue">📱</div><div class="detail-title">Device</div></div>
-        <div class="stat-row"><div class="stat-label">Sales: <span class="stat-val" id="valStoreDeviceSales">Rp 0</span></div><div class="stat-label">Target: <span class="stat-val" id="valStoreDeviceTarget" style="font-weight:400;">Rp 0</span></div></div>
+        <div class="stat-row"><div class="stat-label">Sales: <span class="stat-val" id="valStoreDeviceSales">0</span></div><div class="stat-label">Target: <span class="stat-val" id="valStoreDeviceTarget" style="font-weight:400;">0</span></div></div>
         <div class="progress-bar-container"><div class="progress-bar bar-blue" id="barStoreDevice" style="width: 0%;"></div></div>
       </div>
       <div class="detail-card">
         <div class="detail-card-header"><div class="detail-icon bg-purple c-purple">🎧</div><div class="detail-title">Aksesoris</div></div>
-        <div class="stat-row"><div class="stat-label">Sales: <span class="stat-val" id="valStoreAccSales">Rp 0</span></div><div class="stat-label">Target: <span class="stat-val" id="valStoreAccTarget" style="font-weight:400;">Rp 0</span></div></div>
+        <div class="stat-row"><div class="stat-label">Sales: <span class="stat-val" id="valStoreAccSales">0</span></div><div class="stat-label">Target: <span class="stat-val" id="valStoreAccTarget" style="font-weight:400;">0</span></div></div>
         <div class="progress-bar-container"><div class="progress-bar bar-purple" id="barStoreAcc" style="width: 0%;"></div></div>
       </div>
       <div class="detail-card">
         <div class="detail-card-header"><div class="detail-icon bg-orange c-orange">🛡️</div><div class="detail-title">VAS</div></div>
-        <div class="stat-row"><div class="stat-label">Sales: <span class="stat-val" id="valStoreVasSales">Rp 0</span></div><div class="stat-label">Target: <span class="stat-val" id="valStoreVasTarget" style="font-weight:400;">Rp 0</span></div></div>
+        <div class="stat-row"><div class="stat-label">Sales: <span class="stat-val" id="valStoreVasSales">0</span></div><div class="stat-label">Target: <span class="stat-val" id="valStoreVasTarget" style="font-weight:400;">0</span></div></div>
         <div class="progress-bar-container"><div class="progress-bar bar-orange" id="barStoreVas" style="width: 0%;"></div></div>
       </div>
       <div class="section-title" style="margin-top:35px;">🏆 Klasemen Staf</div>
@@ -336,9 +336,9 @@
     <div id="staffView" style="display:none;">
       <div class="hero-header"><div class="hero-title">Performa Saya</div><div class="hero-name" id="heroStaffName">Nama Staf</div></div>
       <div class="kpi-grid">
-        <div class="kpi-card"><div class="kpi-rank-badge" id="valMyRank">#1</div><div class="kpi-bg-icon">💰</div><div class="kpi-title">Total Sales</div><div class="kpi-value" id="valMySales">Rp 0</div></div>
-        <div class="kpi-card"><div class="kpi-bg-icon">🎯</div><div class="kpi-title">Target Saya</div><div class="kpi-value" id="valMyTarget" style="color: var(--text-muted); font-size: 16px;">Rp 0</div></div>
-        <div class="kpi-card" style="grid-column: span 2; align-items: center; text-align: center;"><div class="kpi-title">Kekurangan Target</div><div class="kpi-value" id="valMySisa" style="font-size:24px;">Rp 0</div><div style="margin-top: 5px; font-size: 12px; color: var(--text-muted);">Pencapaian: <span id="valMyPct" style="font-weight:bold; color:var(--text-main);">0%</span></div></div>
+        <div class="kpi-card"><div class="kpi-rank-badge" id="valMyRank">#1</div><div class="kpi-bg-icon">💰</div><div class="kpi-title">Total Sales</div><div class="kpi-value" id="valMySales">0</div></div>
+        <div class="kpi-card"><div class="kpi-bg-icon">🎯</div><div class="kpi-title">Target Saya</div><div class="kpi-value" id="valMyTarget" style="color: var(--text-muted); font-size: 16px;">0</div></div>
+        <div class="kpi-card" style="grid-column: span 2; align-items: center; text-align: center;"><div class="kpi-title">Kekurangan Target</div><div class="kpi-value" id="valMySisa" style="font-size:24px;">0</div><div style="margin-top: 5px; font-size: 12px; color: var(--text-muted);">Pencapaian: <span id="valMyPct" style="font-weight:bold; color:var(--text-main);">0%</span></div></div>
       </div>
       <div class="section-title">LOB</div>
       <div id="qtyKPI">
@@ -351,12 +351,12 @@
       <div class="section-title">Others</div>
       <div class="detail-card">
         <div class="detail-card-header"><div class="detail-icon bg-purple c-purple">🎧</div><div class="detail-title">Aksesoris</div></div>
-        <div class="stat-row"><div class="stat-label">Sales: <span class="stat-val" id="valAccSales">Rp 0</span></div><div class="stat-label">Target: <span class="stat-val" id="valAccTarget" style="font-weight:400;">Rp 0</span></div></div>
+        <div class="stat-row"><div class="stat-label">Sales: <span class="stat-val" id="valAccSales">0</span></div><div class="stat-label">Target: <span class="stat-val" id="valAccTarget" style="font-weight:400;">0</span></div></div>
         <div class="progress-bar-container"><div class="progress-bar bar-purple" id="barAcc" style="width: 0%;"></div></div>
       </div>
       <div class="detail-card">
         <div class="detail-card-header"><div class="detail-icon bg-blue c-blue">🛡️</div><div class="detail-title">Qoala</div></div>
-        <div class="stat-row"><div class="stat-label">Sales: <span class="stat-val" id="valQoalaSales">Rp 0</span></div><div class="stat-label">Target: <span class="stat-val" id="valQoalaTarget" style="font-weight:400;">Rp 0</span></div></div>
+        <div class="stat-row"><div class="stat-label">Sales: <span class="stat-val" id="valQoalaSales">0</span></div><div class="stat-label">Target: <span class="stat-val" id="valQoalaTarget" style="font-weight:400;">0</span></div></div>
         <div class="progress-bar-container"><div class="progress-bar bar-blue" id="barQoala" style="width: 0%;"></div></div>
       </div>
 
@@ -374,22 +374,22 @@
         <div class="kpi-card">
           <div class="kpi-bg-icon">💰</div>
           <div class="kpi-title">Total Harian</div>
-          <div class="kpi-value c-purple" id="valDailyTotal" style="font-size:17px;">Rp 0</div>
+          <div class="kpi-value c-purple" id="valDailyTotal" style="font-size:17px;">0</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-bg-icon">📱</div>
           <div class="kpi-title">Device</div>
-          <div class="kpi-value" id="valDailyDevice" style="font-size:17px;">Rp 0</div>
+          <div class="kpi-value" id="valDailyDevice" style="font-size:17px;">0</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-bg-icon">🎧</div>
           <div class="kpi-title">Accessories</div>
-          <div class="kpi-value" id="valDailyAcc" style="font-size:17px;">Rp 0</div>
+          <div class="kpi-value" id="valDailyAcc" style="font-size:17px;">0</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-bg-icon">🛡️</div>
           <div class="kpi-title">Qoala</div>
-          <div class="kpi-value" id="valDailyQoala" style="font-size:17px;">Rp 0</div>
+          <div class="kpi-value" id="valDailyQoala" style="font-size:17px;">0</div>
         </div>
       </div>
 
@@ -812,6 +812,11 @@
       return 0;
     }
 
+    function formatAngka(num) {
+      const n = parseNum(num);
+      return Math.round(n).toLocaleString('id-ID');
+    }
+
     function formatRupiah(num) {
       const n = parseNum(num);
       return 'Rp ' + Math.round(n).toLocaleString('id-ID');
@@ -1104,24 +1109,24 @@
       const point = parseNum(st.totalPoint);
       const pct = st.pct > 0 ? Math.round(st.pct) : (target > 0 ? Math.round((sales / target) * 100) : 0);
 
-      document.getElementById('valStoreSales').innerText = formatRupiah(sales);
-      document.getElementById('valStoreTarget').innerText = formatRupiah(target);
+      document.getElementById('valStoreSales').innerText = formatAngka(sales);
+      document.getElementById('valStoreTarget').innerText = formatAngka(target);
       document.getElementById('valStorePoint').innerText = point.toLocaleString('id-ID');
       document.getElementById('valStorePct').innerText = pct + '%';
 
       const devS = parseNum(st.deviceSales), devT = parseNum(st.deviceTarget);
-      document.getElementById('valStoreDeviceSales').innerText = formatRupiah(devS);
-      document.getElementById('valStoreDeviceTarget').innerText = formatRupiah(devT);
+      document.getElementById('valStoreDeviceSales').innerText = formatAngka(devS);
+      document.getElementById('valStoreDeviceTarget').innerText = formatAngka(devT);
       document.getElementById('barStoreDevice').style.width = Math.min(100, devT > 0 ? (devS / devT) * 100 : 0) + '%';
 
       const accS = parseNum(st.accSales), accT = parseNum(st.accTarget);
-      document.getElementById('valStoreAccSales').innerText = formatRupiah(accS);
-      document.getElementById('valStoreAccTarget').innerText = formatRupiah(accT);
+      document.getElementById('valStoreAccSales').innerText = formatAngka(accS);
+      document.getElementById('valStoreAccTarget').innerText = formatAngka(accT);
       document.getElementById('barStoreAcc').style.width = Math.min(100, accT > 0 ? (accS / accT) * 100 : 0) + '%';
 
       const vasS = parseNum(st.vasSales), vasT = parseNum(st.vasTarget);
-      document.getElementById('valStoreVasSales').innerText = formatRupiah(vasS);
-      document.getElementById('valStoreVasTarget').innerText = formatRupiah(vasT);
+      document.getElementById('valStoreVasSales').innerText = formatAngka(vasS);
+      document.getElementById('valStoreVasTarget').innerText = formatAngka(vasT);
       document.getElementById('barStoreVas').style.width = Math.min(100, vasT > 0 ? (vasS / vasT) * 100 : 0) + '%';
 
       const tbody = document.getElementById('rankTableBody');
@@ -1136,7 +1141,7 @@
             <tr style="cursor:pointer;" onclick="document.getElementById('staffSelect').value='${escapeAttr(r.name)}'; showPersonalData();">
               <td style="text-align:center; font-weight:700;">${medal}</td>
               <td style="font-weight:600;">${escapeHtml(r.name)}</td>
-              <td style="text-align:right; font-weight:700; color:var(--primary);">${formatRupiah(r.sales)}</td>
+              <td style="text-align:right; font-weight:700; color:var(--primary);">${formatAngka(r.sales)}</td>
             </tr>
           `;
         }).join('');
@@ -1156,9 +1161,9 @@
       const rankNum = stObj.rank || (rankIdx >= 0 ? rankIdx + 1 : 0);
 
       document.getElementById('valMyRank').innerText = rankNum > 0 ? '#' + rankNum : '#-';
-      document.getElementById('valMySales').innerText = formatRupiah(sales);
-      document.getElementById('valMyTarget').innerText = formatRupiah(target);
-      document.getElementById('valMySisa').innerText = sisa === 0 && target > 0 ? '🎉 Target Tercapai!' : formatRupiah(sisa);
+      document.getElementById('valMySales').innerText = formatAngka(sales);
+      document.getElementById('valMyTarget').innerText = formatAngka(target);
+      document.getElementById('valMySisa').innerText = sisa === 0 && target > 0 ? '🎉 Target Tercapai!' : formatAngka(sisa);
       document.getElementById('valMyPct').innerText = pct + '%';
 
       document.getElementById('qtyIphone').innerText = parseNum(stObj.qtyIphone);
@@ -1168,13 +1173,13 @@
       document.getElementById('qtyAirpods').innerText = parseNum(stObj.qtyAirpods);
 
       const accS = parseNum(stObj.accSales), accT = parseNum(stObj.accTarget);
-      document.getElementById('valAccSales').innerText = formatRupiah(accS);
-      document.getElementById('valAccTarget').innerText = formatRupiah(accT);
+      document.getElementById('valAccSales').innerText = formatAngka(accS);
+      document.getElementById('valAccTarget').innerText = formatAngka(accT);
       document.getElementById('barAcc').style.width = Math.min(100, accT > 0 ? (accS / accT) * 100 : 0) + '%';
 
       const qoalaS = parseNum(stObj.qoalaSales), qoalaT = parseNum(stObj.qoalaTarget);
-      document.getElementById('valQoalaSales').innerText = formatRupiah(qoalaS);
-      document.getElementById('valQoalaTarget').innerText = formatRupiah(qoalaT);
+      document.getElementById('valQoalaSales').innerText = formatAngka(qoalaS);
+      document.getElementById('valQoalaTarget').innerText = formatAngka(qoalaT);
       document.getElementById('barQoala').style.width = Math.min(100, qoalaT > 0 ? (qoalaS / qoalaT) * 100 : 0) + '%';
 
       const dateInput = document.getElementById('dailyDateInput');
@@ -1268,10 +1273,10 @@
         const watch = pickNum(rec, ['qty_aw', 'qtyWatch', 'watchQty', 'Watch', 'watch', 'appleWatch', 'aw']);
         const airpods = pickNum(rec, ['qty_airpods', 'qtyAirpods', 'airpodsQty', 'AirPods', 'airpods']);
 
-        document.getElementById('valDailyTotal').innerText = formatRupiah(total);
-        document.getElementById('valDailyDevice').innerText = formatRupiah(device);
-        document.getElementById('valDailyAcc').innerText = formatRupiah(acc);
-        document.getElementById('valDailyQoala').innerText = formatRupiah(qoala);
+        document.getElementById('valDailyTotal').innerText = formatAngka(total);
+        document.getElementById('valDailyDevice').innerText = formatAngka(device);
+        document.getElementById('valDailyAcc').innerText = formatAngka(acc);
+        document.getElementById('valDailyQoala').innerText = formatAngka(qoala);
 
         document.getElementById('dailyQtyIphone').innerText = iphone;
         document.getElementById('dailyQtyIpad').innerText = ipad;
