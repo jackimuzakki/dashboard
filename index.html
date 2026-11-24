@@ -5,217 +5,224 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>Digimap Staff Portal</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
+    /* =========================================================
+       REDESIGN: tampilan bersih, satu warna aksen.
+       Ganti warna utama cukup lewat --primary / --primary-soft.
+       Nama class, ID, dan variabel dipertahankan agar JS tetap jalan.
+       ========================================================= */
     :root {
-      --bg-main: #F4EEFF; --card-bg: #FFFFFF; --primary: #8C6DFD; --primary-light: #B49BFF; 
-      --text-main: #2D2A4A; --text-muted: #8E8BA7; --shadow-soft: 0 10px 25px rgba(140, 109, 253, 0.08); 
-      --radius-large: 24px; --radius-medium: 16px; --accent-green: #4ADE80; --accent-red: #FB7185; --accent-orange: #FBBF24;
+      --bg-main: #F4F6F9; --card-bg: #FFFFFF; --primary: #2F7DE1; --primary-light: #5B9BF0; --primary-soft: #EAF2FD;
+      --text-main: #1B2430; --text-muted: #6B7686; --border: #E6EAF0; --surface-2: #F8F9FB;
+      --shadow-soft: 0 1px 2px rgba(16, 24, 40, 0.05);
+      --radius-large: 16px; --radius-medium: 12px;
+      --accent-green: #1D9E75; --accent-red: #E5484D; --accent-orange: #E8A317;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', -apple-system, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
     html, body { width: 100%; overflow-x: hidden; background-color: var(--bg-main); color: var(--text-main); }
-    body { display: block; padding: 20px 16px 120px 16px; }
-    
-    /* Navigasi Bawah 5 Menu Utama */
-    .nav { background: var(--card-bg); padding: 10px 12px; border-radius: 40px; display: flex; gap: 4px; box-shadow: 0 15px 35px rgba(140,109,253,0.18); position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 999; flex-wrap: nowrap; justify-content: space-between; width: 92%; max-width: 500px; }
-    .nav button { background: transparent; border: none; padding: 10px 6px; flex: 1; font-weight: 600; color: var(--text-muted); cursor: pointer; border-radius: 30px; transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-    .nav button.active { background: var(--primary); color: white; box-shadow: 0 8px 15px rgba(140,109,253,0.3); }
-    .nav-icon { font-size: 18px; }
-    .nav-text { font-size: 10px; white-space: nowrap; }
-    
-    .tab-content { display: none; width: 100%; max-width: 500px; margin: 0 auto; animation: fadeIn 0.4s ease; padding-bottom: 20px; }
+    body { display: block; padding: 18px 16px 110px 16px; font-size: 14px; line-height: 1.45; }
+
+    /* Navigasi bawah 5 menu */
+    .nav { background: var(--card-bg); padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); border-top: 1px solid var(--border); border-radius: 16px 16px 0 0; display: flex; gap: 2px; position: fixed; left: 50%; transform: translateX(-50%); bottom: 0; z-index: 999; flex-wrap: nowrap; justify-content: space-between; width: 100%; max-width: 520px; box-shadow: 0 -4px 16px rgba(16, 24, 40, 0.05); }
+    .nav button { background: transparent; border: none; padding: 8px 4px; flex: 1; font-weight: 500; color: var(--text-muted); cursor: pointer; border-radius: 12px; transition: color 0.2s, background 0.2s; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .nav button.active { background: var(--primary-soft); color: var(--primary); }
+    .nav-icon { display: flex; align-items: center; justify-content: center; line-height: 0; }
+    .nav-icon svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .nav-text { font-size: 11px; white-space: nowrap; }
+
+    .tab-content { display: none; width: 100%; max-width: 500px; margin: 0 auto; animation: fadeIn 0.25s ease; padding-bottom: 20px; }
     .tab-content.active { display: block; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
-    .card { background: var(--card-bg); padding: 30px; border-radius: var(--radius-large); box-shadow: var(--shadow-soft); margin-bottom: 20px; }
-    .card h2 { text-align: center; margin-bottom: 25px; font-weight: 700; font-size: 22px; color: var(--text-main); }
-    
-    label { font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; display: block; margin-top: 15px; }
-    input[type="file"], input[type="password"] { width: 100%; padding: 16px; border: 2px solid #F0EDFF; border-radius: var(--radius-medium); margin-bottom: 15px; background: #FAFAFF; font-size: 14px; outline: none; transition: 0.3s; color: var(--text-main); }
-    input[type="password"]:focus { border-color: var(--primary); background: #FFF; box-shadow: 0 0 0 4px rgba(140,109,253,0.1); }
-    
-    .btn-primary { width: 100%; background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; padding: 16px; border: none; border-radius: var(--radius-medium); font-size: 15px; font-weight: 600; cursor: pointer; transition: 0.3s; margin-top: 10px; box-shadow: 0 10px 20px rgba(140,109,253,0.25); }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(140,109,253,0.35); }
-    .btn-primary:disabled { background: #D4C9FF; cursor: not-allowed; box-shadow: none; transform: none; }
-    
-    .btn-outline { width: 100%; background: transparent; color: var(--primary); padding: 15px; border: 2px solid var(--primary); border-radius: var(--radius-medium); font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 15px; transition: 0.2s; }
-    .btn-outline:hover { background: #F4EEFF; }
-    #status { margin-top: 20px; text-align: center; font-weight: 600; color: var(--accent-green); font-size: 14px; }
-    
-    .dropdown-container { text-align: center; margin-bottom: 25px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
-    select, input[type="text"].search-box { padding: 16px 20px; border-radius: 30px; border: 2px solid #FFF; font-size: 14px; font-weight: 600; color: var(--text-main); background: var(--card-bg); width: 100%; outline: none; box-shadow: var(--shadow-soft); transition: 0.3s; }
-    select { cursor: pointer; appearance: none; text-align: center; }
-    select:focus, input[type="text"].search-box:focus { border-color: var(--primary); }
-    input[type="text"].search-box::placeholder { color: var(--text-muted); font-weight: 500; }
-    
-    .hero-header { background: linear-gradient(135deg, var(--primary), var(--primary-light)); border-radius: var(--radius-large); padding: 24px 22px; color: white; margin-bottom: 20px; position: relative; overflow: hidden; box-shadow: 0 15px 30px rgba(140,109,253,0.2); }
-    .hero-header::after { content: ''; position: absolute; top: -30px; right: -30px; width: 120px; height: 120px; background: rgba(255,255,255,0.1); border-radius: 50%; }
-    .hero-header::before { content: ''; position: absolute; bottom: -20px; left: 20px; width: 60px; height: 60px; background: rgba(255,255,255,0.1); border-radius: 50%; }
-    .hero-title { font-size: 13px; font-weight: 500; opacity: 0.9; margin-bottom: 4px; z-index: 2; position: relative; }
-    .hero-name { font-size: 24px; font-weight: 700; z-index: 2; position: relative; }
-    
-    .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 25px; }
-    .kpi-card { background: var(--card-bg); padding: 20px 15px; border-radius: var(--radius-large); box-shadow: var(--shadow-soft); display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
-    .kpi-bg-icon { position: absolute; right: -10px; bottom: -10px; font-size: 60px; opacity: 0.03; z-index: 0; }
-    .kpi-title { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-bottom: 8px; z-index: 1; }
-    .kpi-value { font-size: 16px; font-weight: 700; color: var(--text-main); z-index: 1; }
-    .kpi-rank-badge { position: absolute; top: 15px; right: 15px; background: #FEF3C7; color: #D97706; width: 35px; height: 35px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+    .card { background: var(--card-bg); padding: 22px 18px; border-radius: var(--radius-large); border: 1px solid var(--border); box-shadow: var(--shadow-soft); margin-bottom: 16px; }
+    .card h2 { text-align: center; margin-bottom: 18px; font-weight: 600; font-size: 19px; color: var(--text-main); }
 
-    .section-title { font-size: 16px; font-weight: 700; color: var(--text-main); margin: 25px 0 15px 5px; }
-    .qty-card { background: var(--card-bg); padding: 15px; border-radius: var(--radius-medium); box-shadow: var(--shadow-soft); text-align: center; min-width: 90px; flex-shrink: 0; }
-    .qty-emoji { font-size: 24px; margin-bottom: 8px; background: var(--bg-main); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px auto; }
-    .qty-label { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-bottom: 2px; }
-    .qty-val { font-size: 18px; font-weight: 700; color: var(--primary); }
+    label { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; display: block; margin-top: 14px; }
+    input[type="file"], input[type="password"] { width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 12px; background: var(--surface-2); font-size: 14px; outline: none; transition: 0.2s; color: var(--text-main); }
+    input[type="file"] { border-style: dashed; border-width: 1.5px; cursor: pointer; font-size: 13px; }
+    input[type="password"]:focus { border-color: var(--primary); background: #FFF; box-shadow: 0 0 0 3px rgba(47, 125, 225, 0.12); }
 
-    /* Grid 5 Kolom Kompak untuk LOB Bulanan (#qtyKPI) - Samakan dengan LOB Harian */
-    #qtyKPI { width: 100%; display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 25px; }
-    #qtyKPI .qty-card { min-width: 0; padding: 14px 2px; border-radius: 16px; }
-    #qtyKPI .qty-emoji { width: 36px; height: 36px; font-size: 18px; margin-bottom: 6px; }
+    .btn-primary { width: 100%; background: var(--primary); color: white; padding: 13px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s, opacity 0.2s; margin-top: 10px; }
+    .btn-primary:hover { background: #2569BF; }
+    .btn-primary:active { opacity: 0.9; }
+    .btn-primary:disabled { background: #B9D3F4; cursor: not-allowed; }
+
+    .btn-outline { width: 100%; background: transparent; color: var(--primary); padding: 12px; border: 1px solid var(--primary); border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 12px; transition: 0.2s; }
+    .btn-outline:hover { background: var(--primary-soft); }
+    #status { margin-top: 16px; text-align: center; font-weight: 500; color: var(--accent-green); font-size: 13px; }
+
+    .dropdown-container { text-align: center; margin-bottom: 16px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    select, input[type="text"].search-box { padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); font-size: 14px; font-weight: 500; color: var(--text-main); background: var(--card-bg); width: 100%; outline: none; transition: 0.2s; }
+    select { cursor: pointer; appearance: none; -webkit-appearance: none; text-align: left; padding-right: 36px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B7686' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
+    select:focus, input[type="text"].search-box:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(47, 125, 225, 0.12); }
+    input[type="text"].search-box::placeholder { color: var(--text-muted); font-weight: 400; }
+
+    /* Header tiap halaman */
+    .hero-header { background: var(--primary-soft); border: 1px solid #D5E6FA; border-radius: var(--radius-large); padding: 18px; color: var(--text-main); margin-bottom: 16px; position: relative; overflow: hidden; }
+    .hero-title { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-bottom: 2px; z-index: 2; position: relative; }
+    .hero-name { font-size: 21px; font-weight: 600; z-index: 2; position: relative; letter-spacing: -0.2px; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 18px; }
+    .kpi-card { background: var(--card-bg); padding: 14px; border-radius: var(--radius-medium); border: 1px solid var(--border); box-shadow: var(--shadow-soft); display: flex; flex-direction: column; justify-content: center; position: relative; overflow: hidden; }
+    .kpi-bg-icon { display: none; }
+    .kpi-title { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-bottom: 4px; z-index: 1; }
+    .kpi-value { font-size: 16px; font-weight: 600; color: var(--text-main); z-index: 1; letter-spacing: -0.3px; font-variant-numeric: tabular-nums; }
+    .kpi-rank-badge { position: absolute; top: 12px; right: 12px; background: #FFF4D6; color: #A86B00; min-width: 32px; height: 28px; padding: 0 8px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 13px; }
+
+    .section-title { font-size: 15px; font-weight: 600; color: var(--text-main); margin: 22px 0 10px 2px; }
+    .qty-card { background: var(--card-bg); padding: 12px 8px; border-radius: var(--radius-medium); border: 1px solid var(--border); text-align: center; min-width: 90px; flex-shrink: 0; }
+    .qty-emoji { font-size: 20px; background: var(--primary-soft); width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px auto; }
+    .qty-label { font-size: 11px; color: var(--text-muted); font-weight: 500; margin-bottom: 2px; }
+    .qty-val { font-size: 17px; font-weight: 600; color: var(--text-main); }
+
+    /* Grid 5 kolom untuk LOB bulanan dan harian */
+    #qtyKPI { width: 100%; display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 18px; }
+    #qtyKPI .qty-card { min-width: 0; padding: 10px 2px; border-radius: 12px; }
+    #qtyKPI .qty-emoji { width: 34px; height: 34px; font-size: 17px; margin-bottom: 6px; border-radius: 10px; }
     #qtyKPI .qty-val { font-size: 16px; }
-    #qtyKPI .qty-label { font-size: 9.5px; letter-spacing: -0.2px; }
+    #qtyKPI .qty-label { font-size: 10px; letter-spacing: -0.1px; }
 
-    .detail-card { background: var(--card-bg); padding: 22px; border-radius: var(--radius-large); box-shadow: var(--shadow-soft); margin-bottom: 15px; }
-    .detail-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
-    .detail-icon { width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .detail-card { background: var(--card-bg); padding: 16px; border-radius: var(--radius-medium); border: 1px solid var(--border); box-shadow: var(--shadow-soft); margin-bottom: 10px; }
+    .detail-card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .detail-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 17px; }
     .detail-title { font-size: 14px; font-weight: 600; color: var(--text-main); }
-    .stat-row { display: flex; justify-content: space-between; margin-bottom: 5px; }
+    .stat-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
     .stat-label { font-size: 12px; color: var(--text-muted); }
-    .stat-val { font-size: 14px; font-weight: 700; color: var(--text-main); }
-    .progress-bar-container { width: 100%; background-color: #F0EDFF; border-radius: 10px; height: 8px; margin-top: 10px; overflow: hidden; }
-    .progress-bar { height: 100%; border-radius: 10px; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
+    .stat-val { font-size: 13px; font-weight: 600; color: var(--text-main); }
+    .progress-bar-container { width: 100%; background-color: #EDF0F4; border-radius: 4px; height: 6px; margin-top: 8px; overflow: hidden; }
+    .progress-bar { height: 100%; border-radius: 4px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
 
-    .loading-text { text-align: center; font-weight: 500; color: var(--text-muted); display: none; margin: 20px 0; font-size: 14px; }
-    
-    .table-container { background: var(--card-bg); border-radius: var(--radius-large); box-shadow: var(--shadow-soft); overflow: hidden; margin-bottom: 25px; }
+    .loading-text { text-align: center; font-weight: 500; color: var(--text-muted); display: none; margin: 18px 0; font-size: 13px; }
+
+    .table-container { background: var(--card-bg); border-radius: var(--radius-medium); border: 1px solid var(--border); overflow: hidden; margin-bottom: 20px; }
     table { width: 100%; border-collapse: collapse; text-align: left; }
-    th { background: #FAFAFF; color: var(--text-muted); padding: 16px; font-weight: 600; font-size: 12px; text-transform: uppercase; border-bottom: 1px solid #F0EDFF; }
-    td { padding: 16px; border-bottom: 1px solid #F8F7FF; color: var(--text-main); font-size: 13px; font-weight: 500; }
+    th { background: var(--surface-2); color: var(--text-muted); padding: 11px 14px; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 1px solid var(--border); }
+    td { padding: 12px 14px; border-bottom: 1px solid #F0F2F6; color: var(--text-main); font-size: 13px; font-weight: 500; }
     tr:last-child td { border-bottom: none; }
-    tr:nth-child(even) { background-color: #FCFBFF; }
-    .qty-badge { background: #EEF2FF; color: var(--primary); padding: 6px 12px; border-radius: 20px; font-weight: 700; font-size: 13px; display: inline-block; min-width: 45px; text-align: center; }
+    .qty-badge { background: var(--primary-soft); color: var(--primary); padding: 4px 10px; border-radius: 8px; font-weight: 600; font-size: 12.5px; display: inline-block; min-width: 42px; text-align: center; }
 
-    .payslip { background: #FFFFFF; padding: 0; border-radius: var(--radius-large); margin-top: 10px; box-shadow: var(--shadow-soft); overflow: hidden; border: 1px solid #F0EDFF; }
-    .payslip-header { background: linear-gradient(135deg, var(--primary), var(--primary-light)); padding: 25px; text-align: center; color: white; }
-    .payslip-header h3 { font-size: 18px; font-weight: 700; opacity: 0.9; margin-bottom: 5px; }
-    .payslip-header h2 { font-size: 24px; font-weight: 800; }
-    .payslip-body { padding: 25px; }
-    .payslip-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed #E2E8F0; }
+    .payslip { background: #FFFFFF; padding: 0; border-radius: var(--radius-large); margin-top: 10px; overflow: hidden; border: 1px solid var(--border); }
+    .payslip-header { background: var(--primary-soft); padding: 20px; text-align: center; color: var(--text-main); border-bottom: 1px solid #D5E6FA; }
+    .payslip-header h3 { font-size: 13px; font-weight: 500; color: var(--text-muted); margin-bottom: 3px; }
+    .payslip-header h2 { font-size: 21px; font-weight: 600; }
+    .payslip-body { padding: 20px; }
+    .payslip-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #F0F2F6; }
     .payslip-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
     .payslip-label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
-    .payslip-value { font-size: 15px; font-weight: 600; color: var(--text-main); }
-    .payslip-total-box { background: #FAFAFF; padding: 20px; border-radius: var(--radius-medium); text-align: center; margin-top: 15px; border: 1px solid #F0EDFF; }
-    .payslip-total-label { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-bottom: 5px; text-transform: uppercase; }
-    .payslip-total-val { font-size: 26px; color: var(--primary); font-weight: 800; }
-    .payslip-note { margin-top: 20px; font-size: 11px; color: #94A3B8; text-align: center; line-height: 1.5; background: #F8FAFC; padding: 15px; border-radius: 12px; }
+    .payslip-value { font-size: 14px; font-weight: 600; color: var(--text-main); }
+    .payslip-total-box { background: var(--surface-2); padding: 16px; border-radius: var(--radius-medium); text-align: center; margin-top: 14px; border: 1px solid var(--border); }
+    .payslip-total-label { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.4px; }
+    .payslip-total-val { font-size: 25px; color: var(--primary); font-weight: 700; }
+    .payslip-note { margin-top: 14px; font-size: 11px; color: var(--text-muted); text-align: center; line-height: 1.5; background: var(--surface-2); padding: 12px; border-radius: 10px; }
 
-    .c-blue { color: #3B82F6; } .bg-blue { background: rgba(59, 130, 246, 0.1); } .bar-blue { background-color: #3B82F6; }
-    .c-purple { color: #8B5CF6; } .bg-purple { background: rgba(139, 92, 246, 0.1); } .bar-purple { background-color: #8B5CF6; }
-    .c-orange { color: #F59E0B; } .bg-orange { background: rgba(245, 158, 11, 0.1); } .bar-orange { background-color: #F59E0B; }
-    .c-green { color: #10B981; } .bg-green { background: rgba(16, 185, 129, 0.1); }
+    .c-blue { color: #2F7DE1; } .bg-blue { background: rgba(47, 125, 225, 0.12); } .bar-blue { background-color: #2F7DE1; }
+    .c-purple { color: #7F5AF0; } .bg-purple { background: rgba(127, 90, 240, 0.12); } .bar-purple { background-color: #7F5AF0; }
+    .c-orange { color: #D9890B; } .bg-orange { background: rgba(232, 163, 23, 0.16); } .bar-orange { background-color: #E8A317; }
+    .c-green { color: #1D9E75; } .bg-green { background: rgba(29, 158, 117, 0.12); }
 
-    /* Styling Bagian Sales Harian Staff */
-    .daily-header-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 28px 0 12px 2px; flex-wrap: wrap; }
-    .daily-date-nav { display: flex; align-items: center; gap: 6px; background: var(--card-bg); padding: 5px 8px; border-radius: 20px; box-shadow: var(--shadow-soft); }
-    .btn-date-step { background: var(--bg-main); border: none; color: var(--primary); width: 30px; height: 30px; border-radius: 50%; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; }
-    .daily-date-input { border: none; background: transparent; font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600; color: var(--text-main); outline: none; cursor: pointer; }
-    .daily-meta-info { font-size: 11.5px; color: var(--text-muted); margin: 0 0 14px 5px; }
-    .qty-row-scroll { width: 100%; display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 6px; margin-bottom: 15px; }
-    .qty-row-scroll .qty-card { min-width: 0; padding: 14px 2px; border-radius: 16px; }
-    .qty-row-scroll .qty-emoji { width: 36px; height: 36px; font-size: 18px; margin-bottom: 6px; }
+    /* Sales harian staf */
+    .daily-header-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 22px 0 10px 0; flex-wrap: wrap; }
+    .daily-date-nav { display: flex; align-items: center; gap: 4px; background: var(--card-bg); padding: 4px 6px; border-radius: 10px; border: 1px solid var(--border); }
+    .btn-date-step { background: var(--surface-2); border: none; color: var(--primary); width: 28px; height: 28px; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; }
+    .daily-date-input { border: none; background: transparent; font-size: 12px; font-weight: 500; color: var(--text-main); outline: none; cursor: pointer; }
+    .daily-meta-info { font-size: 12px; color: var(--text-muted); margin: 0 0 12px 2px; }
+    .qty-row-scroll { width: 100%; display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 6px; margin-bottom: 14px; }
+    .qty-row-scroll .qty-card { min-width: 0; padding: 10px 2px; border-radius: 12px; }
+    .qty-row-scroll .qty-emoji { width: 34px; height: 34px; font-size: 17px; margin-bottom: 6px; border-radius: 10px; }
     .qty-row-scroll .qty-val { font-size: 16px; }
-    .qty-row-scroll .qty-label { font-size: 9.5px; letter-spacing: -0.2px; }
+    .qty-row-scroll .qty-label { font-size: 10px; letter-spacing: -0.1px; }
 
-    /* Styling Menu Pusat Form & Link */
+    /* Pusat form dan link */
     .link-hero-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; z-index: 2; position: relative; }
-    .btn-add-link { background: rgba(255,255,255,0.22); border: 1px solid rgba(255,255,255,0.45); color: white; padding: 8px 13px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; backdrop-filter: blur(4px); white-space: nowrap; }
-    .chip-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 16px; scrollbar-width: none; }
+    .btn-add-link { background: var(--primary); border: none; color: white; padding: 8px 14px; border-radius: 10px; font-size: 12.5px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .chip-row { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 14px; scrollbar-width: none; }
     .chip-row::-webkit-scrollbar { display: none; }
-    .chip-btn { background: var(--card-bg); border: 1.5px solid #EDE9FE; color: var(--text-muted); padding: 8px 15px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: 0.2s; }
-    .chip-btn.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 6px 14px rgba(140,109,253,0.22); }
+    .chip-btn { background: var(--card-bg); border: 1px solid var(--border); color: var(--text-muted); padding: 7px 14px; border-radius: 16px; font-size: 12px; font-weight: 500; cursor: pointer; white-space: nowrap; transition: 0.2s; }
+    .chip-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-    .form-card { background: var(--card-bg); border-radius: 20px; padding: 18px; margin-bottom: 14px; box-shadow: var(--shadow-soft); border: 1.5px solid transparent; }
-    .form-top { display: flex; gap: 13px; align-items: flex-start; }
-    .form-icon { width: 44px; height: 44px; border-radius: 14px; background: var(--bg-main); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .form-card { background: var(--card-bg); border-radius: var(--radius-medium); padding: 14px; margin-bottom: 10px; border: 1px solid var(--border); box-shadow: var(--shadow-soft); }
+    .form-top { display: flex; gap: 12px; align-items: flex-start; }
+    .form-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--primary-soft); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
     .form-info { flex: 1; min-width: 0; }
-    .form-badge { display: inline-block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; padding: 3px 9px; border-radius: 10px; background: #F4EEFF; color: var(--primary); margin-bottom: 5px; }
-    .form-title { font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 3px; line-height: 1.3; overflow-wrap: break-word; word-break: break-word; }
+    .form-badge { display: inline-block; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; padding: 2px 8px; border-radius: 6px; background: var(--surface-2); color: var(--text-muted); border: 1px solid var(--border); margin-bottom: 4px; }
+    .form-title { font-size: 14.5px; font-weight: 600; color: var(--text-main); margin-bottom: 2px; line-height: 1.3; overflow-wrap: break-word; word-break: break-word; }
     .form-desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; overflow-wrap: break-word; word-break: break-word; }
-    .form-actions { display: flex; gap: 8px; margin-top: 14px; padding-top: 12px; border-top: 1px dashed #F0EDFF; }
-    .btn-copy-link { flex: 1; background: #F8F7FF; border: 1.5px solid #E9E4FF; color: var(--primary); padding: 10px 8px; border-radius: 12px; font-size: 11.5px; font-weight: 600; cursor: pointer; text-align: center; white-space: nowrap; }
-    .btn-open-link { flex: 1.2; background: linear-gradient(135deg, var(--primary), var(--primary-light)); border: none; color: white; padding: 10px 10px; border-radius: 12px; font-size: 11.5px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 4px; box-shadow: 0 6px 14px rgba(140,109,253,0.22); white-space: nowrap; }
-    .btn-edit-custom { background: #EEF2FF; border: none; color: var(--primary); padding: 0 11px; border-radius: 12px; font-size: 13px; cursor: pointer; }
-    .btn-del-custom { background: #FFF1F2; border: none; color: #FB7185; padding: 0 11px; border-radius: 12px; font-size: 13px; cursor: pointer; }
+    .form-actions { display: flex; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #F0F2F6; }
+    .btn-copy-link { flex: 1; background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); padding: 9px 8px; border-radius: 10px; font-size: 12px; font-weight: 500; cursor: pointer; text-align: center; white-space: nowrap; }
+    .btn-open-link { flex: 1.2; background: var(--primary); border: none; color: white; padding: 9px 10px; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 4px; white-space: nowrap; }
+    .btn-edit-custom { background: var(--primary-soft); border: none; color: var(--primary); padding: 0 11px; border-radius: 10px; font-size: 13px; cursor: pointer; }
+    .btn-del-custom { background: #FDECEC; border: none; color: var(--accent-red); padding: 0 11px; border-radius: 10px; font-size: 13px; cursor: pointer; }
 
-    /* Styling Menu Pilihan Staf (Gaji, Biodata, Jadwal Shift) */
-    .hub-choice-card { background: var(--card-bg); border-radius: 22px; padding: 20px; margin-bottom: 14px; box-shadow: var(--shadow-soft); display: flex; align-items: center; gap: 15px; cursor: pointer; border: 2px solid transparent; transition: 0.2s ease; }
-    .hub-choice-card:active { transform: scale(0.98); border-color: var(--primary-light); }
-    .hub-choice-icon { width: 54px; height: 54px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; }
+    /* Menu pilihan staf */
+    .hub-choice-card { background: var(--card-bg); border-radius: var(--radius-medium); padding: 14px; margin-bottom: 10px; border: 1px solid var(--border); display: flex; align-items: center; gap: 14px; cursor: pointer; transition: 0.15s ease; }
+    .hub-choice-card:active { transform: scale(0.99); border-color: var(--primary); }
+    .hub-choice-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 21px; flex-shrink: 0; }
     .hub-choice-info { flex: 1; min-width: 0; }
-    .hub-choice-title { font-size: 16px; font-weight: 700; color: var(--text-main); margin-bottom: 3px; }
+    .hub-choice-title { font-size: 15px; font-weight: 600; color: var(--text-main); margin-bottom: 2px; }
     .hub-choice-desc { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
-    .hub-choice-arrow { font-size: 20px; font-weight: 700; color: var(--primary); }
-    .sub-switcher-bar { display: flex; align-items: center; gap: 5px; background: var(--card-bg); padding: 6px; border-radius: 20px; box-shadow: var(--shadow-soft); margin-bottom: 16px; }
-    .btn-back-hub { background: #F4EEFF; border: none; color: var(--primary); padding: 9px 10px; border-radius: 14px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
-    .sub-switch-btn { flex: 1; border: none; background: transparent; padding: 9px 4px; border-radius: 14px; font-size: 11.5px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: 0.2s; white-space: nowrap; }
-    .sub-switch-btn.active { background: var(--primary); color: white; box-shadow: 0 6px 14px rgba(140,109,253,0.22); }
+    .hub-choice-arrow { font-size: 22px; font-weight: 400; color: var(--text-muted); }
+    .sub-switcher-bar { display: flex; align-items: center; gap: 4px; background: #E9EDF2; padding: 4px; border-radius: 12px; margin-bottom: 14px; }
+    .btn-back-hub { background: transparent; border: none; color: var(--primary); padding: 8px 10px; border-radius: 9px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+    .sub-switch-btn { flex: 1; border: none; background: transparent; padding: 8px 4px; border-radius: 9px; font-size: 12px; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: 0.2s; white-space: nowrap; }
+    .sub-switch-btn.active { background: var(--card-bg); color: var(--primary); font-weight: 600; box-shadow: 0 1px 3px rgba(16, 24, 40, 0.1); }
 
-    /* Styling Menu Biodata Tim */
-    .bio-card { background: var(--card-bg); border-radius: 22px; padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow-soft); }
-    .bio-header { display: flex; gap: 14px; align-items: center; margin-bottom: 14px; }
-    .bio-avatar { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: white; font-size: 22px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 3px solid #F4EEFF; }
+    /* Biodata tim */
+    .bio-card { background: var(--card-bg); border-radius: var(--radius-medium); padding: 16px; margin-bottom: 12px; border: 1px solid var(--border); box-shadow: var(--shadow-soft); }
+    .bio-header { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
+    .bio-avatar { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; background: var(--primary); color: white; font-size: 19px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 2px solid var(--primary-soft); }
     .bio-main-info { flex: 1; min-width: 0; }
-    .bio-name { font-size: 16px; font-weight: 700; color: var(--text-main); line-height: 1.3; overflow-wrap: break-word; }
+    .bio-name { font-size: 15px; font-weight: 600; color: var(--text-main); line-height: 1.3; overflow-wrap: break-word; }
     .bio-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 5px; }
-    .bio-role-badge { font-size: 10.5px; font-weight: 700; padding: 3px 10px; border-radius: 12px; background: #F4EEFF; color: var(--primary); }
-    .bio-bday-badge { font-size: 10.5px; font-weight: 700; padding: 3px 10px; border-radius: 12px; background: #FEF3C7; color: #D97706; }
-    .bio-details { background: #FAFAFF; border-radius: 16px; padding: 13px 15px; display: flex; flex-direction: column; gap: 8px; border: 1px solid #F0EDFF; }
+    .bio-role-badge { font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 8px; background: var(--primary-soft); color: var(--primary); }
+    .bio-bday-badge { font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 8px; background: #FFF4D6; color: #A86B00; }
+    .bio-details { background: var(--surface-2); border-radius: 10px; padding: 11px 13px; display: flex; flex-direction: column; gap: 7px; border: 1px solid #EEF1F5; }
     .bio-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; font-size: 12px; }
     .bio-lbl { color: var(--text-muted); font-weight: 500; white-space: nowrap; }
-    .bio-val { color: var(--text-main); font-weight: 600; text-align: right; overflow-wrap: break-word; word-break: break-word; }
-    .btn-wa-link { flex: 1.3; background: linear-gradient(135deg, #22C55E, #16A34A); border: none; color: white; padding: 10px 10px; border-radius: 12px; font-size: 11.5px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 5px; box-shadow: 0 6px 14px rgba(34,197,94,0.22); white-space: nowrap; }
+    .bio-val { color: var(--text-main); font-weight: 500; text-align: right; overflow-wrap: break-word; word-break: break-word; }
+    .btn-wa-link { flex: 1.3; background: #1FA855; border: none; color: white; padding: 9px 10px; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap; }
 
     /* =========================================================
-       STYLING MENU JADWAL SHIFT & CATATAN PER STAF (2 STACKED)
+       Jadwal shift dan catatan per staf
        ========================================================= */
-    .week-nav-bar { background: var(--card-bg); border-radius: 18px; padding: 8px 10px; margin-bottom: 13px; box-shadow: var(--shadow-soft); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-    .btn-week-step { width: 34px; height: 34px; border-radius: 12px; border: none; background: #F4EEFF; color: var(--primary); font-size: 13px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-    .week-range-label { font-size: 12.5px; font-weight: 700; color: var(--text-main); text-align: center; }
+    .week-nav-bar { background: var(--card-bg); border-radius: 12px; padding: 6px 8px; margin-bottom: 12px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .btn-week-step { width: 32px; height: 32px; border-radius: 9px; border: none; background: var(--surface-2); color: var(--primary); font-size: 12px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .week-range-label { font-size: 13px; font-weight: 600; color: var(--text-main); text-align: center; }
 
-    .subview-tabs { display: flex; background: #E8E0FF; padding: 5px; border-radius: 18px; margin-bottom: 14px; }
-    .subview-tab-btn { flex: 1; border: none; background: transparent; padding: 10px 6px; border-radius: 14px; font-size: 12px; font-weight: 700; color: var(--text-muted); cursor: pointer; transition: 0.2s ease; }
-    .subview-tab-btn.active { background: var(--card-bg); color: var(--primary); box-shadow: 0 4px 12px rgba(140, 109, 253, 0.15); }
+    .subview-tabs { display: flex; background: #E9EDF2; padding: 4px; border-radius: 12px; margin-bottom: 12px; }
+    .subview-tab-btn { flex: 1; border: none; background: transparent; padding: 9px 6px; border-radius: 9px; font-size: 12.5px; font-weight: 500; color: var(--text-muted); cursor: pointer; transition: 0.2s ease; }
+    .subview-tab-btn.active { background: var(--card-bg); color: var(--primary); font-weight: 600; box-shadow: 0 1px 3px rgba(16, 24, 40, 0.1); }
 
-    .day-selector-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; margin-bottom: 12px; }
-    .day-pill { position: relative; background: var(--card-bg); border: 1.5px solid transparent; border-radius: 16px; padding: 9px 2px 8px 2px; text-align: center; cursor: pointer; box-shadow: var(--shadow-soft); transition: 0.16s; }
-    .day-pill .dp-name { display: block; font-size: 10px; font-weight: 600; color: var(--text-muted); }
-    .day-pill .dp-num { display: block; font-size: 13.5px; font-weight: 800; color: var(--text-main); }
-    .day-pill.active { background: var(--primary); box-shadow: 0 8px 16px rgba(140, 109, 253, 0.28); transform: translateY(-2px); }
+    .day-selector-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 12px; }
+    .day-pill { position: relative; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 8px 2px; text-align: center; cursor: pointer; transition: 0.15s; }
+    .day-pill .dp-name { display: block; font-size: 10px; font-weight: 500; color: var(--text-muted); }
+    .day-pill .dp-num { display: block; font-size: 14px; font-weight: 600; color: var(--text-main); }
+    .day-pill.active { background: var(--primary); border-color: var(--primary); }
     .day-pill.active .dp-name, .day-pill.active .dp-num { color: #FFFFFF; }
-    .note-dot-indicator { position: absolute; top: 5px; right: 5px; width: 6px; height: 6px; border-radius: 50%; background: #F59E0B; }
-    .day-pill.active .note-dot-indicator { background: #FDE047; }
+    .note-dot-indicator { position: absolute; top: 5px; right: 5px; width: 6px; height: 6px; border-radius: 50%; background: #E8A317; }
+    .day-pill.active .note-dot-indicator { background: #FFE27A; }
 
-    .daily-summary-bar { background: var(--card-bg); border-radius: 18px; padding: 11px 13px; margin-bottom: 12px; box-shadow: var(--shadow-soft); }
-    .dsb-top { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 700; margin-bottom: 8px; }
+    .daily-summary-bar { background: var(--card-bg); border-radius: 12px; padding: 10px 12px; margin-bottom: 10px; border: 1px solid var(--border); }
+    .dsb-top { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 600; margin-bottom: 8px; }
     .dsb-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
-    .dsb-chip { padding: 5px 2px; border-radius: 10px; font-size: 10px; font-weight: 700; text-align: center; }
+    .dsb-chip { padding: 5px 2px; border-radius: 8px; font-size: 10px; font-weight: 600; text-align: center; }
 
-    .daily-staff-row { background: var(--card-bg); border-radius: 20px; padding: 12px 14px; margin-bottom: 10px; box-shadow: var(--shadow-soft); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-    .daily-staff-row.is-off { opacity: 0.78; background: #FCFBFF; }
-    .dsr-left { display: flex; align-items: center; gap: 11px; flex: 1; min-width: 0; text-align: left; }
-    .sch-avatar { width: 42px; height: 42px; border-radius: 50%; font-size: 13.5px; font-weight: 800; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .daily-staff-row { background: var(--card-bg); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .daily-staff-row.is-off { opacity: 0.75; background: var(--surface-2); }
+    .dsr-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; text-align: left; }
+    .sch-avatar { width: 40px; height: 40px; border-radius: 50%; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .av-P { background: #DBEAFE; color: #1D4ED8; border: 2px solid #BFDBFE; }
     .av-M { background: #FEF3C7; color: #B45309; border: 2px solid #FDE68A; }
     .av-S { background: #EDE9FE; color: #6D28D9; border: 2px solid #DDD6FE; }
     .av-OFF { background: #FFE4E6; color: #BE123C; border: 2px solid #FECDD3; }
 
     .dsr-text-col { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; min-width: 0; flex: 1; }
-    .dsr-name { font-size: 14px; font-weight: 700; color: var(--text-main); line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
-    .dsr-shift-line { display: inline-flex; align-items: center; gap: 4px; margin-top: 4px; padding: 3px 9px; border-radius: 9px; font-size: 11px; font-weight: 700; cursor: default; white-space: nowrap; }
+    .dsr-name { font-size: 14px; font-weight: 600; color: var(--text-main); line-height: 1.25; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+    .dsr-shift-line { display: inline-flex; align-items: center; gap: 4px; margin-top: 4px; padding: 2px 8px; border-radius: 7px; font-size: 11px; font-weight: 600; cursor: default; white-space: nowrap; }
 
-    /* Wadah Kanan Bersusun Atas-Bawah untuk Maksimal 2 Catatan */
     .dsr-right { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 4px; flex-shrink: 0; max-width: 45%; }
-    .btn-add-note-right { background: #F8F7FF; border: 1.5px dashed #D8CEFF; color: var(--primary); border-radius: 12px; padding: 7px 10px; font-size: 11px; font-weight: 700; cursor: pointer; white-space: nowrap; }
-    .btn-active-note-right { background: #FFFBEB; border: 1.5px solid #FDE68A; color: #92400E; border-radius: 10px; padding: 4px 8px; font-size: 8.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; max-width: 100%; text-align: left; line-height: 1.2; }
+    .btn-add-note-right { background: var(--surface-2); border: 1px dashed #C9D2DE; color: var(--primary); border-radius: 10px; padding: 6px 10px; font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .btn-active-note-right { background: #FFF8E1; border: 1px solid #F6E0A0; color: #7A5200; border-radius: 8px; padding: 4px 8px; font-size: 9px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; max-width: 100%; text-align: left; line-height: 1.2; }
     .btn-active-note-right span.note-label-clamp { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
     .sh-P { background: #EFF6FF; color: #2563EB; border: 1px solid #BFDBFE; }
@@ -223,69 +230,115 @@
     .sh-S { background: #F4EEFF; color: #7C3AED; border: 1px solid #DDD6FE; }
     .sh-OFF { background: #FFF1F2; color: #E11D48; border: 1px solid #FECDD3; }
 
-    /* View Per Staf (7 Hari - 1 Staf Terpilih) */
-    .staff-day-row { background: var(--card-bg); border-radius: 18px; padding: 12px 14px; margin-bottom: 9px; box-shadow: var(--shadow-soft); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-    .staff-day-row.is-off { opacity: 0.78; background: #FCFBFF; }
-    .sdr-left { display: flex; align-items: center; gap: 11px; flex: 1; min-width: 0; text-align: left; }
-    .day-badge-box { width: 44px; height: 44px; border-radius: 14px; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; line-height: 1.1; }
-    .dbb-day { font-size: 9.5px; font-weight: 700; text-transform: uppercase; }
-    .dbb-num { font-size: 14px; font-weight: 800; margin-top: 1px; }
+    /* Tampilan per staf (7 hari) */
+    .staff-day-row { background: var(--card-bg); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .staff-day-row.is-off { opacity: 0.75; background: var(--surface-2); }
+    .sdr-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; text-align: left; }
+    .day-badge-box { width: 42px; height: 42px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; line-height: 1.1; }
+    .dbb-day { font-size: 9.5px; font-weight: 600; text-transform: uppercase; }
+    .dbb-num { font-size: 14px; font-weight: 700; margin-top: 1px; }
     .sdr-text-col { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; min-width: 0; flex: 1; }
-    .sdr-date-title { font-size: 13.5px; font-weight: 700; color: var(--text-main); line-height: 1.25; }
+    .sdr-date-title { font-size: 13.5px; font-weight: 600; color: var(--text-main); line-height: 1.25; }
 
-    /* Modal Matriks 7 Hari & Catatan */
-    .brush-panel { position: sticky; top: -6px; z-index: 10; background: #F8F6FF; border: 1.5px solid #EAE2FF; border-radius: 16px; padding: 10px; margin-bottom: 12px; }
-    .brush-header { font-size: 10.5px; font-weight: 700; color: var(--text-muted); margin-bottom: 7px; display: flex; justify-content: space-between; }
+    /* Modal matriks 7 hari dan catatan */
+    .brush-panel { position: sticky; top: -6px; z-index: 10; background: var(--surface-2); border: 1px solid var(--border); border-radius: 12px; padding: 10px; margin-bottom: 12px; }
+    .brush-header { font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 7px; display: flex; justify-content: space-between; }
     .brush-pills { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
-    .brush-btn { background: #FFFFFF; border: 1.5px solid #E9E4FF; border-radius: 11px; padding: 8px 2px; font-size: 10px; font-weight: 700; color: var(--text-main); cursor: pointer; text-align: center; white-space: nowrap; }
+    .brush-btn { background: #FFFFFF; border: 1px solid var(--border); border-radius: 9px; padding: 8px 2px; font-size: 10px; font-weight: 600; color: var(--text-main); cursor: pointer; text-align: center; white-space: nowrap; }
     .brush-btn.active-P { background: #2563EB; border-color: #2563EB; color: #FFF; }
     .brush-btn.active-M { background: #D97706; border-color: #D97706; color: #FFF; }
     .brush-btn.active-S { background: #7C3AED; border-color: #7C3AED; color: #FFF; }
     .brush-btn.active-OFF { background: #E11D48; border-color: #E11D48; color: #FFF; }
-    .brush-btn.active-NOTE { background: #F59E0B; border-color: #F59E0B; color: #FFF; }
+    .brush-btn.active-NOTE { background: #E8A317; border-color: #E8A317; color: #FFF; }
 
-    .matrix-cell-note-prompt { background: #FFFBEB; border: 1.5px solid #F59E0B; border-radius: 16px; padding: 12px; margin-bottom: 12px; }
-    .mcnp-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 12px; font-weight: 700; color: #92400E; }
-    .matrix-scroll-wrap { border: 1.5px solid #EFEAFF; border-radius: 16px; overflow-x: auto; margin-bottom: 12px; background: #FFFFFF; }
+    .matrix-cell-note-prompt { background: #FFF8E1; border: 1px solid #F0CF7A; border-radius: 12px; padding: 12px; margin-bottom: 12px; }
+    .mcnp-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 12px; font-weight: 600; color: #7A5200; }
+    .matrix-scroll-wrap { border: 1px solid var(--border); border-radius: 12px; overflow-x: auto; margin-bottom: 12px; background: #FFFFFF; }
     .matrix-table { width: 100%; min-width: 390px; border-collapse: collapse; }
-    .matrix-table th { background: #F6F3FF; padding: 8px 3px; font-size: 10px; font-weight: 700; color: var(--text-main); text-align: center; border-bottom: 1px solid #EAE2FF; }
-    .matrix-table th:first-child, .matrix-table td:first-child { position: sticky; left: 0; z-index: 2; background: #FFFFFF; text-align: left; padding-left: 10px; padding-right: 6px; min-width: 78px; font-size: 11.5px; font-weight: 700; border-right: 1px solid #F0EDFF; }
-    .matrix-table th:first-child { background: #F6F3FF; color: var(--text-muted); }
-    .matrix-table td { padding: 6px 2px; text-align: center; border-bottom: 1px solid #F5F2FF; }
-    .m-cell-btn { position: relative; width: 100%; min-width: 40px; height: 32px; border-radius: 9px; font-size: 10px; font-weight: 700; cursor: pointer; }
-    .m-cell-pin { position: absolute; top: -5px; right: -3px; font-size: 9px; background: #FEF3C7; border: 1px solid #F59E0B; border-radius: 50%; width: 14px; height: 14px; display: flex; align-items: center; justify-content: center; }
-    .matrix-sum-row td { background: #FAFAFF !important; border-bottom: none; border-top: 1.5px solid #EAE2FF; padding: 8px 2px; }
-    .duty-badge { display: inline-block; padding: 3px 5px; border-radius: 7px; font-size: 9.5px; font-weight: 800; }
-    .duty-ok { background: #ECFDF5; color: #059669; }
-    .duty-warn { background: #FFFBEB; color: #D97706; border: 1px solid #FDE68A; }
+    .matrix-table th { background: var(--surface-2); padding: 8px 3px; font-size: 10px; font-weight: 600; color: var(--text-main); text-align: center; border-bottom: 1px solid var(--border); letter-spacing: 0; text-transform: none; }
+    .matrix-table th:first-child, .matrix-table td:first-child { position: sticky; left: 0; z-index: 2; background: #FFFFFF; text-align: left; padding-left: 10px; padding-right: 6px; min-width: 78px; font-size: 11.5px; font-weight: 600; border-right: 1px solid #EEF1F5; }
+    .matrix-table th:first-child { background: var(--surface-2); color: var(--text-muted); }
+    .matrix-table td { padding: 6px 2px; text-align: center; border-bottom: 1px solid #F0F2F6; }
+    .m-cell-btn { position: relative; width: 100%; min-width: 40px; height: 32px; border-radius: 8px; font-size: 10px; font-weight: 600; cursor: pointer; }
+    .m-cell-pin { position: absolute; top: -5px; right: -3px; font-size: 9px; background: #FFF4D6; border: 1px solid #E8A317; border-radius: 50%; width: 14px; height: 14px; display: flex; align-items: center; justify-content: center; }
+    .matrix-sum-row td { background: var(--surface-2) !important; border-bottom: none; border-top: 1px solid var(--border); padding: 8px 2px; }
+    .duty-badge { display: inline-block; padding: 3px 5px; border-radius: 6px; font-size: 9.5px; font-weight: 700; }
+    .duty-ok { background: #E6F6F0; color: #12805D; }
+    .duty-warn { background: #FFF8E1; color: #A86B00; border: 1px solid #F0CF7A; }
 
     .preset-chips-wrap { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 12px 0; }
-    .note-preset-chip { background: #FFFBEB; border: 1.5px solid #FDE68A; color: #92400E; border-radius: 20px; padding: 6px 12px; font-size: 11.5px; font-weight: 700; cursor: pointer; }
-    .note-preset-chip.active-chip { background: #F59E0B; border-color: #F59E0B; color: #FFFFFF; }
-    .btn-danger-modal { flex: 1; padding: 13px; border-radius: 14px; border: 1.5px solid #FECDD3; background: #FFF1F2; color: #E11D48; font-size: 12.5px; font-weight: 700; cursor: pointer; }
+    .note-preset-chip { background: #FFF8E1; border: 1px solid #F0CF7A; color: #7A5200; border-radius: 16px; padding: 5px 11px; font-size: 11.5px; font-weight: 600; cursor: pointer; }
+    .note-preset-chip.active-chip { background: #E8A317; border-color: #E8A317; color: #FFFFFF; }
+    .btn-danger-modal { flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #F5C6C8; background: #FDECEC; color: #C93338; font-size: 12.5px; font-weight: 600; cursor: pointer; }
 
-    /* Modal Umum (Link, Biodata, Jadwal) */
-    .link-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(45,42,74,0.48); backdrop-filter: blur(3px); z-index: 1200; align-items: center; justify-content: center; padding: 14px; overflow-y: auto; }
+    /* Modal umum (link, biodata, jadwal) */
+    .link-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(20, 28, 40, 0.5); backdrop-filter: blur(3px); z-index: 1200; align-items: center; justify-content: center; padding: 14px; overflow-y: auto; }
     .link-modal-overlay.open { display: flex; }
-    .link-modal-box { background: white; width: 100%; max-width: 440px; max-height: 90vh; overflow-y: auto; border-radius: 24px; padding: 22px 18px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
-    .link-modal-box input, .link-modal-box select { width: 100%; padding: 12px 14px; border: 2px solid #F0EDFF; border-radius: 14px; font-size: 13px; margin-bottom: 10px; outline: none; background: #FAFAFF; text-align: left; }
-    .modal-field-lbl { font-size: 11.5px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; display: block; margin-top: 2px; }
-    .photo-picker-wrap { display: flex; align-items: center; gap: 14px; background: #FAFAFF; padding: 12px; border-radius: 16px; border: 2px dashed #E9E4FF; margin-bottom: 12px; }
-    .photo-preview-circle { width: 58px; height: 58px; border-radius: 50%; object-fit: cover; background: var(--bg-main); display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--primary); font-weight: 700; flex-shrink: 0; border: 2px solid var(--primary-light); }
-    .btn-pick-photo { background: #F4EEFF; color: var(--primary); border: none; padding: 8px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; cursor: pointer; }
-    .link-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-80px); background: var(--text-main); color: white; padding: 11px 20px; border-radius: 30px; font-size: 12px; font-weight: 600; z-index: 1500; transition: 0.3s ease; white-space: nowrap; }
+    .link-modal-box { background: white; width: 100%; max-width: 440px; max-height: 90vh; overflow-y: auto; border-radius: 18px; padding: 20px 18px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.18); }
+    .link-modal-box input, .link-modal-box select { width: 100%; padding: 11px 13px; border: 1px solid var(--border); border-radius: 10px; font-size: 13px; margin-bottom: 10px; outline: none; background: var(--surface-2); text-align: left; }
+    .link-modal-box input:focus, .link-modal-box select:focus { border-color: var(--primary); background: #FFF; }
+    .modal-field-lbl { font-size: 11.5px; font-weight: 500; color: var(--text-muted); margin-bottom: 4px; display: block; margin-top: 2px; }
+    .photo-picker-wrap { display: flex; align-items: center; gap: 14px; background: var(--surface-2); padding: 12px; border-radius: 12px; border: 1.5px dashed #D3DAE4; margin-bottom: 12px; }
+    .photo-preview-circle { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; background: var(--primary-soft); display: flex; align-items: center; justify-content: center; font-size: 21px; color: var(--primary); font-weight: 600; flex-shrink: 0; border: 2px solid #CFE2F9; }
+    .btn-pick-photo { background: var(--primary-soft); color: var(--primary); border: none; padding: 8px 12px; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .link-toast { position: fixed; top: 18px; left: 50%; transform: translateX(-50%) translateY(-80px); background: var(--text-main); color: white; padding: 10px 18px; border-radius: 12px; font-size: 12.5px; font-weight: 500; z-index: 1500; transition: 0.3s ease; white-space: nowrap; }
     .link-toast.show { transform: translateX(-50%) translateY(0); }
+    /* Ikon garis (menggantikan emoji) */
+    .ic { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; vertical-align: -0.14em; flex-shrink: 0; margin-right: 0.3em; }
+    .qty-emoji .ic, .detail-icon .ic, .hub-choice-icon .ic, .form-icon .ic, .btn-edit-custom .ic, .btn-del-custom .ic, .btn-date-step .ic, .btn-week-step .ic, .photo-preview-circle .ic, .m-cell-pin .ic, .dsr-shift-line .ic { margin-right: 0; }
+    .dsr-shift-line .ic, .dsb-chip .ic { margin-right: 0.25em; }
+    .qty-emoji { color: var(--primary); }
+    .form-icon { color: var(--primary); }
+    .btn-date-step .ic, .btn-week-step .ic { width: 16px; height: 16px; stroke-width: 2.2; }
+    .btn-open-link .ic, .btn-copy-link .ic, .btn-wa-link .ic { width: 14px; height: 14px; }
+    .brush-btn .ic { width: 11px; height: 11px; margin-right: 2px; }
+    .m-cell-pin .ic { width: 9px; height: 9px; }
+    .section-title .ic { color: var(--primary); }
+    .rank-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 50%; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+    .rank-1 { background: #FFF1C2; color: #8A5A00; } .rank-2 { background: #E9EDF2; color: #4B5563; } .rank-3 { background: #FBE3D0; color: #9A4B14; }
+    input[type="text"].search-box { padding-left: 40px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236B7686' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: 13px center; }
+  
+
+    /* Tampilan depan (Overview Toko) */
+    .app-head { display: flex; justify-content: space-between; align-items: center; margin: 2px 2px 14px; }
+    .app-head-sub { font-size: 12px; color: var(--text-muted); }
+    .app-head-title { font-size: 20px; font-weight: 600; letter-spacing: -0.2px; }
+    .app-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--primary-soft); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; border: 1px solid #D5E6FA; }
+    .hero-ring-card { background: var(--primary-soft); border: 1px solid #D5E6FA; border-radius: var(--radius-large); padding: 16px; display: flex; align-items: center; gap: 16px; margin-bottom: 10px; }
+    .ring-wrap { position: relative; width: 88px; height: 88px; flex-shrink: 0; }
+    .ring-wrap svg { width: 88px; height: 88px; display: block; }
+    .ring-bg { fill: none; stroke: rgba(47, 125, 225, 0.18); stroke-width: 8; }
+    .ring-fg { fill: none; stroke: var(--primary); stroke-width: 8; stroke-linecap: round; transition: stroke-dasharray 0.9s cubic-bezier(0.4, 0, 0.2, 1); }
+    .ring-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 600; color: var(--text-main); }
+    .ring-info { min-width: 0; flex: 1; }
+    .ring-sub { font-size: 12px; color: var(--text-muted); }
+    .ring-big { font-size: 21px; font-weight: 600; letter-spacing: -0.4px; margin: 1px 0 2px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+    .mini-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 6px; }
+    .mini-tile { background: #ECEFF3; border-radius: 12px; padding: 11px 13px; }
+    .mini-title { font-size: 12px; color: var(--text-muted); }
+    .mini-value { font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .lob-list { margin-bottom: 4px; }
+    .lob-row { margin-bottom: 14px; }
+    .lob-top { display: flex; justify-content: space-between; align-items: center; font-size: 13.5px; margin-bottom: 6px; }
+    .lob-name { display: inline-flex; align-items: center; gap: 8px; font-weight: 500; }
+    .lob-ic { display: inline-flex; font-size: 17px; }
+    .lob-ic .ic { margin-right: 0; }
+    .lob-pct { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+    .lob-sub { font-size: 11.5px; color: var(--text-muted); margin-top: 5px; }
+    .lob-sub b { color: var(--text-main); font-weight: 600; }
+    .rank-list thead { display: none; }
+    .rank-list td { padding: 11px 14px; }
   </style>
 </head>
 <body>
 
   <!-- Navigasi Bawah -->
   <div class="nav">
-    <button id="btnTabDashboard" class="active" onclick="switchTab('dashboard')"><span class="nav-icon">📊</span><span class="nav-text">Target</span></button>
-    <button id="btnTabSoh" onclick="switchTab('soh')"><span class="nav-icon">📦</span><span class="nav-text">Stok</span></button>
-    <button id="btnTabLinks" onclick="switchTab('links')"><span class="nav-icon">🔗</span><span class="nav-text">Link</span></button>
-    <button id="btnTabStaf" onclick="switchTab('staf')"><span class="nav-icon">👤</span><span class="nav-text">Staf</span></button>
-    <button id="btnTabUpload" onclick="switchTab('upload')"><span class="nav-icon">⚙️</span><span class="nav-text">Admin</span></button>
+    <button id="btnTabDashboard" class="active" onclick="switchTab('dashboard')"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/></svg></span><span class="nav-text">Target</span></button>
+    <button id="btnTabSoh" onclick="switchTab('soh')"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.3 7 12 12 20.7 7"/><line x1="12" y1="22" x2="12" y2="12"/></svg></span><span class="nav-text">Stok</span></button>
+    <button id="btnTabLinks" onclick="switchTab('links')"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span><span class="nav-text">Link</span></button>
+    <button id="btnTabStaf" onclick="switchTab('staf')"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="nav-text">Staf</span></button>
+    <button id="btnTabUpload" onclick="switchTab('upload')"><span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></span><span class="nav-text">Admin</span></button>
   </div>
 
   <!-- TAB ADMIN -->
@@ -304,107 +357,122 @@
   <!-- TAB TARGET & SALES HARIAN -->
   <div id="tab-dashboard" class="tab-content active">
     <div class="dropdown-container">
-      <select id="staffSelect" onchange="showPersonalData()"><option value="">⏳ Memuat Data Staff...</option></select>
+      <select id="staffSelect" onchange="showPersonalData()"><option value="">Memuat Data Staff...</option></select>
     </div>
     <div id="loadingDash" class="loading-text">Menyiapkan dashboard Anda...</div>
     
     <div id="storeView" style="display:none;">
-      <div class="hero-header">
-        <div class="hero-title">Overview Toko</div>
-        <div class="hero-name">Digimap Jember Roxy</div>
+      <div class="app-head">
+        <div><div class="app-head-sub">Digimap Staff Portal</div><div class="app-head-title">Jember Roxy</div></div>
+        <div class="app-avatar">DR</div>
       </div>
-      <div class="kpi-grid">
-        <div class="kpi-card"><div class="kpi-bg-icon">💰</div><div class="kpi-title">Total Sales</div><div class="kpi-value" id="valStoreSales">0</div></div>
-        <div class="kpi-card"><div class="kpi-bg-icon">🎯</div><div class="kpi-title">Target Toko</div><div class="kpi-value" id="valStoreTarget" style="color: var(--text-muted); font-size: 16px;">0</div></div>
-        <div class="kpi-card"><div class="kpi-bg-icon">⭐</div><div class="kpi-title">Total Poin</div><div class="kpi-value c-purple" id="valStorePoint">0</div></div>
-        <div class="kpi-card"><div class="kpi-bg-icon">🚀</div><div class="kpi-title">Pencapaian</div><div class="kpi-value c-green" id="valStorePct">0%</div></div>
+
+      <div class="hero-ring-card">
+        <div class="ring-wrap">
+          <svg viewBox="0 0 84 84" aria-hidden="true"><circle class="ring-bg" cx="42" cy="42" r="34"/><circle id="ringStorePct" class="ring-fg" cx="42" cy="42" r="34" stroke-dasharray="0 214" transform="rotate(-90 42 42)"/></svg>
+          <span class="ring-label" id="valStorePct">0%</span>
+        </div>
+        <div class="ring-info">
+          <div class="ring-sub">Total sales bulan ini</div>
+          <div class="ring-big">Rp <span id="valStoreSales">0</span></div>
+          <div class="ring-sub">Target Rp <span id="valStoreTarget">0</span></div>
+        </div>
       </div>
+
+      <div class="mini-grid">
+        <div class="mini-tile"><div class="mini-title">Total poin</div><div class="mini-value" id="valStorePoint">0</div></div>
+        <div class="mini-tile"><div class="mini-title">Sisa target</div><div class="mini-value">Rp <span id="valStoreSisa">0</span></div></div>
+      </div>
+
       <div class="section-title">Breakdown LOB</div>
-      <div class="detail-card">
-        <div class="detail-card-header"><div class="detail-icon bg-blue c-blue">📱</div><div class="detail-title">Device</div></div>
-        <div class="stat-row"><div class="stat-label">Sales: <span class="stat-val" id="valStoreDeviceSales">0</span></div><div class="stat-label">Target: <span class="stat-val" id="valStoreDeviceTarget" style="font-weight:400;">0</span></div></div>
-        <div class="progress-bar-container"><div class="progress-bar bar-blue" id="barStoreDevice" style="width: 0%;"></div></div>
+      <div class="lob-list">
+        <div class="lob-row">
+          <div class="lob-top"><span class="lob-name"><span class="lob-ic c-blue"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></span>Device</span><span class="lob-pct" id="valStoreDevicePct">0%</span></div>
+          <div class="progress-bar-container"><div class="progress-bar bar-blue" id="barStoreDevice" style="width: 0%;"></div></div>
+          <div class="lob-sub">Sales <b id="valStoreDeviceSales">0</b> &middot; Target <b id="valStoreDeviceTarget">0</b></div>
+        </div>
+        <div class="lob-row">
+          <div class="lob-top"><span class="lob-name"><span class="lob-ic c-purple"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></span>Aksesoris</span><span class="lob-pct" id="valStoreAccPct">0%</span></div>
+          <div class="progress-bar-container"><div class="progress-bar bar-purple" id="barStoreAcc" style="width: 0%;"></div></div>
+          <div class="lob-sub">Sales <b id="valStoreAccSales">0</b> &middot; Target <b id="valStoreAccTarget">0</b></div>
+        </div>
+        <div class="lob-row">
+          <div class="lob-top"><span class="lob-name"><span class="lob-ic c-orange"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></span>VAS</span><span class="lob-pct" id="valStoreVasPct">0%</span></div>
+          <div class="progress-bar-container"><div class="progress-bar bar-orange" id="barStoreVas" style="width: 0%;"></div></div>
+          <div class="lob-sub">Sales <b id="valStoreVasSales">0</b> &middot; Target <b id="valStoreVasTarget">0</b></div>
+        </div>
       </div>
-      <div class="detail-card">
-        <div class="detail-card-header"><div class="detail-icon bg-purple c-purple">🎧</div><div class="detail-title">Aksesoris</div></div>
-        <div class="stat-row"><div class="stat-label">Sales: <span class="stat-val" id="valStoreAccSales">0</span></div><div class="stat-label">Target: <span class="stat-val" id="valStoreAccTarget" style="font-weight:400;">0</span></div></div>
-        <div class="progress-bar-container"><div class="progress-bar bar-purple" id="barStoreAcc" style="width: 0%;"></div></div>
-      </div>
-      <div class="detail-card">
-        <div class="detail-card-header"><div class="detail-icon bg-orange c-orange">🛡️</div><div class="detail-title">VAS</div></div>
-        <div class="stat-row"><div class="stat-label">Sales: <span class="stat-val" id="valStoreVasSales">0</span></div><div class="stat-label">Target: <span class="stat-val" id="valStoreVasTarget" style="font-weight:400;">0</span></div></div>
-        <div class="progress-bar-container"><div class="progress-bar bar-orange" id="barStoreVas" style="width: 0%;"></div></div>
-      </div>
-      <div class="section-title" style="margin-top:35px;">🏆 Klasemen Staf</div>
-      <div class="table-container"><table id="rankTable"><thead><tr><th style="width:50px; text-align:center;">#</th><th>Nama</th><th style="text-align:right;">Sales</th></tr></thead><tbody id="rankTableBody"></tbody></table></div>
+
+      <div class="section-title">Klasemen staf</div>
+      <div class="table-container rank-list"><table id="rankTable"><thead><tr><th style="width:50px; text-align:center;">#</th><th>Nama</th><th style="text-align:right;">Sales</th></tr></thead><tbody id="rankTableBody"></tbody></table></div>
     </div>
 
     <div id="staffView" style="display:none;">
       <div class="hero-header"><div class="hero-title">Performa Saya</div><div class="hero-name" id="heroStaffName">Nama Staf</div></div>
       <div class="kpi-grid">
-        <div class="kpi-card"><div class="kpi-rank-badge" id="valMyRank">#1</div><div class="kpi-bg-icon">💰</div><div class="kpi-title">Total Sales</div><div class="kpi-value" id="valMySales">0</div></div>
-        <div class="kpi-card"><div class="kpi-bg-icon">🎯</div><div class="kpi-title">Target Saya</div><div class="kpi-value" id="valMyTarget" style="color: var(--text-muted); font-size: 16px;">0</div></div>
+        <div class="kpi-card"><div class="kpi-rank-badge" id="valMyRank">#1</div><div class="kpi-bg-icon"></div><div class="kpi-title">Total Sales</div><div class="kpi-value" id="valMySales">0</div></div>
+        <div class="kpi-card"><div class="kpi-bg-icon"></div><div class="kpi-title">Target Saya</div><div class="kpi-value" id="valMyTarget" style="color: var(--text-muted); font-size: 16px;">0</div></div>
         <div class="kpi-card" style="grid-column: span 2; align-items: center; text-align: center;"><div class="kpi-title">Kekurangan Target</div><div class="kpi-value" id="valMySisa" style="font-size:24px;">0</div><div style="margin-top: 5px; font-size: 12px; color: var(--text-muted);">Pencapaian: <span id="valMyPct" style="font-weight:bold; color:var(--text-main);">0%</span></div></div>
       </div>
       <div class="section-title">LOB</div>
       <div id="qtyKPI">
-        <div class="qty-card"><div class="qty-emoji">📱</div><div class="qty-val" id="qtyIphone">0</div><div class="qty-label">iPhone</div></div>
-        <div class="qty-card"><div class="qty-emoji">💻</div><div class="qty-val" id="qtyIpad">0</div><div class="qty-label">iPad</div></div>
-        <div class="qty-card"><div class="qty-emoji">🖥️</div><div class="qty-val" id="qtyMac">0</div><div class="qty-label">Mac</div></div>
-        <div class="qty-card"><div class="qty-emoji">⌚</div><div class="qty-val" id="qtyWatch">0</div><div class="qty-label">Watch</div></div>
-        <div class="qty-card"><div class="qty-emoji">🎧</div><div class="qty-val" id="qtyAirpods">0</div><div class="qty-label">AirPods</div></div>
+        <div class="qty-card"><div class="qty-emoji"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div><div class="qty-val" id="qtyIphone">0</div><div class="qty-label">iPhone</div></div>
+        <div class="qty-card"><div class="qty-emoji"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div><div class="qty-val" id="qtyIpad">0</div><div class="qty-label">iPad</div></div>
+        <div class="qty-card"><div class="qty-emoji"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div><div class="qty-val" id="qtyMac">0</div><div class="qty-label">Mac</div></div>
+        <div class="qty-card"><div class="qty-emoji"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6"/><polyline points="12 10 12 12 13 13"/><path d="M16.13 7.66l-.81-4.05a2 2 0 0 0-2-1.61h-2.68a2 2 0 0 0-2 1.61l-.78 4.05m.01 8.68l.78 4.05a2 2 0 0 0 2 1.61h2.68a2 2 0 0 0 2-1.61l.81-4.05"/></svg></div><div class="qty-val" id="qtyWatch">0</div><div class="qty-label">Watch</div></div>
+        <div class="qty-card"><div class="qty-emoji"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></div><div class="qty-val" id="qtyAirpods">0</div><div class="qty-label">AirPods</div></div>
       </div>
       <div class="section-title">Others</div>
       <div class="detail-card">
-        <div class="detail-card-header"><div class="detail-icon bg-purple c-purple">🎧</div><div class="detail-title">Aksesoris</div></div>
+        <div class="detail-card-header"><div class="detail-icon bg-purple c-purple"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></div><div class="detail-title">Aksesoris</div></div>
         <div class="stat-row"><div class="stat-label">Sales: <span class="stat-val" id="valAccSales">0</span></div><div class="stat-label">Target: <span class="stat-val" id="valAccTarget" style="font-weight:400;">0</span></div></div>
         <div class="progress-bar-container"><div class="progress-bar bar-purple" id="barAcc" style="width: 0%;"></div></div>
       </div>
       <div class="detail-card">
-        <div class="detail-card-header"><div class="detail-icon bg-blue c-blue">🛡️</div><div class="detail-title">Qoala</div></div>
+        <div class="detail-card-header"><div class="detail-icon bg-blue c-blue"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div><div class="detail-title">Qoala</div></div>
         <div class="stat-row"><div class="stat-label">Sales: <span class="stat-val" id="valQoalaSales">0</span></div><div class="stat-label">Target: <span class="stat-val" id="valQoalaTarget" style="font-weight:400;">0</span></div></div>
         <div class="progress-bar-container"><div class="progress-bar bar-blue" id="barQoala" style="width: 0%;"></div></div>
       </div>
 
       <div class="daily-header-row">
-        <div class="section-title" style="margin:0;">📅 Sales Harian</div>
+        <div class="section-title" style="margin:0;"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Sales Harian</div>
         <div class="daily-date-nav">
-          <button type="button" class="btn-date-step" onclick="stepDailyDate(-1)" title="Hari Sebelumnya">◀</button>
+          <button type="button" class="btn-date-step" onclick="stepDailyDate(-1)" title="Hari Sebelumnya"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg></button>
           <input type="date" id="dailyDateInput" class="daily-date-input" onchange="loadDailySales()">
-          <button type="button" class="btn-date-step" onclick="stepDailyDate(1)" title="Hari Berikutnya">▶</button>
+          <button type="button" class="btn-date-step" onclick="stepDailyDate(1)" title="Hari Berikutnya"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></button>
         </div>
       </div>
       <div id="dailyMetaInfo" class="daily-meta-info">Memuat data harian...</div>
 
       <div class="kpi-grid" style="margin-bottom: 10px;">
         <div class="kpi-card">
-          <div class="kpi-bg-icon">💰</div>
+          <div class="kpi-bg-icon"></div>
           <div class="kpi-title">Total Harian</div>
           <div class="kpi-value c-purple" id="valDailyTotal" style="font-size:17px;">0</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-bg-icon">📱</div>
+          <div class="kpi-bg-icon"></div>
           <div class="kpi-title">Device</div>
           <div class="kpi-value" id="valDailyDevice" style="font-size:17px;">0</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-bg-icon">🎧</div>
+          <div class="kpi-bg-icon"></div>
           <div class="kpi-title">Accessories</div>
           <div class="kpi-value" id="valDailyAcc" style="font-size:17px;">0</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-bg-icon">🛡️</div>
+          <div class="kpi-bg-icon"></div>
           <div class="kpi-title">Qoala</div>
           <div class="kpi-value" id="valDailyQoala" style="font-size:17px;">0</div>
         </div>
       </div>
 
       <div class="qty-row-scroll">
-        <div class="qty-card"><div class="qty-emoji">📱</div><div class="qty-val" id="dailyQtyIphone">0</div><div class="qty-label">iPhone</div></div>
-        <div class="qty-card"><div class="qty-emoji">💻</div><div class="qty-val" id="dailyQtyIpad">0</div><div class="qty-label">iPad</div></div>
-        <div class="qty-card"><div class="qty-emoji">🖥️</div><div class="qty-val" id="dailyQtyMac">0</div><div class="qty-label">Mac</div></div>
-        <div class="qty-card"><div class="qty-emoji">⌚</div><div class="qty-val" id="dailyQtyWatch">0</div><div class="qty-label">Watch</div></div>
-        <div class="qty-card"><div class="qty-emoji">🎧</div><div class="qty-val" id="dailyQtyAirpods">0</div><div class="qty-label">AirPods</div></div>
+        <div class="qty-card"><div class="qty-emoji"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div><div class="qty-val" id="dailyQtyIphone">0</div><div class="qty-label">iPhone</div></div>
+        <div class="qty-card"><div class="qty-emoji"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div><div class="qty-val" id="dailyQtyIpad">0</div><div class="qty-label">iPad</div></div>
+        <div class="qty-card"><div class="qty-emoji"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div><div class="qty-val" id="dailyQtyMac">0</div><div class="qty-label">Mac</div></div>
+        <div class="qty-card"><div class="qty-emoji"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6"/><polyline points="12 10 12 12 13 13"/><path d="M16.13 7.66l-.81-4.05a2 2 0 0 0-2-1.61h-2.68a2 2 0 0 0-2 1.61l-.78 4.05m.01 8.68l.78 4.05a2 2 0 0 0 2 1.61h2.68a2 2 0 0 0 2-1.61l.81-4.05"/></svg></div><div class="qty-val" id="dailyQtyWatch">0</div><div class="qty-label">Watch</div></div>
+        <div class="qty-card"><div class="qty-emoji"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></div><div class="qty-val" id="dailyQtyAirpods">0</div><div class="qty-label">AirPods</div></div>
       </div>
     </div>
   </div>
@@ -412,15 +480,15 @@
   <!-- TAB STOK (SOH) -->
   <div id="tab-soh" class="tab-content">
     <div class="dropdown-container">
-      <input type="text" id="searchInput" class="search-box" placeholder="🔍 Cari nama barang..." onkeyup="renderSOH()">
+      <input type="text" id="searchInput" class="search-box" placeholder="Cari nama barang..." onkeyup="renderSOH()">
       <select id="catSelect" onchange="renderSOH()">
         <option value="Semua">Tampilkan Semua Kategori</option>
-        <option value="iPhone">📱 iPhone</option>
-        <option value="iPad">💻 iPad</option>
-        <option value="Mac">🖥️ Mac</option>
-        <option value="Apple Watch">⌚ Apple Watch</option>
-        <option value="AirPods">🎧 AirPods</option>
-        <option value="Accessories">🛒 Accessories</option>
+        <option value="iPhone">iPhone</option>
+        <option value="iPad">iPad</option>
+        <option value="Mac">Mac</option>
+        <option value="Apple Watch">Apple Watch</option>
+        <option value="AirPods">AirPods</option>
+        <option value="Accessories">Accessories</option>
       </select>
     </div>
     <div id="loadingSOH" class="loading-text" style="display:block;">Mengecek ketersediaan di gudang...</div>
@@ -441,7 +509,7 @@
     </div>
 
     <div class="dropdown-container" style="margin-bottom:14px;">
-      <input type="text" id="linkSearchInput" class="search-box" placeholder="🔍 Cari nama form atau laporan..." onkeyup="renderLinks()">
+      <input type="text" id="linkSearchInput" class="search-box" placeholder="Cari nama form atau laporan..." onkeyup="renderLinks()">
     </div>
 
     <div class="chip-row" id="linkFilterChips">
@@ -465,7 +533,7 @@
       </div>
 
       <div class="hub-choice-card" onclick="openStaffSubMenu('bonus')">
-        <div class="hub-choice-icon bg-purple c-purple">💳</div>
+        <div class="hub-choice-icon bg-purple c-purple"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
         <div class="hub-choice-info">
           <div class="hub-choice-title">Cek Slip Gaji</div>
           <div class="hub-choice-desc">Lihat estimasi gaji pokok, insentif & atur PIN keamanan</div>
@@ -474,7 +542,7 @@
       </div>
 
       <div class="hub-choice-card" onclick="openStaffSubMenu('biodata')">
-        <div class="hub-choice-icon bg-blue c-blue">👥</div>
+        <div class="hub-choice-icon bg-blue c-blue"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
         <div class="hub-choice-info">
           <div class="hub-choice-title">Biodata Tim</div>
           <div class="hub-choice-desc">Profil tim, foto, kontak WA, NIK & edit biodata Anda</div>
@@ -483,7 +551,7 @@
       </div>
 
       <div class="hub-choice-card" onclick="openStaffSubMenu('jadwal')">
-        <div class="hub-choice-icon bg-green c-green">📅</div>
+        <div class="hub-choice-icon bg-green c-green"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
         <div class="hub-choice-info">
           <div class="hub-choice-title">Jadwal Shift</div>
           <div class="hub-choice-desc">Jadwal shift harian, catatan kegiatan & roster 7 hari</div>
@@ -494,18 +562,18 @@
 
     <div id="staffSubSwitcher" class="sub-switcher-bar" style="display:none;">
       <button type="button" class="btn-back-hub" onclick="showStaffHubChoice()">‹ Staf</button>
-      <button type="button" id="btnSubBonus" class="sub-switch-btn" onclick="openStaffSubMenu('bonus')">💳 Gaji</button>
-      <button type="button" id="btnSubBiodata" class="sub-switch-btn" onclick="openStaffSubMenu('biodata')">👥 Biodata</button>
-      <button type="button" id="btnSubJadwal" class="sub-switch-btn" onclick="openStaffSubMenu('jadwal')">📅 Jadwal</button>
+      <button type="button" id="btnSubBonus" class="sub-switch-btn" onclick="openStaffSubMenu('bonus')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Gaji</button>
+      <button type="button" id="btnSubBiodata" class="sub-switch-btn" onclick="openStaffSubMenu('biodata')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Biodata</button>
+      <button type="button" id="btnSubJadwal" class="sub-switch-btn" onclick="openStaffSubMenu('jadwal')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Jadwal</button>
     </div>
 
     <!-- Sub-Menu 1: Slip Gaji -->
     <div id="sub-bonus" style="display:none;">
       <div class="card" id="authBox" style="text-align:center;">
-        <div style="font-size: 50px; margin-bottom: 10px;">🔒</div>
+        <div style="font-size: 44px; margin-bottom: 10px; color: var(--primary);"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
         <h2>Akses Slip Gaji</h2>
         <p style="font-size:12px; color:var(--text-muted); margin-bottom: 25px;">Masukkan PIN Anda untuk melihat estimasi take home pay bulan ini.</p>
-        <select id="bonusStaffSelect" style="margin-bottom:15px;"><option value="">👇 Pilih Nama Kamu 👇</option></select>
+        <select id="bonusStaffSelect" style="margin-bottom:15px;"><option value="">Pilih Nama Kamu </option></select>
         <input type="password" id="inputPin" placeholder="PIN Keamanan (Bawaan: 1234)">
         <button class="btn-primary" id="btnUnlock" onclick="bukaBrankas()">Buka Brankas Saya</button>
         <div id="loadingBonus" class="loading-text">Memverifikasi...</div>
@@ -530,7 +598,7 @@
           <button class="btn-outline" onclick="gantiPin()">Simpan PIN Baru</button>
           <div id="pinStatus" style="font-size:12px; font-weight:500; text-align:center; margin-top:10px;"></div>
         </div>
-        <button class="btn-outline" style="border-color:#E2E8F0; color:var(--text-muted); margin-top:10px; background:#FFF;" onclick="tutupBrankas()">Tutup & Keluar 🔒</button>
+        <button class="btn-outline" style="border-color:#E2E8F0; color:var(--text-muted); margin-top:10px; background:#FFF;" onclick="tutupBrankas()">Tutup & Keluar </button>
       </div>
     </div>
 
@@ -548,7 +616,7 @@
       </div>
 
       <div class="dropdown-container" style="margin-bottom:16px;">
-        <input type="text" id="bioSearchInput" class="search-box" placeholder="🔍 Cari nama, jabatan, atau NIK..." onkeyup="renderBiodata()">
+        <input type="text" id="bioSearchInput" class="search-box" placeholder="Cari nama, jabatan, atau NIK..." onkeyup="renderBiodata()">
       </div>
 
       <div id="biodataListContainer"></div>
@@ -568,9 +636,9 @@
       </div>
 
       <div class="week-nav-bar">
-        <button type="button" class="btn-week-step" onclick="changeScheduleWeek(-7)" title="Minggu Sebelumnya">◀</button>
+        <button type="button" class="btn-week-step" onclick="changeScheduleWeek(-7)" title="Minggu Sebelumnya"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg></button>
         <div class="week-range-label" id="weekHeaderLabel">Minggu Ini</div>
-        <button type="button" class="btn-week-step" onclick="changeScheduleWeek(7)" title="Minggu Berikutnya">▶</button>
+        <button type="button" class="btn-week-step" onclick="changeScheduleWeek(7)" title="Minggu Berikutnya"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg></button>
       </div>
 
       <div class="subview-tabs">
@@ -598,7 +666,7 @@
   <!-- Modal Tambah / Edit Link -->
   <div class="link-modal-overlay" id="addFormModal" onclick="if(event.target===this) closeAddFormModal()">
     <div class="link-modal-box">
-      <h3 id="formModalTitle" style="font-size:17px; font-weight:700; margin-bottom:14px;">➕ Tambah Link Form Baru</h3>
+      <h3 id="formModalTitle" style="font-size:17px; font-weight:700; margin-bottom:14px;">Tambah Link Form Baru</h3>
       <input type="text" id="newFormTitle" placeholder="Nama Form (Contoh: Form Trade-In)">
       <input type="text" id="newFormDesc" placeholder="Keterangan singkat (opsional)">
       <select id="newFormCat">
@@ -618,10 +686,10 @@
   <!-- Modal Tambah / Edit Biodata -->
   <div class="link-modal-overlay" id="biodataModal" onclick="if(event.target===this) closeBiodataModal()">
     <div class="link-modal-box">
-      <h3 id="bioModalTitle" style="font-size:17px; font-weight:700; margin-bottom:14px;">👤 Tambah Biodata Tim</h3>
+      <h3 id="bioModalTitle" style="font-size:17px; font-weight:700; margin-bottom:14px;">Tambah Biodata Tim</h3>
 
       <div class="photo-picker-wrap">
-        <div id="bioPhotoPreview" class="photo-preview-circle">📷</div>
+        <div id="bioPhotoPreview" class="photo-preview-circle"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
         <div style="flex:1;">
           <div style="font-size:12px; font-weight:600; color:var(--text-main); margin-bottom:5px;">Foto Profil</div>
           <input type="file" id="bioPhotoFile" accept="image/*" style="display:none;" onchange="handleBioPhotoSelect(this)">
@@ -677,29 +745,29 @@
     <div class="link-modal-box">
       <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; margin-bottom:12px;">
         <div>
-          <div style="font-size:16px; font-weight:800; color:var(--text-main);" id="bulkModalTitle">⚡ Atur Roster 7 Hari</div>
+          <div style="font-size:16px; font-weight:800; color:var(--text-main);" id="bulkModalTitle">Atur Roster 7 Hari</div>
           <div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;" id="bulkModalSub">Minggu Ini</div>
         </div>
-        <button type="button" style="background:#F4EEFF; color:var(--text-muted); border:none; width:32px; height:32px; border-radius:50%; font-weight:700; cursor:pointer;" onclick="closeBulkModal()">✕</button>
+        <button type="button" style="background:#EAF2FD; color:var(--text-muted); border:none; width:32px; height:32px; border-radius:50%; font-weight:700; cursor:pointer;" onclick="closeBulkModal()">✕</button>
       </div>
 
       <div class="brush-panel">
         <div class="brush-header">
-          <span>🖌️ Mode Kuas Cepat</span>
-          <span style="color:var(--primary);" id="brushHintLabel">Ketuk sel: 🌅 Pagi</span>
+          <span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Mode Kuas Cepat</span>
+          <span style="color:var(--primary);" id="brushHintLabel">Ketuk sel: Pagi</span>
         </div>
         <div class="brush-pills">
-          <button type="button" id="brushBtn-P" class="brush-btn active-P" onclick="selectBrush('P')">🌅 Pagi</button>
-          <button type="button" id="brushBtn-M" class="brush-btn" onclick="selectBrush('M')">☀️ Middle</button>
-          <button type="button" id="brushBtn-S" class="brush-btn" onclick="selectBrush('S')">🌙 Siang</button>
-          <button type="button" id="brushBtn-OFF" class="brush-btn" onclick="selectBrush('OFF')">🏖️ Off</button>
-          <button type="button" id="brushBtn-NOTE" class="brush-btn" onclick="selectBrush('NOTE')">📌 Catatan</button>
+          <button type="button" id="brushBtn-P" class="brush-btn active-P" onclick="selectBrush('P')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="2" x2="12" y2="9"/><line x1="4.22" y1="10.22" x2="5.64" y2="11.64"/><line x1="1" y1="18" x2="3" y2="18"/><line x1="21" y1="18" x2="23" y2="18"/><line x1="18.36" y1="11.64" x2="19.78" y2="10.22"/><line x1="23" y1="22" x2="1" y2="22"/><polyline points="8 6 12 2 16 6"/></svg> Pagi</button>
+          <button type="button" id="brushBtn-M" class="brush-btn" onclick="selectBrush('M')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg> Middle</button>
+          <button type="button" id="brushBtn-S" class="brush-btn" onclick="selectBrush('S')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg> Siang</button>
+          <button type="button" id="brushBtn-OFF" class="brush-btn" onclick="selectBrush('OFF')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg> Off</button>
+          <button type="button" id="brushBtn-NOTE" class="brush-btn" onclick="selectBrush('NOTE')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v6l-2 4v2h10v-2l-2-4V4"/><line x1="12" y1="16" x2="12" y2="21"/><line x1="8" y1="4" x2="16" y2="4"/></svg> Catatan</button>
         </div>
       </div>
 
       <div id="matrixCellNotePrompt" class="matrix-cell-note-prompt" style="display:none;">
         <div class="mcnp-head">
-          <span id="mcnpTitle">📌 Catatan Kegiatan</span>
+          <span id="mcnpTitle">Catatan Kegiatan</span>
           <button type="button" style="background:none; border:none; color:#92400E; font-weight:800; cursor:pointer;" onclick="closeMatrixCellNotePrompt()">✕</button>
         </div>
         <div class="preset-chips-wrap" style="margin:0 0 8px 0;" id="matrixNotePresets"></div>
@@ -732,11 +800,11 @@
         <div style="display:flex; align-items:center; gap:11px;">
           <div class="sch-avatar av-M" id="snmAvatar">SA</div>
           <div>
-            <div style="font-size:15.5px; font-weight:800; color:var(--text-main);" id="snmTitle">📌 Catatan Staf</div>
+            <div style="font-size:15.5px; font-weight:800; color:var(--text-main);" id="snmTitle">Catatan Staf</div>
             <div style="font-size:11.5px; color:var(--text-muted); margin-top:2px;" id="snmSub">Tanggal</div>
           </div>
         </div>
-        <button type="button" style="background:#F4EEFF; color:var(--text-muted); border:none; width:32px; height:32px; border-radius:50%; font-weight:700; cursor:pointer;" onclick="closeStaffNoteModal()">✕</button>
+        <button type="button" style="background:#EAF2FD; color:var(--text-muted); border:none; width:32px; height:32px; border-radius:50%; font-weight:700; cursor:pointer;" onclick="closeStaffNoteModal()">✕</button>
       </div>
 
       <div style="font-size:11.5px; font-weight:700; color:var(--text-muted);">Pilih Cepat (isi otomatis Catatan 1 / 2):</div>
@@ -1056,10 +1124,10 @@
         console.error('Gagal memuat dashboard:', err);
         const sel = document.getElementById('staffSelect');
         if (sel && sel.options.length <= 1) {
-          sel.innerHTML = '<option value="">🏪 Overview Toko (Digimap Jember Roxy)</option>';
+          sel.innerHTML = '<option value="">Overview Toko (Digimap Jember Roxy)</option>';
         }
         document.getElementById('storeView').style.display = 'block';
-        showLinkToast('⚠️ Gagal menyambung ke server data');
+        showLinkToast('Gagal menyambung ke server data');
       } finally {
         isDashboardLoading = false;
         if (loadingEl) loadingEl.style.display = 'none';
@@ -1082,13 +1150,13 @@
       }
 
       if (sel) {
-        sel.innerHTML = '<option value="">🏪 Overview Toko (Digimap Jember Roxy)</option>' +
-          staffNames.map(n => `<option value="${escapeHtml(n)}">👤 ${escapeHtml(n)}</option>`).join('');
+        sel.innerHTML = '<option value="">Overview Toko (Digimap Jember Roxy)</option>' +
+          staffNames.map(n => `<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
         if (currentVal && staffNames.includes(currentVal)) sel.value = currentVal;
       }
 
       if (bonusSel) {
-        bonusSel.innerHTML = '<option value="">👇 Pilih Nama Kamu 👇</option>' +
+        bonusSel.innerHTML = '<option value="">Pilih Nama Kamu </option>' +
           staffNames.map(n => `<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
         if (currentBonusVal && staffNames.includes(currentBonusVal)) bonusSel.value = currentBonusVal;
       }
@@ -1123,6 +1191,10 @@
       document.getElementById('valStoreTarget').innerText = formatAngka(target);
       document.getElementById('valStorePoint').innerText = point.toLocaleString('id-ID');
       document.getElementById('valStorePct').innerText = pct + '%';
+      const _ring = document.getElementById('ringStorePct');
+      if (_ring) { const _c = 2 * Math.PI * 34; _ring.setAttribute('stroke-dasharray', (Math.min(100, pct) / 100 * _c) + ' ' + _c); }
+      const _sisaEl = document.getElementById('valStoreSisa');
+      if (_sisaEl) _sisaEl.innerText = formatAngka(Math.max(0, target - sales));
 
       const devS = parseNum(st.deviceSales), devT = parseNum(st.deviceTarget);
       document.getElementById('valStoreDeviceSales').innerText = formatAngka(devS);
@@ -1138,6 +1210,8 @@
       document.getElementById('valStoreVasSales').innerText = formatAngka(vasS);
       document.getElementById('valStoreVasTarget').innerText = formatAngka(vasT);
       document.getElementById('barStoreVas').style.width = Math.min(100, vasT > 0 ? (vasS / vasT) * 100 : 0) + '%';
+      const _setPct = (id, s, tg) => { const el = document.getElementById(id); if (el) el.innerText = (tg > 0 ? Math.round((s / tg) * 100) : 0) + '%'; };
+      _setPct('valStoreDevicePct', devS, devT); _setPct('valStoreAccPct', accS, accT); _setPct('valStoreVasPct', vasS, vasT);
 
       const tbody = document.getElementById('rankTableBody');
       const ranking = Array.isArray(dashboardData.ranking) ? dashboardData.ranking : [];
@@ -1146,7 +1220,7 @@
       } else {
         tbody.innerHTML = ranking.map((r, i) => {
           const pos = r.rank || (i + 1);
-          const medal = pos === 1 ? '🥇' : pos === 2 ? '🥈' : pos === 3 ? '🥉' : pos;
+          const medal = pos <= 3 ? `<span class="rank-badge rank-${pos}">${pos}</span>` : pos;
           return `
             <tr style="cursor:pointer;" onclick="document.getElementById('staffSelect').value='${escapeAttr(r.name)}'; showPersonalData();">
               <td style="text-align:center; font-weight:700;">${medal}</td>
@@ -1173,7 +1247,7 @@
       document.getElementById('valMyRank').innerText = rankNum > 0 ? '#' + rankNum : '#-';
       document.getElementById('valMySales').innerText = formatAngka(sales);
       document.getElementById('valMyTarget').innerText = formatAngka(target);
-      document.getElementById('valMySisa').innerText = sisa === 0 && target > 0 ? '🎉 Target Tercapai!' : formatAngka(sisa);
+      document.getElementById('valMySisa').innerText = sisa === 0 && target > 0 ? 'Target Tercapai!' : formatAngka(sisa);
       document.getElementById('valMyPct').innerText = pct + '%';
 
       document.getElementById('qtyIphone').innerText = parseNum(stObj.qtyIphone);
@@ -1260,7 +1334,7 @@
       const metaEl = document.getElementById('dailyMetaInfo');
       if (!staffName) return;
 
-      metaEl.innerText = `⏳ Memuat penjualan ${staffName} (${dateStr})...`;
+      metaEl.innerText = `Memuat penjualan ${staffName} (${dateStr})...`;
       try {
         const res = await fetch(`${API_URL}?action=getDailySales&date=${encodeURIComponent(dateStr)}`, { redirect: 'follow' });
         const raw = await res.json();
@@ -1296,10 +1370,10 @@
 
         const hasSales = total > 0 || (iphone + ipad + mac + watch + airpods) > 0;
         metaEl.innerText = hasSales
-          ? `✅ Menampilkan transaksi tanggal ${serverDate}`
+          ? `Menampilkan transaksi tanggal ${serverDate}`
           : `ℹ️ Tidak ada catatan transaksi pada tanggal ${serverDate}`;
       } catch (err) {
-        metaEl.innerText = `⚠️ Data harian belum tersedia untuk ${dateStr}`;
+        metaEl.innerText = `Data harian belum tersedia untuk ${dateStr}`;
       }
     }
 
@@ -1323,7 +1397,7 @@
         sohList = Array.isArray(json) ? json : (Array.isArray(json.items) ? json.items : (Array.isArray(json.soh) ? json.soh : []));
         renderSOH();
       } catch (err) {
-        document.getElementById('loadingSOH').innerText = '⚠️ Gagal memuat stok gudang.';
+        document.getElementById('loadingSOH').innerText = 'Gagal memuat stok gudang.';
       } finally {
         isSohLoading = false;
       }
@@ -1424,7 +1498,7 @@
       if (filtered.length === 0) {
         container.innerHTML = `
           <div class="card" style="text-align:center; padding:32px 20px;">
-            <div style="font-size:36px; margin-bottom:8px;">🔗</div>
+            <div style="font-size:36px; margin-bottom:8px; color:var(--text-muted);"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
             <div style="font-weight:700; margin-bottom:4px;">Belum ada link di kategori ini</div>
             <div style="font-size:12px; color:var(--text-muted);">Klik tombol <b>+ Tambah</b> di kanan atas untuk menambahkan link baru.</div>
           </div>
@@ -1432,12 +1506,12 @@
         return;
       }
 
-      const iconMap = { Project: '📁', Trainer: '🎓', SPV: '📋', Lainnya: '🔗' };
+      const iconMap = { Project: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>', Trainer: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>', SPV: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>', Lainnya: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>' };
 
       container.innerHTML = filtered.map((item, idx) => {
         const id = item.id || ('link-' + idx);
         const cat = item.category || item.cat || 'Lainnya';
-        const icon = iconMap[cat] || '🔗';
+        const icon = iconMap[cat] || '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>';
         const url = item.url || '#';
         return `
           <div class="form-card">
@@ -1450,10 +1524,10 @@
               </div>
             </div>
             <div class="form-actions">
-              <button type="button" class="btn-copy-link" onclick="copyTextLink('${escapeAttr(url)}')">📋 Salin</button>
-              <a class="btn-open-link" href="${escapeAttr(url)}" target="_blank" rel="noopener noreferrer">Buka ↗</a>
-              <button type="button" class="btn-edit-custom" title="Edit" onclick="openEditFormModal('${escapeAttr(id)}')">✏️</button>
-              <button type="button" class="btn-del-custom" title="Hapus" onclick="deleteFormLink('${escapeAttr(id)}')">🗑️</button>
+              <button type="button" class="btn-copy-link" onclick="copyTextLink('${escapeAttr(url)}')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Salin</button>
+              <a class="btn-open-link" href="${escapeAttr(url)}" target="_blank" rel="noopener noreferrer">Buka <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>
+              <button type="button" class="btn-edit-custom" title="Edit" onclick="openEditFormModal('${escapeAttr(id)}')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>
+              <button type="button" class="btn-del-custom" title="Hapus" onclick="deleteFormLink('${escapeAttr(id)}')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
             </div>
           </div>
         `;
@@ -1469,16 +1543,16 @@
       ta.select();
       try {
         document.execCommand('copy');
-        showLinkToast('📋 Link berhasil disalin!');
+        showLinkToast('Link berhasil disalin!');
       } catch (e) {
-        showLinkToast('⚠️ Gagal menyalin link');
+        showLinkToast('Gagal menyalin link');
       }
       document.body.removeChild(ta);
     }
 
     function openAddFormModal() {
       editingLinkId = null;
-      document.getElementById('formModalTitle').innerText = '➕ Tambah Link Form Baru';
+      document.getElementById('formModalTitle').innerText = 'Tambah Link Form Baru';
       document.getElementById('newFormTitle').value = '';
       document.getElementById('newFormDesc').value = '';
       document.getElementById('newFormCat').value = 'Project';
@@ -1490,7 +1564,7 @@
       const item = allLinksList.find((x, i) => String(x.id || ('link-' + i)) === String(id));
       if (!item) return;
       editingLinkId = id;
-      document.getElementById('formModalTitle').innerText = '✏️ Edit Link Form';
+      document.getElementById('formModalTitle').innerText = 'Edit Link Form';
       document.getElementById('newFormTitle').value = item.title || '';
       document.getElementById('newFormDesc').value = item.desc || item.description || '';
       document.getElementById('newFormCat').value = item.category || item.cat || 'Lainnya';
@@ -1509,7 +1583,7 @@
       let url = document.getElementById('newFormUrl').value.trim();
 
       if (!title || !url) {
-        showLinkToast('⚠️ Judul dan URL wajib diisi!');
+        showLinkToast('Judul dan URL wajib diisi!');
         return;
       }
       if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
@@ -1548,9 +1622,9 @@
           })
         });
         loadLinksData();
-        showLinkToast('✅ Link berhasil disimpan!');
+        showLinkToast('Link berhasil disimpan!');
       } catch (err) {
-        showLinkToast('✅ Link tersimpan di perangkat');
+        showLinkToast('Link tersimpan di perangkat');
       } finally {
         btn.disabled = false;
         btn.innerText = 'Simpan Link';
@@ -1559,7 +1633,7 @@
 
     async function deleteFormLink(id) {
       if (!confirm('Hapus link ini? Perubahan akan berlaku untuk semua staf.')) return;
-      showLinkToast('🗑️ Menghapus link...');
+      showLinkToast('Menghapus link...');
       allLinksList = allLinksList.filter((x, i) => String(x.id || ('link-' + i)) !== String(id));
       try { localStorage.setItem(LINKS_LOCAL_KEY, JSON.stringify(allLinksList)); } catch (e) {}
       renderLinks();
@@ -1572,11 +1646,11 @@
       })
       .then(() => {
         loadLinksData();
-        showLinkToast('🗑️ Link dihapus untuk semua staf!');
+        showLinkToast('Link dihapus untuk semua staf!');
       })
       .catch(() => {
         loadLinksData();
-        showLinkToast('🗑️ Link dihapus!');
+        showLinkToast('Link dihapus!');
       });
     }
 
@@ -1670,7 +1744,7 @@
         const data = await res.json();
         if (data && data.success) {
           stEl.style.color = 'var(--accent-green)';
-          stEl.innerText = '✅ ' + (data.message || 'PIN berhasil diperbarui!');
+          stEl.innerText = '' + (data.message || 'PIN berhasil diperbarui!');
           document.getElementById('oldPin').value = '';
           document.getElementById('newPin').value = '';
         } else {
@@ -1708,7 +1782,7 @@
       isBiodataLoading = true;
       const cont = document.getElementById('biodataListContainer');
       if (cont && allBiodataList.length === 0) {
-        cont.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">⏳ Memuat biodata tim...</div>';
+        cont.innerHTML = '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">Memuat biodata tim...</div>';
       }
 
       try {
@@ -1751,7 +1825,7 @@
       if (filtered.length === 0) {
         cont.innerHTML = `
           <div class="card" style="text-align:center; padding:32px 20px;">
-            <div style="font-size:36px; margin-bottom:8px;">👥</div>
+            <div style="font-size:36px; margin-bottom:8px; color:var(--text-muted);"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
             <div style="font-weight:700; margin-bottom:4px;">Belum ada data profil</div>
             <div style="font-size:12px; color:var(--text-muted);">Klik <b>+ Tambah</b> di atas untuk menambahkan anggota tim.</div>
           </div>
@@ -1774,7 +1848,7 @@
                 <div class="bio-name">${escapeHtml(b.name || '-')}</div>
                 <div class="bio-badges">
                   <span class="bio-role-badge">${escapeHtml(b.role || 'Staff Toko')}</span>
-                  ${b.dob ? `<span class="bio-bday-badge">🎂 ${escapeHtml(b.dob)}</span>` : ''}
+                  ${b.dob ? `<span class="bio-bday-badge"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="8" width="18" height="4" rx="1"/><line x1="12" y1="8" x2="12" y2="21"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 4.8 0 0 1 12 8a4.8 4.8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/></svg> ${escapeHtml(b.dob)}</span>` : ''}
                 </div>
               </div>
             </div>
@@ -1786,9 +1860,9 @@
               <div class="bio-row"><span class="bio-lbl">Alamat</span><span class="bio-val">${escapeHtml(b.address || '-')}</span></div>
             </div>
             <div class="form-actions">
-              ${waHref ? `<a class="btn-wa-link" href="${escapeAttr(waHref)}" target="_blank" rel="noopener noreferrer">💬 Chat WA</a>` : ''}
-              <button type="button" class="btn-copy-link" onclick="openEditBiodataModal('${escapeAttr(id)}')">✏️ Edit Profil</button>
-              <button type="button" class="btn-del-custom" title="Hapus" onclick="deleteBiodata('${escapeAttr(id)}')">🗑️</button>
+              ${waHref ? `<a class="btn-wa-link" href="${escapeAttr(waHref)}" target="_blank" rel="noopener noreferrer"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Chat WA</a>` : ''}
+              <button type="button" class="btn-copy-link" onclick="openEditBiodataModal('${escapeAttr(id)}')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> Edit Profil</button>
+              <button type="button" class="btn-del-custom" title="Hapus" onclick="deleteBiodata('${escapeAttr(id)}')"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg></button>
             </div>
           </div>
         `;
@@ -1798,7 +1872,7 @@
     function openAddBiodataModal() {
       editingBioId = null;
       currentBioPhotoData = '';
-      document.getElementById('bioModalTitle').innerText = '👤 Tambah Biodata Tim';
+      document.getElementById('bioModalTitle').innerText = 'Tambah Biodata Tim';
       document.getElementById('bioName').value = '';
       document.getElementById('bioRole').value = '';
       document.getElementById('bioNik').value = '';
@@ -1816,7 +1890,7 @@
       if (!b) return;
       editingBioId = id;
       currentBioPhotoData = b.photo || '';
-      document.getElementById('bioModalTitle').innerText = '✏️ Edit Biodata Tim';
+      document.getElementById('bioModalTitle').innerText = 'Edit Biodata Tim';
       document.getElementById('bioName').value = b.name || '';
       document.getElementById('bioRole').value = b.role || '';
       document.getElementById('bioNik').value = b.nik || '';
@@ -1840,7 +1914,7 @@
         prev.innerHTML = `<img src="${escapeAttr(src)}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
         clearBtn.style.display = 'inline-block';
       } else {
-        prev.innerHTML = '📷';
+        prev.innerHTML = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>';
         clearBtn.style.display = 'none';
       }
     }
@@ -1876,7 +1950,7 @@
     async function saveBiodata() {
       const name = document.getElementById('bioName').value.trim();
       if (!name) {
-        showLinkToast('⚠️ Nama lengkap wajib diisi!');
+        showLinkToast('Nama lengkap wajib diisi!');
         return;
       }
 
@@ -1919,9 +1993,9 @@
           })
         });
         loadBiodataData(true);
-        showLinkToast('✅ Biodata berhasil disimpan!');
+        showLinkToast('Biodata berhasil disimpan!');
       } catch (err) {
-        showLinkToast('⚠️ Gagal menyinkronkan ke server');
+        showLinkToast('Gagal menyinkronkan ke server');
       } finally {
         btn.disabled = false;
         btn.innerText = 'Simpan Biodata';
@@ -1932,7 +2006,7 @@
       allBiodataList = allBiodataList.filter((x, i) => String(x.id || ('bio-' + i)) !== String(id));
       renderBiodata();
       renderAllScheduleViews();
-      showLinkToast('🗑️ Profil dihapus');
+      showLinkToast('Profil dihapus');
 
       try {
         await fetch(API_URL, {
@@ -1948,10 +2022,10 @@
     // 4C. SUB-MENU STAF: JADWAL SHIFT & CATATAN PER STAF (MAX 2)
     // =========================================================
     const SHIFTS = {
-      P:   { code: 'P',   shortLabel: 'P',   label: 'Pagi',   icon: '🌅', hours: '09:00–17:00', badgeClass: 'sh-P',   avClass: 'av-P' },
-      M:   { code: 'M',   shortLabel: 'M',   label: 'Middle', icon: '☀️', hours: '12:00–20:00', badgeClass: 'sh-M',   avClass: 'av-M' },
-      S:   { code: 'S',   shortLabel: 'S',   label: 'Siang',  icon: '🌙', hours: '14:00–22:00', badgeClass: 'sh-S',   avClass: 'av-S' },
-      OFF: { code: 'OFF', shortLabel: 'OFF', label: 'Off',    icon: '🏖️', hours: 'Libur',       badgeClass: 'sh-OFF', avClass: 'av-OFF' }
+      P:   { code: 'P',   shortLabel: 'P',   label: 'Pagi',   icon: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="2" x2="12" y2="9"/><line x1="4.22" y1="10.22" x2="5.64" y2="11.64"/><line x1="1" y1="18" x2="3" y2="18"/><line x1="21" y1="18" x2="23" y2="18"/><line x1="18.36" y1="11.64" x2="19.78" y2="10.22"/><line x1="23" y1="22" x2="1" y2="22"/><polyline points="8 6 12 2 16 6"/></svg>', hours: '09:00–17:00', badgeClass: 'sh-P',   avClass: 'av-P' },
+      M:   { code: 'M',   shortLabel: 'M',   label: 'Middle', icon: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>', hours: '12:00–20:00', badgeClass: 'sh-M',   avClass: 'av-M' },
+      S:   { code: 'S',   shortLabel: 'S',   label: 'Siang',  icon: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>', hours: '14:00–22:00', badgeClass: 'sh-S',   avClass: 'av-S' },
+      OFF: { code: 'OFF', shortLabel: 'OFF', label: 'Off',    icon: '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>', hours: 'Libur',       badgeClass: 'sh-OFF', avClass: 'av-OFF' }
     };
 
     const NOTE_PRESETS = ['Stock Opname', 'Meeting Area', 'Training Produk', 'Cek Display', 'Admin & Laporan'];
@@ -2082,7 +2156,7 @@
           body: JSON.stringify({ action: 'saveScheduleBatch', items })
         });
       } catch (err) {
-        showLinkToast('⚠️ Jadwal tersimpan lokal (gagal sync server)');
+        showLinkToast('Jadwal tersimpan lokal (gagal sync server)');
       }
     }
 
@@ -2136,7 +2210,7 @@
       if (staffList.length === 0) {
         sumEl.innerHTML = `<div class="dsb-top"><span>${activeDay.dayFull}, ${activeDay.dateNum} ${activeDay.monthShort} ${activeDay.year}</span></div>`;
         listEl.innerHTML = isBiodataLoading
-          ? '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">⏳ Memuat daftar staf dari Biodata...</div>'
+          ? '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">Memuat daftar staf dari Biodata...</div>'
           : '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">Belum ada nama staf di <b>Biodata</b>. Tambahkan profil tim di menu Biodata terlebih dahulu.</div>';
         return;
       }
@@ -2161,10 +2235,10 @@
           <span style="color:var(--primary);">${staffList.length - cOff}/${staffList.length} Masuk</span>
         </div>
         <div class="dsb-grid">
-          <div class="dsb-chip sh-P">🌅 Pagi: ${cP}</div>
-          <div class="dsb-chip sh-M">☀️ Mid: ${cM}</div>
-          <div class="dsb-chip sh-S">🌙 Siang: ${cS}</div>
-          <div class="dsb-chip sh-OFF">🏖️ Off: ${cOff}</div>
+          <div class="dsb-chip sh-P"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 18a5 5 0 0 0-10 0"/><line x1="12" y1="2" x2="12" y2="9"/><line x1="4.22" y1="10.22" x2="5.64" y2="11.64"/><line x1="1" y1="18" x2="3" y2="18"/><line x1="21" y1="18" x2="23" y2="18"/><line x1="18.36" y1="11.64" x2="19.78" y2="10.22"/><line x1="23" y1="22" x2="1" y2="22"/><polyline points="8 6 12 2 16 6"/></svg> Pagi: ${cP}</div>
+          <div class="dsb-chip sh-M"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg> Mid: ${cM}</div>
+          <div class="dsb-chip sh-S"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg> Siang: ${cS}</div>
+          <div class="dsb-chip sh-OFF"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg> Off: ${cOff}</div>
         </div>
       `;
 
@@ -2177,7 +2251,7 @@
         const rightNoteHtml = notesArr.length > 0
           ? notesArr.map(nText => `
               <button type="button" class="btn-active-note-right" onclick="openStaffNoteModal('${escapeAttr(member.name)}', '${activeDay.key}')" title="${escapeAttr(nText)}">
-                <span>📌</span>
+                <span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v6l-2 4v2h10v-2l-2-4V4"/><line x1="12" y1="16" x2="12" y2="21"/><line x1="8" y1="4" x2="16" y2="4"/></svg></span>
                 <span class="note-label-clamp">${escapeHtml(nText)}</span>
               </button>
             `).join('')
@@ -2215,10 +2289,10 @@
       const staffList = getScheduleStaffList();
       if (staffList.length === 0) {
         pickerEl.innerHTML = isBiodataLoading
-          ? '<option value="">⏳ Memuat Biodata Staf...</option>'
+          ? '<option value="">Memuat Biodata Staf...</option>'
           : '<option value="">Belum ada data di Biodata</option>';
         container.innerHTML = isBiodataLoading
-          ? '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">⏳ Memuat daftar staf dari Biodata...</div>'
+          ? '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">Memuat daftar staf dari Biodata...</div>'
           : '<div style="text-align:center; padding:30px; color:var(--text-muted); font-size:13px;">Belum ada nama staf di <b>Biodata</b>. Tambahkan profil tim di menu Biodata terlebih dahulu.</div>';
         return;
       }
@@ -2228,7 +2302,7 @@
       }
 
       pickerEl.innerHTML = staffList.map(m =>
-        `<option value="${escapeHtml(m.name)}" ${m.name === selectedPerStaffName ? 'selected' : ''}>👤 ${escapeHtml(m.name)} (${escapeHtml(m.role)})</option>`
+        `<option value="${escapeHtml(m.name)}" ${m.name === selectedPerStaffName ? 'selected' : ''}>${escapeHtml(m.name)} (${escapeHtml(m.role)})</option>`
       ).join('');
 
       const member = staffList.find(m => m.name === selectedPerStaffName) || staffList[0];
@@ -2245,7 +2319,7 @@
         const rightActionHtml = notesArr.length > 0
           ? notesArr.map(nText => `
               <button type="button" class="btn-active-note-right" onclick="openStaffNoteModal('${escapeAttr(member.name)}', '${d.key}')" title="${escapeAttr(nText)}">
-                <span>📌</span>
+                <span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v6l-2 4v2h10v-2l-2-4V4"/><line x1="12" y1="16" x2="12" y2="21"/><line x1="8" y1="4" x2="16" y2="4"/></svg></span>
                 <span class="note-label-clamp">${escapeHtml(nText)}</span>
               </button>
             `).join('')
@@ -2287,21 +2361,21 @@
         if (btn) btn.className = 'brush-btn' + (m === mode ? ' active-' + m : '');
       });
       if (mode === 'NOTE') {
-        document.getElementById('brushHintLabel').innerText = 'Ketuk sel: 📌 Catatan';
+        document.getElementById('brushHintLabel').innerText = 'Ketuk sel: Catatan';
       } else {
         closeMatrixCellNotePrompt();
-        document.getElementById('brushHintLabel').innerText = `Ketuk sel: ${SHIFTS[mode].icon} ${SHIFTS[mode].label}`;
+        document.getElementById('brushHintLabel').innerText = `Ketuk sel: ${SHIFTS[mode].label}`;
       }
     }
 
     function openBulkMatrixModal() {
       const staffList = getScheduleStaffList();
       if (staffList.length === 0) {
-        showLinkToast(isBiodataLoading ? '⏳ Memuat data dari Biodata...' : '⚠️ Isi data staf di menu Biodata terlebih dahulu!');
+        showLinkToast(isBiodataLoading ? 'Memuat data dari Biodata...' : 'Isi data staf di menu Biodata terlebih dahulu!');
         return;
       }
       const weekDays = getWeekList(currentScheduleWeekStart);
-      document.getElementById('bulkModalTitle').innerText = `⚡ Atur Roster 7 Hari (${staffList.length} Staf)`;
+      document.getElementById('bulkModalTitle').innerText = `Atur Roster 7 Hari (${staffList.length} Staf)`;
       document.getElementById('bulkModalSub').innerText = getWeekRangeText(currentScheduleWeekStart);
       draftBulkData = {};
       staffList.forEach(m => {
@@ -2351,7 +2425,7 @@
         const day = getWeekList(currentScheduleWeekStart)[dayIdx];
         const currNote = draftBulkData[member.name][dayIdx].note || '';
         const notesArr = parseNotes(currNote);
-        document.getElementById('mcnpTitle').innerText = `📌 Catatan: ${member.shortName} • ${day.dayShort} ${day.dateNum}`;
+        document.getElementById('mcnpTitle').innerText = `Catatan: ${member.shortName} • ${day.dayShort} ${day.dateNum}`;
         document.getElementById('matrixCellNoteInput1').value = notesArr[0] || '';
         document.getElementById('matrixCellNoteInput2').value = notesArr[1] || '';
         document.getElementById('btnMcnpDelete').style.display = currNote ? 'block' : 'none';
@@ -2405,7 +2479,7 @@
             return `
               <td>
                 <button type="button" class="m-cell-btn ${sh.badgeClass}" onclick="handleMatrixCellTap(${sIdx}, ${dIdx})">
-                  ${noteCount > 0 ? `<span class="m-cell-pin">${noteCount > 1 ? '2' : '📌'}</span>` : ''}
+                  ${noteCount > 0 ? `<span class="m-cell-pin">${noteCount > 1 ? '2' : '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v6l-2 4v2h10v-2l-2-4V4"/><line x1="12" y1="16" x2="12" y2="21"/><line x1="8" y1="4" x2="16" y2="4"/></svg>'}</span>` : ''}
                   ${sh.shortLabel}
                 </button>
               </td>
@@ -2440,7 +2514,7 @@
 
       closeBulkModal();
       renderAllScheduleViews();
-      showLinkToast('✅ Semua jadwal minggu ini disimpan!');
+      showLinkToast('Semua jadwal minggu ini disimpan!');
       await syncScheduleItemsToServer(batchItems);
     }
 
@@ -2456,7 +2530,7 @@
       const notesArr = parseNotes(currNote);
 
       document.getElementById('snmAvatar').innerText = getInitials(staffName);
-      document.getElementById('snmTitle').innerText = notesArr.length > 0 ? '✏️ Edit Catatan Staf' : '📌 Tambah Catatan Staf';
+      document.getElementById('snmTitle').innerText = notesArr.length > 0 ? 'Edit Catatan Staf' : 'Tambah Catatan Staf';
       document.getElementById('snmSub').innerText = `${staffName} • ${DAY_NAMES_FULL[dt.getDay()]}, ${dt.getDate()} ${MONTH_NAMES_ID[dt.getMonth()]} ${dt.getFullYear()}`;
       document.getElementById('snmTextInput1').value = notesArr[0] || '';
       document.getElementById('snmTextInput2').value = notesArr[1] || '';
@@ -2506,7 +2580,7 @@
       cell.note = combined;
       closeStaffNoteModal();
       renderAllScheduleViews();
-      showLinkToast(combined ? `📌 Catatan ${staffName} disimpan!` : `Catatan ${staffName} dikosongkan`);
+      showLinkToast(combined ? `Catatan ${staffName} disimpan!` : `Catatan ${staffName} dikosongkan`);
       await syncScheduleItemsToServer([{ date: dateKey, staff: staffName, shift: cell.shift || 'P', note: combined }]);
     }
 
@@ -2517,7 +2591,7 @@
       cell.note = '';
       closeStaffNoteModal();
       renderAllScheduleViews();
-      showLinkToast(`🗑️ Catatan ${staffName} dihapus`);
+      showLinkToast(`Catatan ${staffName} dihapus`);
       await syncScheduleItemsToServer([{ date: dateKey, staff: staffName, shift: cell.shift || 'P', note: '' }]);
     }
 
@@ -2559,14 +2633,14 @@
 
       if (!fSPW && !fMSR && !fSTOCK) {
         statusEl.style.color = 'var(--accent-red)';
-        statusEl.innerText = '⚠️ Pilih minimal satu file Excel/CSV terlebih dahulu.';
+        statusEl.innerText = 'Pilih minimal satu file Excel/CSV terlebih dahulu.';
         return;
       }
 
       btn.disabled = true;
       btn.innerText = 'Membaca & Mengunggah...';
       statusEl.style.color = 'var(--text-muted)';
-      statusEl.innerText = '⏳ Memproses file...';
+      statusEl.innerText = 'Memproses file...';
 
       try {
         const [spwText, msrText, stockText] = await Promise.all([
@@ -2589,17 +2663,17 @@
         const result = await res.json();
         if (result && result.success !== false) {
           statusEl.style.color = 'var(--accent-green)';
-          statusEl.innerText = '✅ ' + (result.message || 'Sinkronisasi data berhasil!');
+          statusEl.innerText = '' + (result.message || 'Sinkronisasi data berhasil!');
           dashboardData = null;
           sohList = [];
           loadDashboardData(true);
         } else {
           statusEl.style.color = 'var(--accent-red)';
-          statusEl.innerText = '⚠️ ' + ((result && result.message) || 'Gagal menyinkronkan data.');
+          statusEl.innerText = '' + ((result && result.message) || 'Gagal menyinkronkan data.');
         }
       } catch (err) {
         statusEl.style.color = 'var(--accent-red)';
-        statusEl.innerText = '⚠️ Terjadi kesalahan saat memproses file.';
+        statusEl.innerText = 'Terjadi kesalahan saat memproses file.';
       } finally {
         btn.disabled = false;
         btn.innerText = 'Sinkronisasi Data';
