@@ -207,7 +207,7 @@
     .dsb-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
     .dsb-chip { padding: 5px 2px; border-radius: 8px; font-size: 10px; font-weight: 600; text-align: center; }
 
-    .daily-staff-row { background: var(--card-bg); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .daily-staff-row { background: var(--card-bg); border-radius: 12px; padding: 11px 14px; margin-bottom: 8px; border: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
     .daily-staff-row.is-off { opacity: 0.75; background: var(--surface-2); }
     .dsr-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; text-align: left; }
     .sch-avatar { width: 40px; height: 40px; border-radius: 50%; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -2269,7 +2269,6 @@
         return `
           <div class="daily-staff-row ${isOff ? 'is-off' : ''}">
             <div class="dsr-left">
-              <div class="sch-avatar ${sh.avClass}">${escapeHtml(getInitials(member.name))}</div>
               <div class="dsr-text-col">
                 <div class="dsr-name">${escapeHtml(member.name)}</div>
                 <div class="dsr-shift-line ${sh.badgeClass}">
