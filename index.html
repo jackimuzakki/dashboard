@@ -320,9 +320,17 @@
     .ring-sub { font-size: 12px; color: var(--text-muted); }
     .ring-big { font-size: 21px; font-weight: 600; letter-spacing: -0.4px; margin: 1px 0 2px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
     .mini-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 6px; }
-    .mini-tile { background: #ECEFF3; border-radius: 12px; padding: 11px 13px; }
+    .mini-tile { background: #ECEFF3; border-radius: 12px; padding: 11px 13px; display: flex; flex-direction: column; justify-content: space-between; }
+    .mini-top-row { display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-bottom: 3px; }
     .mini-title { font-size: 12px; color: var(--text-muted); }
-    .mini-value { font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    .mini-value { font-size: 16px; font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; letter-spacing: -0.2px; }
+    .mini-pill { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 7px; white-space: nowrap; }
+    .mini-pill-green { background: #DCFCE7; color: #15803D; }
+    .mini-pill-blue { background: #DBEAFE; color: #1D4ED8; }
+    .mini-pill-amber { background: #FEF3C7; color: #B45309; }
+    .mini-sub-note { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+    .mini-tg-bar { width: 100%; height: 5px; background: #DCE1E8; border-radius: 4px; overflow: hidden; margin-top: 7px; }
+    .mini-tg-fill { height: 100%; background: var(--primary); border-radius: 4px; transition: width 0.7s ease; }
     .lob-list { margin-bottom: 4px; }
     .lob-row { margin-bottom: 14px; }
     .lob-top { display: flex; justify-content: space-between; align-items: center; font-size: 13.5px; margin-bottom: 6px; }
@@ -385,8 +393,30 @@
       </div>
 
       <div class="mini-grid">
-        <div class="mini-tile"><div class="mini-title">Total poin</div><div class="mini-value" id="valStorePoint">0</div></div>
-        <div class="mini-tile"><div class="mini-title">Sisa target</div><div class="mini-value">Rp <span id="valStoreSisa">0</span></div></div>
+        <div class="mini-tile">
+          <div class="mini-title">Total poin</div>
+          <div class="mini-value" id="valStorePoint">0</div>
+        </div>
+        <div class="mini-tile">
+          <div class="mini-title">Sisa target</div>
+          <div class="mini-value">Rp <span id="valStoreSisa">0</span></div>
+        </div>
+        <div class="mini-tile">
+          <div class="mini-top-row">
+            <span class="mini-title">Estimasi capai</span>
+            <span class="mini-pill mini-pill-blue" id="valStoreEstPct">0%</span>
+          </div>
+          <div class="mini-value">Rp <span id="valStoreEstSales">0</span></div>
+          <div class="mini-sub-note">Proyeksi akhir bulan</div>
+        </div>
+        <div class="mini-tile">
+          <div class="mini-top-row">
+            <span class="mini-title">Timegone</span>
+            <span class="mini-sub-note" style="margin-top:0;" id="valStoreDaysInfo">Hari 0/30</span>
+          </div>
+          <div class="mini-value" id="valStoreTimegone">0%</div>
+          <div class="mini-tg-bar"><div class="mini-tg-fill" id="barStoreTimegone" style="width: 0%;"></div></div>
+        </div>
       </div>
 
       <div class="section-title">Breakdown LOB</div>
@@ -1107,6 +1137,10 @@
       const totalPoint = pickNum(stRaw, ['point', 'totalPoint', 'points', 'poin', 'totalPoin']);
       const pct = pickNum(stRaw, ['achieved', 'pct', 'achievement', 'pencapaian']);
 
+      const timegone = pickNum(stRaw, ['timegone', 'timeGone', 'time_gone', 'tg']);
+      const estSales = pickNum(stRaw, ['estimasi', 'estSales', 'estimasiSales', 'projectedSales', 'projection', 'runRate']);
+      const estPct = pickNum(stRaw, ['estPct', 'estimasiPct', 'projectedPct', 'estAchieved']);
+
       const deviceTarget = pickNum(stRaw, ['deviceTarget', 'targetDevice']);
       const deviceSales = pickNum(stRaw, ['deviceSales', 'salesDevice', 'device']) || Math.max(0, totalSales - sumStaffAcc - sumStaffVas);
 
@@ -1122,6 +1156,9 @@
           totalTarget,
           totalPoint,
           pct,
+          timegone,
+          estSales,
+          estPct,
           deviceSales,
           deviceTarget,
           accSales,
@@ -1225,6 +1262,48 @@
       if (_ring) { const _c = 2 * Math.PI * 34; _ring.setAttribute('stroke-dasharray', (Math.min(100, pct) / 100 * _c) + ' ' + _c); }
       const _sisaEl = document.getElementById('valStoreSisa');
       if (_sisaEl) _sisaEl.innerText = formatAngka(Math.max(0, target - sales));
+
+      // Hitung Timegone & Estimasi Pencapaian Toko
+      const now = new Date();
+      const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      const daysElapsed = Math.max(1, now.getDate());
+
+      let timegonePct = parseNum(st.timegone);
+      if (timegonePct > 0 && timegonePct <= 1) {
+        timegonePct = timegonePct * 100;
+      } else if (timegonePct <= 0) {
+        timegonePct = (daysElapsed / daysInMonth) * 100;
+      }
+      timegonePct = Math.min(100, Math.max(0, timegonePct));
+      const tgDisplay = (Math.round(timegonePct * 10) / 10).toString().replace(/\.0$/, '') + '%';
+
+      let estSales = parseNum(st.estSales);
+      if (estSales <= 0) {
+        estSales = timegonePct > 0 ? (sales / (timegonePct / 100)) : sales;
+      }
+
+      let estPct = parseNum(st.estPct);
+      if (estPct > 0 && estPct <= 1) {
+        estPct = estPct * 100;
+      } else if (estPct <= 0) {
+        estPct = target > 0 ? (estSales / target) * 100 : 0;
+      }
+      const estPctRounded = Math.round(estPct);
+
+      const elTimegone = document.getElementById('valStoreTimegone');
+      const elDaysInfo = document.getElementById('valStoreDaysInfo');
+      const elBarTg = document.getElementById('barStoreTimegone');
+      if (elTimegone) elTimegone.innerText = tgDisplay;
+      if (elDaysInfo) elDaysInfo.innerText = `Hari ${daysElapsed}/${daysInMonth}`;
+      if (elBarTg) elBarTg.style.width = Math.min(100, timegonePct) + '%';
+
+      const elEstSales = document.getElementById('valStoreEstSales');
+      const elEstPct = document.getElementById('valStoreEstPct');
+      if (elEstSales) elEstSales.innerText = formatAngka(estSales);
+      if (elEstPct) {
+        elEstPct.innerText = estPctRounded + '%';
+        elEstPct.className = 'mini-pill ' + (estPctRounded >= 100 ? 'mini-pill-green' : (estPctRounded >= 80 ? 'mini-pill-blue' : 'mini-pill-amber'));
+      }
 
       const devS = parseNum(st.deviceSales), devT = parseNum(st.deviceTarget);
       document.getElementById('valStoreDeviceSales').innerText = formatAngka(devS);
