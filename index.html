@@ -283,6 +283,7 @@
     .btn-pick-photo { background: var(--primary-soft); color: var(--primary); border: none; padding: 8px 12px; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer; }
     .link-toast { position: fixed; top: 18px; left: 50%; transform: translateX(-50%) translateY(-80px); background: var(--text-main); color: white; padding: 10px 18px; border-radius: 12px; font-size: 12.5px; font-weight: 500; z-index: 1500; transition: 0.3s ease; white-space: nowrap; }
     .link-toast.show { transform: translateX(-50%) translateY(0); }
+
     /* Ikon garis (menggantikan emoji) */
     .ic { width: 1em; height: 1em; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; vertical-align: -0.14em; flex-shrink: 0; margin-right: 0.3em; }
     .qty-emoji .ic, .detail-icon .ic, .hub-choice-icon .ic, .form-icon .ic, .btn-edit-custom .ic, .btn-del-custom .ic, .btn-date-step .ic, .btn-week-step .ic, .photo-preview-circle .ic, .m-cell-pin .ic, .dsr-shift-line .ic { margin-right: 0; }
@@ -297,7 +298,6 @@
     .rank-badge { display: inline-flex; width: 24px; height: 24px; border-radius: 50%; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
     .rank-1 { background: #FFF1C2; color: #8A5A00; } .rank-2 { background: #E9EDF2; color: #4B5563; } .rank-3 { background: #FBE3D0; color: #9A4B14; }
     input[type="text"].search-box { padding-left: 40px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236B7686' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: 13px center; }
-  
 
     /* Tampilan depan (Overview Toko) */
     .app-head { display: flex; justify-content: space-between; align-items: center; margin: 2px 2px 14px; }
@@ -328,6 +328,8 @@
     .lob-sub b { color: var(--text-main); font-weight: 600; }
     .rank-list thead { display: none; }
     .rank-list td { padding: 11px 14px; }
+    .rank-list tr:active { background-color: var(--surface-2); }
+    .btn-back-overview { background: rgba(47, 125, 225, 0.14); border: 1px solid #C8DFFA; color: var(--primary); padding: 8px 12px; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; }
   </style>
 </head>
 <body>
@@ -356,9 +358,6 @@
 
   <!-- TAB TARGET & SALES HARIAN -->
   <div id="tab-dashboard" class="tab-content active">
-    <div class="dropdown-container">
-      <select id="staffSelect" onchange="showPersonalData()"><option value="">Memuat Data Staff...</option></select>
-    </div>
     <div id="loadingDash" class="loading-text">Menyiapkan dashboard Anda...</div>
     
     <div id="storeView" style="display:none;">
@@ -408,7 +407,15 @@
     </div>
 
     <div id="staffView" style="display:none;">
-      <div class="hero-header"><div class="hero-title">Performa Saya</div><div class="hero-name" id="heroStaffName">Nama Staf</div></div>
+      <div class="hero-header">
+        <div class="link-hero-top" style="align-items:center;">
+          <div>
+            <div class="hero-title">Performa Staf</div>
+            <div class="hero-name" id="heroStaffName">Nama Staf</div>
+          </div>
+          <button type="button" class="btn-back-overview" onclick="backToStoreOverview()">‹ Overview Toko</button>
+        </div>
+      </div>
       <div class="kpi-grid">
         <div class="kpi-card"><div class="kpi-rank-badge" id="valMyRank">#1</div><div class="kpi-bg-icon"></div><div class="kpi-title">Total Sales</div><div class="kpi-value" id="valMySales">0</div></div>
         <div class="kpi-card"><div class="kpi-bg-icon"></div><div class="kpi-title">Target Saya</div><div class="kpi-value" id="valMyTarget" style="color: var(--text-muted); font-size: 16px;">0</div></div>
@@ -832,6 +839,7 @@
 
     let dashboardData = null;
     let isDashboardLoading = false;
+    let currentSelectedStaff = '';
     let sohList = [];
     let isSohLoading = false;
 
@@ -949,7 +957,10 @@
       const btnId = 'btnTab' + tabName.charAt(0).toUpperCase() + tabName.slice(1);
       if (document.getElementById(btnId)) document.getElementById(btnId).classList.add('active');
       
-      if (tabName === 'dashboard') loadDashboardData(); 
+      if (tabName === 'dashboard') {
+        currentSelectedStaff = '';
+        loadDashboardData();
+      }
       if (tabName === 'soh') loadSOHData();
       if (tabName === 'links') loadLinksData();
       if (tabName === 'staf') {
@@ -1122,10 +1133,6 @@
         showPersonalData();
       } catch (err) {
         console.error('Gagal memuat dashboard:', err);
-        const sel = document.getElementById('staffSelect');
-        if (sel && sel.options.length <= 1) {
-          sel.innerHTML = '<option value="">Overview Toko (Digimap Jember Roxy)</option>';
-        }
         document.getElementById('storeView').style.display = 'block';
         showLinkToast('Gagal menyambung ke server data');
       } finally {
@@ -1135,9 +1142,7 @@
     }
 
     function populateStaffDropdowns() {
-      const sel = document.getElementById('staffSelect');
       const bonusSel = document.getElementById('bonusStaffSelect');
-      const currentVal = sel ? sel.value : '';
       const currentBonusVal = bonusSel ? bonusSel.value : '';
 
       const staffNames = [];
@@ -1149,12 +1154,6 @@
         }
       }
 
-      if (sel) {
-        sel.innerHTML = '<option value="">Overview Toko (Digimap Jember Roxy)</option>' +
-          staffNames.map(n => `<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
-        if (currentVal && staffNames.includes(currentVal)) sel.value = currentVal;
-      }
-
       if (bonusSel) {
         bonusSel.innerHTML = '<option value="">Pilih Nama Kamu </option>' +
           staffNames.map(n => `<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
@@ -1162,20 +1161,30 @@
       }
     }
 
+    function openStaffPerformance(staffName) {
+      currentSelectedStaff = String(staffName || '').trim();
+      showPersonalData();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function backToStoreOverview() {
+      currentSelectedStaff = '';
+      showPersonalData();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
     function showPersonalData() {
-      const sel = document.getElementById('staffSelect');
-      const selectedStaff = sel ? sel.value : '';
       const storeView = document.getElementById('storeView');
       const staffView = document.getElementById('staffView');
 
-      if (!selectedStaff) {
+      if (!currentSelectedStaff) {
         storeView.style.display = 'block';
         staffView.style.display = 'none';
         renderStoreOverview();
       } else {
         storeView.style.display = 'none';
         staffView.style.display = 'block';
-        renderStaffOverview(selectedStaff);
+        renderStaffOverview(currentSelectedStaff);
       }
     }
 
@@ -1222,10 +1231,10 @@
           const pos = r.rank || (i + 1);
           const medal = pos <= 3 ? `<span class="rank-badge rank-${pos}">${pos}</span>` : pos;
           return `
-            <tr style="cursor:pointer;" onclick="document.getElementById('staffSelect').value='${escapeAttr(r.name)}'; showPersonalData();">
+            <tr style="cursor:pointer;" onclick="openStaffPerformance('${escapeAttr(r.name)}')">
               <td style="text-align:center; font-weight:700;">${medal}</td>
               <td style="font-weight:600;">${escapeHtml(r.name)}</td>
-              <td style="text-align:right; font-weight:700; color:var(--primary);">${formatAngka(r.sales)}</td>
+              <td style="text-align:right; font-weight:700; color:var(--primary);">${formatAngka(r.sales)} <span style="color:var(--text-muted); font-weight:400; margin-left:4px;">›</span></td>
             </tr>
           `;
         }).join('');
@@ -1328,7 +1337,7 @@
     }
 
     async function loadDailySales() {
-      const staffName = document.getElementById('staffSelect').value;
+      const staffName = currentSelectedStaff;
       const dateInp = document.getElementById('dailyDateInput');
       const dateStr = (dateInp && dateInp.value) ? dateInp.value : getTodayLocalStr();
       const metaEl = document.getElementById('dailyMetaInfo');
