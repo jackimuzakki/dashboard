@@ -344,6 +344,22 @@
     .rank-list td { padding: 11px 14px; }
     .rank-list tr:active { background-color: var(--surface-2); }
     .btn-back-overview { background: rgba(47, 125, 225, 0.14); border: 1px solid #C8DFFA; color: var(--primary); padding: 8px 12px; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  
+
+    /* Performa Staf selaras dengan tampilan depan */
+    .back-link { background: transparent !important; border: none !important; color: var(--primary) !important; padding: 2px 2px 8px !important; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .rank-pill { position: static; min-width: 40px; height: 32px; font-size: 14px; }
+    .mini-wide { grid-column: span 2; }
+    #valMySisa { font-variant-numeric: tabular-nums; }
+
+    /* Tombol upload file Admin */
+    input[type="file"]::file-selector-button { background: var(--primary-soft); color: var(--primary); border: none; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; margin-right: 12px; font-family: inherit; }
+    input[type="file"]::file-selector-button:hover { background: #D8E8FB; }
+    input[type="file"] { color: var(--text-muted); }
+  
+
+    .btn-back-bottom { width: 100%; margin-top: 22px; background: var(--card-bg); color: var(--primary); border: 1px solid var(--primary); padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    .btn-back-bottom:hover { background: var(--primary-soft); }
   </style>
 </head>
 <body>
@@ -377,7 +393,6 @@
     <div id="storeView" style="display:none;">
       <div class="app-head">
         <div><div class="app-head-sub">Digimap Staff Portal</div><div class="app-head-title">Jember Roxy</div></div>
-        <div class="app-avatar">DR</div>
       </div>
 
       <div class="hero-ring-card">
@@ -443,21 +458,28 @@
     </div>
 
     <div id="staffView" style="display:none;">
-      <div class="hero-header">
-        <div class="link-hero-top" style="align-items:center;">
-          <div>
-            <div class="hero-title">Performa Staf</div>
-            <div class="hero-name" id="heroStaffName">Nama Staf</div>
-          </div>
-          <button type="button" class="btn-back-overview" onclick="backToStoreOverview()">‹ Overview Toko</button>
+      <div class="app-head">
+        <div><div class="app-head-sub">Performa staf</div><div class="app-head-title" id="heroStaffName">Nama Staf</div></div>
+        <div class="kpi-rank-badge rank-pill" id="valMyRank">#1</div>
+      </div>
+
+      <div class="hero-ring-card">
+        <div class="ring-wrap">
+          <svg viewBox="0 0 84 84" aria-hidden="true"><circle class="ring-bg" cx="42" cy="42" r="34"/><circle id="ringMyPct" class="ring-fg" cx="42" cy="42" r="34" stroke-dasharray="0 214" transform="rotate(-90 42 42)"/></svg>
+          <span class="ring-label" id="valMyPct">0%</span>
+        </div>
+        <div class="ring-info">
+          <div class="ring-sub">Total sales bulan ini</div>
+          <div class="ring-big">Rp <span id="valMySales">0</span></div>
+          <div class="ring-sub">Target Rp <span id="valMyTarget">0</span></div>
         </div>
       </div>
-      <div class="kpi-grid">
-        <div class="kpi-card"><div class="kpi-rank-badge" id="valMyRank">#1</div><div class="kpi-bg-icon"></div><div class="kpi-title">Total Sales</div><div class="kpi-value" id="valMySales">0</div></div>
-        <div class="kpi-card"><div class="kpi-bg-icon"></div><div class="kpi-title">Target Saya</div><div class="kpi-value" id="valMyTarget" style="color: var(--text-muted); font-size: 16px;">0</div></div>
-        <div class="kpi-card" style="grid-column: span 2; align-items: center; text-align: center;"><div class="kpi-title">Kekurangan Target</div><div class="kpi-value" id="valMySisa" style="font-size:24px;">0</div><div style="margin-top: 5px; font-size: 12px; color: var(--text-muted);">Pencapaian: <span id="valMyPct" style="font-weight:bold; color:var(--text-main);">0%</span></div></div>
+
+      <div class="mini-grid">
+        <div class="mini-tile mini-wide"><div class="mini-title">Kekurangan target</div><div class="mini-value"><span id="valMySisa">0</span></div></div>
       </div>
-      <div class="section-title">LOB</div>
+
+      <div class="section-title">Penjualan per LOB</div>
       <div id="qtyKPI">
         <div class="qty-card"><div class="qty-emoji"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div><div class="qty-val" id="qtyIphone">0</div><div class="qty-label">iPhone</div></div>
         <div class="qty-card"><div class="qty-emoji"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div><div class="qty-val" id="qtyIpad">0</div><div class="qty-label">iPad</div></div>
@@ -465,16 +487,18 @@
         <div class="qty-card"><div class="qty-emoji"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6"/><polyline points="12 10 12 12 13 13"/><path d="M16.13 7.66l-.81-4.05a2 2 0 0 0-2-1.61h-2.68a2 2 0 0 0-2 1.61l-.78 4.05m.01 8.68l.78 4.05a2 2 0 0 0 2 1.61h2.68a2 2 0 0 0 2-1.61l.81-4.05"/></svg></div><div class="qty-val" id="qtyWatch">0</div><div class="qty-label">Watch</div></div>
         <div class="qty-card"><div class="qty-emoji"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></div><div class="qty-val" id="qtyAirpods">0</div><div class="qty-label">AirPods</div></div>
       </div>
-      <div class="section-title">Others</div>
-      <div class="detail-card">
-        <div class="detail-card-header"><div class="detail-icon bg-purple c-purple"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></div><div class="detail-title">Aksesoris</div></div>
-        <div class="stat-row"><div class="stat-label">Sales: <span class="stat-val" id="valAccSales">0</span></div><div class="stat-label">Target: <span class="stat-val" id="valAccTarget" style="font-weight:400;">0</span></div></div>
-        <div class="progress-bar-container"><div class="progress-bar bar-purple" id="barAcc" style="width: 0%;"></div></div>
-      </div>
-      <div class="detail-card">
-        <div class="detail-card-header"><div class="detail-icon bg-blue c-blue"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div><div class="detail-title">Qoala</div></div>
-        <div class="stat-row"><div class="stat-label">Sales: <span class="stat-val" id="valQoalaSales">0</span></div><div class="stat-label">Target: <span class="stat-val" id="valQoalaTarget" style="font-weight:400;">0</span></div></div>
-        <div class="progress-bar-container"><div class="progress-bar bar-blue" id="barQoala" style="width: 0%;"></div></div>
+      <div class="section-title">Lainnya</div>
+      <div class="lob-list">
+        <div class="lob-row">
+          <div class="lob-top"><span class="lob-name"><span class="lob-ic c-purple"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></span>Aksesoris</span><span class="lob-pct" id="valAccPct">0%</span></div>
+          <div class="progress-bar-container"><div class="progress-bar bar-purple" id="barAcc" style="width: 0%;"></div></div>
+          <div class="lob-sub">Sales <b id="valAccSales">0</b> &middot; Target <b id="valAccTarget">0</b></div>
+        </div>
+        <div class="lob-row">
+          <div class="lob-top"><span class="lob-name"><span class="lob-ic c-blue"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></span>Qoala</span><span class="lob-pct" id="valQoalaPct">0%</span></div>
+          <div class="progress-bar-container"><div class="progress-bar bar-blue" id="barQoala" style="width: 0%;"></div></div>
+          <div class="lob-sub">Sales <b id="valQoalaSales">0</b> &middot; Target <b id="valQoalaTarget">0</b></div>
+        </div>
       </div>
 
       <div class="daily-header-row">
@@ -532,22 +556,24 @@
         <div class="qty-card"><div class="qty-emoji"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6"/><polyline points="12 10 12 12 13 13"/><path d="M16.13 7.66l-.81-4.05a2 2 0 0 0-2-1.61h-2.68a2 2 0 0 0-2 1.61l-.78 4.05m.01 8.68l.78 4.05a2 2 0 0 0 2 1.61h2.68a2 2 0 0 0 2-1.61l.81-4.05"/></svg></div><div class="qty-val" id="dailyQtyWatch">0</div><div class="qty-label">Watch</div></div>
         <div class="qty-card"><div class="qty-emoji"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></div><div class="qty-val" id="dailyQtyAirpods">0</div><div class="qty-label">AirPods</div></div>
       </div>
+
+      <button type="button" class="btn-back-bottom" onclick="backToStoreOverview()">&lsaquo; Kembali ke Overview Toko</button>
     </div>
   </div>
 
   <!-- TAB STOK (SOH) -->
   <div id="tab-soh" class="tab-content">
-    <div class="dropdown-container">
+    <div class="dropdown-container" style="margin-bottom: 10px;">
       <input type="text" id="searchInput" class="search-box" placeholder="Cari nama barang..." onkeyup="renderSOH()">
-      <select id="catSelect" onchange="renderSOH()">
-        <option value="Semua">Tampilkan Semua Kategori</option>
-        <option value="iPhone">iPhone</option>
-        <option value="iPad">iPad</option>
-        <option value="Mac">Mac</option>
-        <option value="Apple Watch">Apple Watch</option>
-        <option value="AirPods">AirPods</option>
-        <option value="Accessories">Accessories</option>
-      </select>
+      <input type="hidden" id="catSelect" value="Semua">
+    </div>
+    <div class="chip-row" id="sohFilterChips">
+      <button type="button" class="chip-btn active" onclick="setSohCat('Semua', this)">Semua</button>
+      <button type="button" class="chip-btn" onclick="setSohCat('iPhone', this)">iPhone</button>
+      <button type="button" class="chip-btn" onclick="setSohCat('iPad', this)">iPad</button>
+      <button type="button" class="chip-btn" onclick="setSohCat('Mac', this)">Mac</button>
+      <button type="button" class="chip-btn" onclick="setSohCat('Apple Watch', this)">Apple Watch</button>
+      <button type="button" class="chip-btn" onclick="setSohCat('AirPods', this)">AirPods</button>
     </div>
     <div id="loadingSOH" class="loading-text" style="display:block;">Mengecek ketersediaan di gudang...</div>
     <div class="table-container" id="sohTableContainer" style="display:none;"><table id="sohTable"><thead><tr><th>Detail Produk</th><th style="text-align:center; width: 70px;">Stok</th></tr></thead><tbody id="sohTableBody"></tbody></table></div>
@@ -1358,6 +1384,8 @@
       document.getElementById('valMyTarget').innerText = formatAngka(target);
       document.getElementById('valMySisa').innerText = sisa === 0 && target > 0 ? 'Target Tercapai!' : formatAngka(sisa);
       document.getElementById('valMyPct').innerText = pct + '%';
+      const _myRing = document.getElementById('ringMyPct');
+      if (_myRing) { const _c = 2 * Math.PI * 34; _myRing.setAttribute('stroke-dasharray', (Math.min(100, pct) / 100 * _c) + ' ' + _c); }
 
       document.getElementById('qtyIphone').innerText = parseNum(stObj.qtyIphone);
       document.getElementById('qtyIpad').innerText = parseNum(stObj.qtyIpad);
@@ -1374,6 +1402,8 @@
       document.getElementById('valQoalaSales').innerText = formatAngka(qoalaS);
       document.getElementById('valQoalaTarget').innerText = formatAngka(qoalaT);
       document.getElementById('barQoala').style.width = Math.min(100, qoalaT > 0 ? (qoalaS / qoalaT) * 100 : 0) + '%';
+      const _setMyPct = (id, s, tg) => { const el = document.getElementById(id); if (el) el.innerText = (tg > 0 ? Math.round((s / tg) * 100) : 0) + '%'; };
+      _setMyPct('valAccPct', accS, accT); _setMyPct('valQoalaPct', qoalaS, qoalaT);
 
       const startInp = document.getElementById('dailyStartDate');
       const endInp = document.getElementById('dailyEndDate');
@@ -1683,6 +1713,13 @@
       } finally {
         isSohLoading = false;
       }
+    }
+
+    function setSohCat(cat, btnEl) {
+      document.getElementById('catSelect').value = cat;
+      document.querySelectorAll('#sohFilterChips .chip-btn').forEach(b => b.classList.remove('active'));
+      if (btnEl) btnEl.classList.add('active');
+      renderSOH();
     }
 
     function renderSOH() {
