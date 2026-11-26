@@ -3515,120 +3515,131 @@
       loadDashboardData();
       loadBiodataData();
     });
+  </script>
+
   <script>
-function enhanceMinimalSelect(selectEl, options = {}) {
-  if (!selectEl || selectEl.dataset.enhanced === 'true') return;
-  selectEl.dataset.enhanced = 'true';
+    function enhanceMinimalSelect(selectEl, options = {}) {
+      if (!selectEl || selectEl.dataset.enhanced === 'true') return;
+      selectEl.dataset.enhanced = 'true';
 
-  const excludeList = (options.exclude || []).map(s => s.toLowerCase());
-  const formatTitle = options.titleCase !== false;
+      const excludeList = (options.exclude || []).map(s => s.toLowerCase());
+      const formatTitle = options.titleCase !== false;
 
-  const toLabel = (text) => {
-    if (!formatTitle) return text;
-    return text.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
-  };
+      const toLabel = (text) => {
+        if (!formatTitle) return text;
+        return text.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+      };
 
-  selectEl.style.display = 'none';
+      selectEl.style.display = 'none';
 
-  const wrapper = document.createElement('div');
-  wrapper.className = 'm-select';
-  selectEl.parentNode.insertBefore(wrapper, selectEl.nextSibling);
+      const wrapper = document.createElement('div');
+      wrapper.className = 'm-select';
+      selectEl.parentNode.insertBefore(wrapper, selectEl.nextSibling);
 
-  const trigger = document.createElement('button');
-  trigger.type = 'button';
-  trigger.className = 'm-select-trigger is-placeholder';
-  trigger.innerHTML = `
-    <span class="m-select-text">Pilih Nama Kamu</span>
-    <svg class="m-select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="6 9 12 15 18 9"></polyline>
-    </svg>
-  `;
-
-  const menu = document.createElement('div');
-  menu.className = 'm-select-menu';
-
-  wrapper.appendChild(trigger);
-  wrapper.appendChild(menu);
-
-  const textEl = trigger.querySelector('.m-select-text');
-
-  function renderOptions() {
-    menu.innerHTML = '';
-    const opts = Array.from(selectEl.options);
-    let selectedLabel = '';
-    let hasValue = false;
-
-    opts.forEach((opt) => {
-      const rawVal = opt.value;
-      const rawText = opt.textContent.trim();
-      if (rawVal && excludeList.includes(rawVal.toLowerCase())) return;
-
-      const isPlaceholder = !rawVal;
-      const label = isPlaceholder ? rawText : toLabel(rawText);
-
-      if (opt.selected) {
-        selectedLabel = label;
-        hasValue = !isPlaceholder;
-      }
-
-      const item = document.createElement('button');
-      item.type = 'button';
-      item.className = 'm-select-item'
-        + (opt.selected ? ' is-selected' : '')
-        + (isPlaceholder ? ' is-muted' : '');
-      item.innerHTML = `
-        <span>${label}</span>
-        ${opt.selected && !isPlaceholder ? `
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-        ` : ''}
+      const trigger = document.createElement('button');
+      trigger.type = 'button';
+      trigger.className = 'm-select-trigger is-placeholder';
+      trigger.innerHTML = `
+        <span class="m-select-text">Pilih Nama Kamu</span>
+        <svg class="m-select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
       `;
 
-      item.addEventListener('click', () => {
-        selectEl.value = rawVal;
-        selectEl.dispatchEvent(new Event('change', { bubbles: true }));
-        wrapper.classList.remove('is-open');
-        renderOptions();
+      const menu = document.createElement('div');
+      menu.className = 'm-select-menu';
+
+      wrapper.appendChild(trigger);
+      wrapper.appendChild(menu);
+
+      const textEl = trigger.querySelector('.m-select-text');
+
+      function renderOptions() {
+        menu.innerHTML = '';
+        const opts = Array.from(selectEl.options);
+        let selectedLabel = '';
+        let hasValue = false;
+
+        opts.forEach((opt) => {
+          const rawVal = opt.value;
+          const rawText = opt.textContent.trim();
+          if (rawVal && excludeList.includes(rawVal.toLowerCase())) return;
+
+          const isPlaceholder = !rawVal;
+          const label = isPlaceholder ? rawText : toLabel(rawText);
+
+          if (opt.selected) {
+            selectedLabel = label;
+            hasValue = !isPlaceholder;
+          }
+
+          const item = document.createElement('button');
+          item.type = 'button';
+          item.className = 'm-select-item'
+            + (opt.selected ? ' is-selected' : '')
+            + (isPlaceholder ? ' is-muted' : '');
+          item.innerHTML = `
+            <span>${label}</span>
+            ${opt.selected && !isPlaceholder ? `
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            ` : ''}
+          `;
+
+          item.addEventListener('click', () => {
+            selectEl.value = rawVal;
+            selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+            wrapper.classList.remove('is-open');
+            renderOptions();
+          });
+
+          menu.appendChild(item);
+        });
+
+        textEl.textContent = selectedLabel || 'Pilih Nama Kamu';
+        trigger.classList.toggle('is-placeholder', !hasValue);
+      }
+
+      // Sinkronkan tampilan saat .value diubah lewat JS (misal saat modal Edit dibuka)
+      const valDesc = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value');
+      if (valDesc && valDesc.set) {
+        Object.defineProperty(selectEl, 'value', {
+          get() { return valDesc.get.call(this); },
+          set(v) {
+            valDesc.set.call(this, v);
+            renderOptions();
+          }
+        });
+      }
+
+      trigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        document.querySelectorAll('.m-select.is-open').forEach(el => {
+          if (el !== wrapper) el.classList.remove('is-open');
+        });
+        wrapper.classList.toggle('is-open');
       });
 
-      menu.appendChild(item);
+      document.addEventListener('click', (e) => {
+        if (!wrapper.contains(e.target)) wrapper.classList.remove('is-open');
+      });
+
+      const observer = new MutationObserver(renderOptions);
+      observer.observe(selectEl, { childList: true, subtree: true, attributes: true });
+
+      renderOptions();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const staffSelectIds = ['bonusStaffSelect', 'perStaffScheduleSelect'];
+      document.querySelectorAll('select').forEach((sel) => {
+        enhanceMinimalSelect(sel, {
+          exclude: ['MAPEMALL', 'digimap.co.id'],
+          titleCase: staffSelectIds.includes(sel.id)
+        });
+      });
     });
-
-    textEl.textContent = selectedLabel || 'Pilih Nama Kamu';
-    trigger.classList.toggle('is-placeholder', !hasValue);
-  }
-
-  trigger.addEventListener('click', (e) => {
-    e.stopPropagation();
-    document.querySelectorAll('.m-select.is-open').forEach(el => {
-      if (el !== wrapper) el.classList.remove('is-open');
-    });
-    wrapper.classList.toggle('is-open');
-  });
-
-  document.addEventListener('click', (e) => {
-    if (!wrapper.contains(e.target)) wrapper.classList.remove('is-open');
-  });
-
-  // Otomatis update saat opsi nama diisi dari server
-  const observer = new MutationObserver(renderOptions);
-  observer.observe(selectEl, { childList: true, subtree: true, attributes: true });
-
-  renderOptions();
-}
-
-// Terapkan ke semua dropdown di halaman (termasuk Slip Gaji & Ganti PIN)
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('select').forEach((sel) => {
-    enhanceMinimalSelect(sel, {
-      exclude: ['MAPEMALL', 'digimap.co.id'],
-      titleCase: true
-    });
-  });
-});
-</script>
-
-  
+  </script>
 </body>
 </html>
