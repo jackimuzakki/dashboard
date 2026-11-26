@@ -360,6 +360,134 @@
 
     .btn-back-bottom { width: 100%; margin-top: 22px; background: var(--card-bg); color: var(--primary); border: 1px solid var(--primary); padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: 0.2s; }
     .btn-back-bottom:hover { background: var(--primary-soft); }
+
+    /* Minimalist Custom Dropdown */
+.m-select {
+  position: relative;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+}
+
+.m-select-trigger {
+  width: 100%;
+  height: 46px;
+  padding: 0 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  color: #1E293B;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.m-select-trigger:hover {
+  background: #FFFFFF;
+  border-color: #CBD5E1;
+}
+
+.m-select.is-open .m-select-trigger {
+  background: #FFFFFF;
+  border-color: #1D63DC;
+  box-shadow: 0 0 0 3px rgba(29, 99, 220, 0.12);
+}
+
+.m-select-trigger.is-placeholder .m-select-text {
+  color: #94A3B8;
+  font-weight: 400;
+}
+
+.m-select-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.m-select-arrow {
+  flex-shrink: 0;
+  color: #64748B;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.m-select.is-open .m-select-arrow {
+  transform: rotate(180deg);
+  color: #1D63DC;
+}
+
+.m-select-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 999;
+  max-height: 230px;
+  overflow-y: auto;
+  padding: 6px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 14px;
+  box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.12), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px) scale(0.98);
+  transform-origin: top center;
+  transition: opacity 0.16s ease, transform 0.16s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.16s;
+}
+
+.m-select.is-open .m-select-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+/* Scrollbar tipis & bersih */
+.m-select-menu::-webkit-scrollbar {
+  width: 5px;
+}
+.m-select-menu::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 99px;
+}
+
+.m-select-item {
+  width: 100%;
+  padding: 9px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border: none;
+  background: transparent;
+  border-radius: 9px;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.14s ease, color 0.14s ease;
+}
+
+.m-select-item:hover {
+  background: #F1F5F9;
+  color: #0F172A;
+}
+
+.m-select-item.is-selected {
+  background: #EFF6FF;
+  color: #1D63DC;
+  font-weight: 600;
+}
+
+.m-select-item.is-muted {
+  color: #94A3B8;
+  font-weight: 400;
+}
   </style>
 </head>
 <body>
@@ -3387,6 +3515,120 @@
       loadDashboardData();
       loadBiodataData();
     });
-  </script>
+  <script>
+function enhanceMinimalSelect(selectEl, options = {}) {
+  if (!selectEl || selectEl.dataset.enhanced === 'true') return;
+  selectEl.dataset.enhanced = 'true';
+
+  const excludeList = (options.exclude || []).map(s => s.toLowerCase());
+  const formatTitle = options.titleCase !== false;
+
+  const toLabel = (text) => {
+    if (!formatTitle) return text;
+    return text.toLowerCase().replace(/\b\w/g, c => c.toUpperCase());
+  };
+
+  selectEl.style.display = 'none';
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'm-select';
+  selectEl.parentNode.insertBefore(wrapper, selectEl.nextSibling);
+
+  const trigger = document.createElement('button');
+  trigger.type = 'button';
+  trigger.className = 'm-select-trigger is-placeholder';
+  trigger.innerHTML = `
+    <span class="m-select-text">Pilih Nama Kamu</span>
+    <svg class="m-select-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="6 9 12 15 18 9"></polyline>
+    </svg>
+  `;
+
+  const menu = document.createElement('div');
+  menu.className = 'm-select-menu';
+
+  wrapper.appendChild(trigger);
+  wrapper.appendChild(menu);
+
+  const textEl = trigger.querySelector('.m-select-text');
+
+  function renderOptions() {
+    menu.innerHTML = '';
+    const opts = Array.from(selectEl.options);
+    let selectedLabel = '';
+    let hasValue = false;
+
+    opts.forEach((opt) => {
+      const rawVal = opt.value;
+      const rawText = opt.textContent.trim();
+      if (rawVal && excludeList.includes(rawVal.toLowerCase())) return;
+
+      const isPlaceholder = !rawVal;
+      const label = isPlaceholder ? rawText : toLabel(rawText);
+
+      if (opt.selected) {
+        selectedLabel = label;
+        hasValue = !isPlaceholder;
+      }
+
+      const item = document.createElement('button');
+      item.type = 'button';
+      item.className = 'm-select-item'
+        + (opt.selected ? ' is-selected' : '')
+        + (isPlaceholder ? ' is-muted' : '');
+      item.innerHTML = `
+        <span>${label}</span>
+        ${opt.selected && !isPlaceholder ? `
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+          </svg>
+        ` : ''}
+      `;
+
+      item.addEventListener('click', () => {
+        selectEl.value = rawVal;
+        selectEl.dispatchEvent(new Event('change', { bubbles: true }));
+        wrapper.classList.remove('is-open');
+        renderOptions();
+      });
+
+      menu.appendChild(item);
+    });
+
+    textEl.textContent = selectedLabel || 'Pilih Nama Kamu';
+    trigger.classList.toggle('is-placeholder', !hasValue);
+  }
+
+  trigger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    document.querySelectorAll('.m-select.is-open').forEach(el => {
+      if (el !== wrapper) el.classList.remove('is-open');
+    });
+    wrapper.classList.toggle('is-open');
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!wrapper.contains(e.target)) wrapper.classList.remove('is-open');
+  });
+
+  // Otomatis update saat opsi nama diisi dari server
+  const observer = new MutationObserver(renderOptions);
+  observer.observe(selectEl, { childList: true, subtree: true, attributes: true });
+
+  renderOptions();
+}
+
+// Terapkan ke semua dropdown di halaman (termasuk Slip Gaji & Ganti PIN)
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('select').forEach((sel) => {
+    enhanceMinimalSelect(sel, {
+      exclude: ['MAPEMALL', 'digimap.co.id'],
+      titleCase: true
+    });
+  });
+});
+</script>
+
+  
 </body>
 </html>
